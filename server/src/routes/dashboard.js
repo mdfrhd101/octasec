@@ -24,6 +24,11 @@ const DAY = 86400000;
 const STALE_DAYS = 90;
 const EXPIRY_WINDOW_DAYS = 30;
 const PIPE = ["requested", "assigned", "in_progress", "delivered"];
+// audit actions a platform operator must see on the Overview
+export const SECURITY_EVENTS = [
+  "auth.login_fail", "auth.rate_limited", "auth.reset_fail", "auth.verify_fail", "auth.password_change_fail",
+  "user.disable", "user.delete", "user.password_reset", "company.suspend", "company.delete",
+];
 
 function scoreFrom(sev) {
   let penalty = 0;
@@ -137,9 +142,10 @@ async function opsBlocks() {
     ]),
     Company.find().sort({ createdAt: -1 }).limit(1000).select("name profile status").lean(),
     Client.countDocuments({ $or: [{ "authorization.onFile": { $ne: true } }, { "authorization.validUntil": { $lt: new Date(new Date().setUTCHours(0, 0, 0, 0)) } }] }),
-    AuditLog.find({ action: { $in: ["auth.login_fail", "user.disable", "user.password_reset", "company.suspend"] } })
+    AuditLog.find({ action: { $in: SECURITY_EVENTS } })
       .sort({ createdAt: -1 }).limit(8).select("action actorEmail targetLabel ip createdAt").lean(),
-    User.aggregate([{ $group: { _id: "$role", n: { $sum: 1 } } }]),
+    // accounts that never confirmed their email are not "clients" yet — counted separately
+    User.aggregate([{ $match: { status: { $ne: "pending" } } }, { $group: { _id: "$role", n: { $sum: 1 } } }]),
     Domain.countDocuments({ verified: true }),
   ]);
   const cname = Object.fromEntries(companies.map((c) => [String(c._id), c.name]));
@@ -165,9 +171,11 @@ async function opsBlocks() {
     onboarding: {
       incompleteCompanies: incomplete.length, companies: incomplete.slice(0, 5),
       clientsWithoutAuthorization: badAuthClients,
+      pendingSignups: await User.countDocuments({ status: "pending" }),
     },
     securityEvents: events.map((e) => ({ action: e.action, actor: e.actorEmail || "—", target: e.targetLabel || "", ip: e.ip || "", at: e.createdAt })),
     totals: { companies: companies.length, users: countBy(users), verifiedDomains: verified },
+    generatedAt: new Date(),
   };
 }
 

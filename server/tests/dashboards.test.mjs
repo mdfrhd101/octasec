@@ -25,6 +25,16 @@ chk("security events list", Array.isArray(a.ops?.securityEvents), true);
 chk("totals companies", typeof a.ops?.totals?.companies, "number");
 chk("posture still present", typeof a.score, "number");
 
+console.log("--- super admin reflects deletions, pending signups and freshness ---");
+const tmp = await J("POST", "/admin/companies", { name: "Gone Co " + Date.now(), adminEmail: `gone${Date.now()}@test.com` }, admin);
+await J("DELETE", `/admin/companies/${tmp.j.company.id}`, null, admin);
+await J("POST", "/auth/register", { email: `pend${Date.now()}@test.com`, password: "Pending-Signup-1" });
+const a2 = (await J("GET", "/dashboard", null, admin)).j;
+chk("company deletion shows in security events", a2.ops.securityEvents.some((e) => e.action === "company.delete"), true);
+chk("pending signups counted", a2.ops.onboarding.pendingSignups >= 1, true);
+chk("pending signups not counted as clients", a2.ops.totals.users.client, a.ops.totals.users.client);
+chk("generatedAt timestamp present", typeof a2.ops.generatedAt, "string");
+
 console.log("--- company admin ---");
 const c = (await J("GET", "/dashboard", null, ca)).j;
 chk("no ops for company", c.ops, undefined);

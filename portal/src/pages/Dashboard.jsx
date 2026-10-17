@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { get } from "../api.js";
 import { useAuth } from "../auth.jsx";
@@ -10,7 +10,15 @@ import { AUTH_CHIP } from "../profileOptions.js";
 // Every block answers a question the role actually asks — docs/PORTAL_DATA_AND_DASHBOARDS.md §4.
 const SEV_CLASS = { critical: "c", high: "h", medium: "m", low: "l" };
 const SCORE_COLOR = { Strong: "var(--green)", Good: "var(--gold)", Fair: "var(--warn)", "At risk": "var(--red)" };
-const ACTION_LABEL = { "auth.login_fail": "Failed sign-in", "user.disable": "User disabled", "user.password_reset": "Password reset", "company.suspend": "Company suspended" };
+const ACTION_LABEL = {
+  "auth.login_fail": "Failed sign-in", "auth.rate_limited": "Rate-limited", "auth.reset_fail": "Bad reset link",
+  "auth.verify_fail": "Bad confirm link", "auth.password_change_fail": "Wrong current password",
+  "user.disable": "User disabled", "user.delete": "User deleted", "user.password_reset": "Password reset",
+  "company.suspend": "Company suspended", "company.delete": "Company deleted",
+};
+const SEVERE = new Set(["user.disable", "user.delete", "company.suspend", "company.delete"]);
+const REFRESH_MS = 60000;
+const fmtHours = (h) => (h == null ? "—" : h < 1 ? "< 1 h" : h < 48 ? h + " h" : Math.round(h / 24) + " d");
 
 function timeAgo(iso) {
   if (!iso) return "never";
@@ -27,13 +35,28 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [d, setD] = useState(null);
   const [err, setErr] = useState("");
-  useEffect(() => { (async () => { try { setD(await get("/dashboard")); } catch (e) { setErr(e.message); } })(); }, []);
+  const [at, setAt] = useState(null);
+  const load = useCallback(async () => {
+    try { setD(await get("/dashboard")); setAt(new Date()); setErr(""); } catch (e) { setErr(e.message); }
+  }, []);
+  // live: refresh every minute while the tab is visible, and immediately when it becomes visible again
+  useEffect(() => {
+    load();
+    const t = setInterval(() => { if (document.visibilityState === "visible") load(); }, REFRESH_MS);
+    const onVis = () => { if (document.visibilityState === "visible") load(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(t); document.removeEventListener("visibilitychange", onVis); };
+  }, [load]);
 
   const title = user.role === "super_admin" ? "Overview" : "Dashboard";
-  if (err) return <Shell title={title}><Empty>{err}</Empty></Shell>;
+  if (err && !d) return <Shell title={title}><Empty>{err}</Empty></Shell>;
   if (!d) return <Shell title={title}><div style={{ padding: 30 }}><Spinner /></div></Shell>;
   return (
     <Shell title={title}>
+      <div className="refresh-line">
+        <span>Live · updated {at ? at.toLocaleTimeString() : "—"} · refreshes every minute{err ? " · last refresh failed" : ""}</span>
+        <button className="btn ghost sm" onClick={load}>Refresh now</button>
+      </div>
       {user.role === "super_admin" ? <Ops d={d} /> : <Tenant d={d} role={user.role} />}
     </Shell>
   );
@@ -51,7 +74,7 @@ function Ops({ d }) {
         <Tile k="Waiting > 24 h" v={o.queue.unassigned24} gold={o.queue.unassigned24 > 0} />
         <Tile k="In progress" v={o.pipeline.assigned + o.pipeline.in_progress} />
         <Tile k="Delivered this month" v={o.pipeline.deliveredThisMonth} />
-        <Tile k="Avg turnaround" v={o.turnaroundHours == null ? "—" : o.turnaroundHours < 48 ? o.turnaroundHours + " h" : Math.round(o.turnaroundHours / 24) + " d"} />
+        <Tile k="Avg turnaround (30 d)" v={fmtHours(o.turnaroundHours)} />
         <Tile k="New leads (7 d)" v={o.leads.last7d} />
       </div>
 
@@ -61,7 +84,7 @@ function Ops({ d }) {
           {o.queue.oldest.length ? o.queue.oldest.map((e) => (
             <div className="alertrow" key={e.id}>
               <span><b className="mono">{e.domainName}</b><br /><span className="dimtxt">{e.tenant}</span></span>
-              <span className={"chip " + (e.ageHours >= 24 ? "red" : "warn")}>waiting {e.ageHours < 48 ? e.ageHours + " h" : Math.round(e.ageHours / 24) + " d"}</span>
+              <span className={"chip " + (e.ageHours >= 24 ? "red" : "warn")}>waiting {fmtHours(e.ageHours)}</span>
             </div>
           )) : <Empty>Nothing waiting — the queue is clear.</Empty>}
         </div>
@@ -91,6 +114,7 @@ function Ops({ d }) {
           <h3>Onboarding gaps<span className="sp"><button className="btn ghost sm" onClick={() => nav("/admin/companies")}>Companies</button></span></h3>
           <div className="alertrow"><span>Companies with incomplete profiles</span><b className="mono">{o.onboarding.incompleteCompanies}</b></div>
           <div className="alertrow"><span>Clients without a valid authorisation to test</span><b className="mono">{o.onboarding.clientsWithoutAuthorization}</b></div>
+          <div className="alertrow"><span>Sign-ups awaiting email confirmation</span><b className="mono">{o.onboarding.pendingSignups ?? 0}</b></div>
           {o.onboarding.companies.map((c) => (
             <div className="alertrow" key={c.id}><span className="dimtxt">{c.name}</span><span className="chip warn">{c.pct}% complete</span></div>
           ))}
@@ -102,7 +126,7 @@ function Ops({ d }) {
           <h3>Security events<span className="sp"><button className="btn ghost sm" onClick={() => nav("/admin/audit")}>Audit log</button></span></h3>
           {o.securityEvents.length ? o.securityEvents.map((e, i) => (
             <div className="alertrow" key={i}>
-              <span><span className={"chip " + (e.action === "auth.login_fail" ? "warn" : "red")}>{ACTION_LABEL[e.action] || e.action}</span> <span className="mono dim">{e.target || e.actor}</span></span>
+              <span><span className={"chip " + (SEVERE.has(e.action) ? "red" : "warn")}>{ACTION_LABEL[e.action] || e.action}</span> <span className="mono dim">{e.target || (e.actor !== "—" ? e.actor : "unknown account")}</span></span>
               <span className="when">{e.ip ? e.ip + " · " : ""}{timeAgo(e.at)}</span>
             </div>
           )) : <Empty>No security events.</Empty>}
