@@ -130,8 +130,24 @@ export default function SiteMotion() {
     const rvs = Array.prototype.slice.call(
       document.querySelectorAll(".rv, .stagger, .dash-tbl")
     ) as HTMLElement[];
+    function countUp(root: HTMLElement) {
+      root.querySelectorAll<HTMLElement>("[data-count]").forEach((n) => {
+        const to = Number(n.dataset.count) || 0;
+        if (reduce || to === 0 || n.dataset.counted) return;
+        n.dataset.counted = "1";
+        const t0 = performance.now(), dur = 1400;
+        const step = (t: number) => {
+          const k = Math.min(1, (t - t0) / dur);
+          n.textContent = String(Math.round(to * (1 - Math.pow(2, -10 * k))));
+          if (k < 1) requestAnimationFrame(step); else n.textContent = String(to);
+        };
+        n.textContent = "0";
+        requestAnimationFrame(step);
+      });
+    }
     function reveal(el: HTMLElement) {
       el.classList.add("in");
+      countUp(el);
       if (el.classList.contains("stagger")) {
         const c = el.children;
         for (let i = 0; i < c.length; i++)

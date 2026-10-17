@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import "lenis/dist/lenis.css";
 import "./globals.css";
+import "./landing-v2.css";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import SiteMotion from "./components/SiteMotion";
+import SmoothScroll from "./components/SmoothScroll";
 import { SITE_URL, PLAUSIBLE_DOMAIN } from "./site";
 
 const KEYWORDS = [
@@ -52,7 +55,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Share+Tech+Mono&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap"
         />
         {/* Plausible analytics (privacy-friendly, cookieless) — only when configured at build time */}
         {PLAUSIBLE_DOMAIN ? (
@@ -65,6 +68,7 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <SiteMotion />
+        <SmoothScroll />
       </body>
     </html>
   );

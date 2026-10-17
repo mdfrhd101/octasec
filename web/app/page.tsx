@@ -1,136 +1,91 @@
 import Link from "next/link";
 import Hero from "./components/Hero";
-import SectionHead from "./components/SectionHead";
-import Card from "./components/Card";
+import HeroTerminal from "./components/HeroTerminal";
+import MethodChapters from "./components/MethodChapters";
 import DifferentiatorTable from "./components/DifferentiatorTable";
 import FinalCTA from "./components/FinalCTA";
+
+// landing page v2 — docs/LANDING_DESIGN_V2.md
+const STATS: [number, string, string][] = [
+  [104, "", "public benchmark apps"],
+  [90, "+", "offensive technique modules"],
+  [100, "%", "findings human-verified"],
+  [0, "", "findings auto-submitted"],
+];
+
+const PILLARS = [
+  { k: "01", t: "The attacks others miss", d: "Business logic, auth flows, race conditions, multi-step chains — the classes scanners are structurally blind to. Every parameter, state transition and trust boundary.", c: ["Logic flaws", "Auth & roles", "Chains"] },
+  { k: "02", t: "Proof, not noise", d: "Every finding is a case file: the attack path, a working reproduction, the decision log and developer-ready remediation. If we can't prove it, we don't report it.", c: ["Reproduction", "Evidence", "Fix guidance"] },
+  { k: "03", t: "Human-gated, always", d: "AI does the grinding. A named human operator verifies, writes and signs every report. Nothing is auto-submitted. Ever.", c: ["Named operator", "Signed report", "Full audit log"], v: true },
+];
 
 export default function HomePage() {
   return (
     <>
       <Hero />
 
-      <section className="wrap rv" style={{ paddingBlock: "clamp(26px,4vw,44px)" }}>
-        <div className="complybar stagger">
-          <span className="cb-lbl">Proof</span>
-          <span className="cb-item">104-app public benchmark suite</span>
-          <span className="cb-item">90+ technique modules</span>
-          <span className="cb-item">100% human-verified findings</span>
-          <span className="cb-item">Every action logged</span>
+      <section className="wrap proof-strip rv" id="proof" aria-label="OctaSec in numbers">
+        {STATS.map(([n, suf, l]) => (
+          <div key={l} className="pstat">
+            <b><span data-count={n}>{n}</span>{suf}</b>
+            <span>{l}</span>
+          </div>
+        ))}
+      </section>
+
+      <section className="wrap problem2" id="problem">
+        <div className="rv">
+          <span className="eyebrow">The problem</span>
+          <h2 className="mh big-statement">
+            Your last &ldquo;pentest&rdquo; was a scanner PDF with a logo on top.
+          </h2>
+          <p className="lead">
+            Affordable pentests find what&apos;s known and miss what&apos;s specific to
+            your app. Real breaches chain three boring bugs into one critical incident.
+            Scanners don&apos;t chain anything &mdash; OctaSec does, and proves it.
+          </p>
+        </div>
+        <div className="rv problem-term">
+          <HeroTerminal />
         </div>
       </section>
 
-      <section className="wrap center rv" id="problem">
-        <SectionHead
-          eyebrow="The problem"
-          title={<>Your last &ldquo;pentest&rdquo; was a scanner PDF.</>}
-          center
-        />
-        <p className="lead">
-          Most affordable pentests are automated scans with a logo on top. They
-          find what&apos;s known, miss what&apos;s specific to your app, and never
-          prove impact. Real breaches chain three boring bugs into one critical
-          incident. Scanners don&apos;t chain anything.
-        </p>
-      </section>
-
-      <section className="wrap center rv" id="solution">
-        <SectionHead eyebrow="The difference" title="Proof, not noise." center />
-        <div className="blocks c3 stagger">
-          <Card className="cov">
-            <h4>The attacks others miss</h4>
-            <p>
-              Business logic, auth flows, race conditions, multi-step chains
-              &mdash; the classes scanners are structurally blind to. Every
-              parameter, every state transition, every trust boundary.
-            </p>
-          </Card>
-          <Card className="cov">
-            <h4>Proof, not noise</h4>
-            <p>
-              Every finding is a complete case file: the chained attack path, a
-              working reproduction, the decision log, and developer-ready
-              remediation. If we can&apos;t prove it, we don&apos;t report it.
-            </p>
-          </Card>
-          <Card className="cov">
-            <h4>Human-gated, always</h4>
-            <p>
-              AI does the grinding. A named human operator verifies, writes, and
-              signs every report. Nothing is auto-submitted. Ever.
-            </p>
-          </Card>
+      <section className="pillars" id="solution">
+        <div className="pillars-mark" aria-hidden="true">PROOF</div>
+        <div className="wrap">
+          <div className="rv sec-left">
+            <span className="eyebrow">The difference</span>
+            <h2 className="mh">Depth of a red team. Discipline of an audit.</h2>
+          </div>
+          <div className="pillar-grid stagger">
+            {PILLARS.map((p) => (
+              <article key={p.k} className={"card glass pillar" + (p.v ? " verified" : "")}>
+                <span className="pk">{p.k}</span>
+                <h3>{p.t}</h3>
+                <p>{p.d}</p>
+                <div className="pchips">{p.c.map((x) => <span key={x}>{x}</span>)}</div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="wrap center rv" id="how">
-        <SectionHead
-          eyebrow="How it works"
-          title={<>Scope &rarr; Map &rarr; Hunt &rarr; Prove.</>}
-          text="You define the target; the engine does the thousands of hours of grinding; humans do the judgment."
-          center
-        />
-        <div className="steps stagger">
-          <Card className="st">
-            <div className="sn">01</div>
-            <h3>Scope</h3>
-            <p>
-              You define assets and rules of engagement; we both sign. Scope is
-              enforced at the network level, not just on paper.
-            </p>
-          </Card>
-          <Card className="st">
-            <div className="sn">02</div>
-            <h3>Map</h3>
-            <p>
-              Subdomains, ports, services, JS-hidden endpoints, technology
-              fingerprinting, cloud assets, leaked secrets.
-            </p>
-          </Card>
-          <Card className="st">
-            <div className="sn">03</div>
-            <h3>Hunt</h3>
-            <p>
-              90+ offensive technique modules selected per feature by the engine
-              &mdash; never sprayed. Multi-account, multi-role.
-            </p>
-          </Card>
-          <Card className="st">
-            <div className="sn">04</div>
-            <h3>Prove &amp; report</h3>
-            <p>
-              Minimum-impact proofs, human review, then a case-file report. Retest
-              included.
-            </p>
-          </Card>
-        </div>
-        <div className="hero-cta" style={{ justifyContent: "center", marginTop: 30 }}>
-          <Link className="link" href="/how-it-works">
-            See the full method <span className="ar">&rarr;</span>
-          </Link>
-        </div>
-      </section>
+      <MethodChapters />
 
       <section className="wrap rv" id="pricing-anchor">
-        <SectionHead
-          eyebrow="Pricing"
-          title="Priced for the companies attackers actually target."
-          center
-        />
-        <div className="anchorb">
-          <p className="lead">
-            A traditional deep pentest costs $15&ndash;40k and takes weeks. OctaSec
-            engagements start at a fraction of that, finish in days, and include a
-            free retest. Contact us for a scoped quote &mdash; fixed price, no
-            surprises.
-          </p>
-          <div className="hero-cta">
-            <Link className="btn btn-white" href="/contact">
-              Get a scoped quote
-            </Link>
-            <Link className="link" href="/services">
-              Browse services <span className="ar">&rarr;</span>
-            </Link>
+        <div className="anchor2 card glass">
+          <div>
+            <span className="eyebrow">Pricing</span>
+            <h2 className="mh">Priced for the companies attackers actually target.</h2>
+            <p className="lead">
+              A traditional deep pentest costs $15&ndash;40k and takes weeks. OctaSec
+              engagements start at a fraction of that, finish in days, and include a
+              free retest. Fixed price for the agreed scope &mdash; no surprises.
+            </p>
+          </div>
+          <div className="anchor2-cta">
+            <Link className="btn btn-white" href="/pricing">See engagement models</Link>
+            <Link className="btn btn-ghost" href="/contact">Get a scoped quote</Link>
           </div>
         </div>
       </section>

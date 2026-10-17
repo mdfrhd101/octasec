@@ -46,7 +46,8 @@ function QuoteModal({ plan, onClose }: { plan: Plan; onClose: () => void }) {
     window.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden"; // no background scroll while the dialog is open
-    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
+    window.__lenis?.stop(); // smooth scroll (SmoothScroll.tsx) must pause too
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; window.__lenis?.start(); };
   }, [onClose]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -69,7 +70,7 @@ function QuoteModal({ plan, onClose }: { plan: Plan; onClose: () => void }) {
 
   return (
     // a click on the backdrop does NOT close the dialog — typed text is never lost by accident
-    <div className="qmodal" role="dialog" aria-modal="true" aria-labelledby="qmodal-title">
+    <div className="qmodal" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="qmodal-title">
       <div className="qcard card">
         <button type="button" className="qx" onClick={onClose} aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
