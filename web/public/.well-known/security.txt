@@ -1,0 +1,6 @@
+Contact: mailto:security@octasec.ai
+Contact: mailto:hassan@octagramltd.com
+Preferred-Languages: en, bn
+Canonical: https://octasec.ai/.well-known/security.txt
+Policy: https://octasec.ai/legal/#disclosure
+Expires: 2027-10-15T00:00:00.000Z

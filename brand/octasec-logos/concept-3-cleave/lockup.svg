@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 200" width="660" height="200" role="img" aria-label="OctaSec">
+  <defs>
+    <linearGradient id="c3a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbe7a6"/>
+      <stop offset=".45" stop-color="#f6dd8d"/>
+      <stop offset="1" stop-color="#ecc96a"/>
+    </linearGradient>
+    <linearGradient id="c3b" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b78e22"/>
+      <stop offset=".5" stop-color="#9a7a1c"/>
+      <stop offset="1" stop-color="#6e5212"/>
+    </linearGradient>
+  </defs>
+  <rect width="660" height="200" fill="#04080b"/>
+  <g transform="translate(28 28) scale(.5625)">
+    <path fill="#4f3a0c" d="M85 30h86l61 61v86l-61 61H85l-61-61V91Z"/>
+    <path fill="#1c1405" d="M85 18h86l61 61v86l-61 61H85l-61-61V79Z"/>
+    <path fill="#1c1405" d="M50.5 191.5l8 8v12l-8-8Z"/>
+    <path fill="url(#c3a)" d="M85 18h86l26.5 26.5-147 147L24 165V79Z"/>
+    <path fill="url(#c3b)" d="M205.5 52.5L232 79v86l-61 61H85l-26.5-26.5Z"/>
+    <path stroke="#45e0a8" stroke-width="8" stroke-opacity=".25" d="M201.5 48.5 54.5 195.5"/>
+    <path stroke="#45e0a8" stroke-width="2" d="M201.5 48.5 54.5 195.5"/>
+  </g>
+  <text x="204" y="130" font-family="'Chakra Petch','Share Tech Mono',Consolas,monospace" font-weight="700" font-size="84" letter-spacing="7" fill="#f9f0d4">OCTA<tspan fill="#e8c15a">SEC</tspan></text>
+</svg>

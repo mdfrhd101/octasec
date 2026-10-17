@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="OctaSec">
+  <defs>
+    <radialGradient id="g">
+      <stop offset="0" stop-color="#45e0a8" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#45e0a8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="256" height="256" rx="48" fill="#04080b"/>
+  <g stroke="#04080b" stroke-width="3" stroke-linejoin="round">
+    <path fill="#f6dd8d" d="M24 85 85 24l61 60h-36Z"/>
+    <path fill="#ecc96a" d="M85 24h86l1 86-26-26Z"/>
+    <path fill="#d9b045" d="M171 24l61 61-60 61v-36Z"/>
+    <path fill="#b78e22" d="M232 85v86l-86 1 26-26Z"/>
+    <path fill="#8f6d18" d="M232 171l-61 61-61-60h36Z"/>
+    <path fill="#a98320" d="M171 232H85l-1-86 26 26Z"/>
+    <path fill="#cfa63d" d="M85 232l-61-61 60-61v36Z"/>
+    <path fill="#e8c15a" d="M24 171V85l86-1-26 26Z"/>
+  </g>
+  <circle cx="128" cy="128" r="34" fill="url(#g)"/>
+  <circle cx="128" cy="128" r="10" fill="#45e0a8"/>
+</svg>

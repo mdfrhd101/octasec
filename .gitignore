@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# secrets — never commit
+.env
+.env.*
+!.env.example
+.gemini_key
+*.pem
+*.key
+
+# build output (rebuilt from source)
+web/.next/
+web/out/
+portal/dist/
+*.tsbuildinfo
+
+# large generated media / archives
+breach_frames/
+brand/*.zip
+
+# local tooling
+.claude/
+*.log
+.DS_Store
+Thumbs.db
