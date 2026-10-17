@@ -46,7 +46,7 @@ export default function ContactForm() {
         <p className="cnote">
           Replies within one business day. Scoping calls are free &mdash; and honest.
           <br />
-          Email <span style={{ color: "var(--gold)" }}>hassan@octagramltd.com</span> &middot; Dhaka &middot; 10am&ndash;8pm
+          Email <a href="mailto:support@octasec.com" style={{ color: "var(--gold)" }}>support@octasec.com</a> &middot; Call <a href="tel:+8801326875385" style={{ color: "var(--gold)" }}>+880 1326-875385</a> &middot; Dhaka &middot; 10am&ndash;8pm
         </p>
       </>
     );
@@ -82,7 +82,7 @@ export default function ContactForm() {
       <p className="cnote">
         Replies within one business day. Scoping calls are free &mdash; and honest.
         <br />
-        Email <span style={{ color: "var(--gold)" }}>hassan@octagramltd.com</span> &middot; Dhaka &middot; 10am&ndash;8pm
+        Email <a href="mailto:support@octasec.com" style={{ color: "var(--gold)" }}>support@octasec.com</a> &middot; Call <a href="tel:+8801326875385" style={{ color: "var(--gold)" }}>+880 1326-875385</a> &middot; Dhaka &middot; 10am&ndash;8pm
       </p>
     </>
   );

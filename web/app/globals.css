@@ -488,3 +488,24 @@ input:-webkit-autofill:active{
 .pr .amt small{display:block;margin-top:4px}
 /* section labels are pills, not full-width bars (the older display:block rule predates the pill style) */
 .section-head .eyebrow{display:inline-flex}
+
+/* ---- footer bottom: copyright · socials · back to top + oversized wordmark ---- */
+footer{overflow:hidden}
+.foot-contact{display:grid;gap:6px;margin-top:16px}
+.foot-contact a{font-family:var(--m);font-size:13.5px;color:var(--text);width:max-content}
+.foot-contact a:hover{color:var(--gold)}
+.foot-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;margin-top:36px;padding-top:24px;border-top:1px solid var(--line)}
+.foot-copy{font-size:13.5px;color:var(--muted)}
+.foot-copy a{color:var(--muted);text-decoration:underline;text-underline-offset:4px}
+.foot-copy a:hover{color:var(--gold)}
+.foot-social{display:flex;gap:12px;justify-content:center}
+.foot-social a{width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.16);display:grid;place-items:center;color:var(--muted);transition:color .2s,border-color .2s,background .2s,transform .2s}
+.foot-social a:hover{color:var(--gold);border-color:rgba(232,193,90,.5);background:rgba(232,193,90,.06);transform:translateY(-2px)}
+.foot-social svg{width:18px;height:18px}
+.to-top{justify-self:end;display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:transparent;color:var(--text);font-family:var(--m);font-size:14px;letter-spacing:.04em;cursor:pointer;transition:border-color .2s,color .2s}
+.to-top:hover{border-color:rgba(232,193,90,.5);color:var(--gold)}
+.foot-mark{font-family:var(--d);font-weight:700;font-size:clamp(4.5rem,20.5vw,19rem);line-height:.8;letter-spacing:.01em;text-align:center;white-space:nowrap;margin:54px 0 -0.24em;user-select:none;pointer-events:none;
+  background:linear-gradient(180deg,#8f7a46 0%,#6c5626 55%,rgba(40,30,10,.15) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1px rgba(232,193,90,.18)}
+@media(max-width:820px){.foot-bar{grid-template-columns:1fr;justify-items:center;text-align:center}.to-top{justify-self:center}}
+footer{padding-bottom:0}
+.foot-mark{margin-bottom:-0.34em}

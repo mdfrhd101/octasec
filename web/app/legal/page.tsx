@@ -5,7 +5,7 @@ import FinalCTA from "../components/FinalCTA";
 export const metadata: Metadata = {
   title: "OctaSec — Legal",
   description:
-    "Authorized testing only. Responsible disclosure and security.txt.",
+    "Authorized testing only. Privacy, terms, responsible disclosure and security.txt.",
   alternates: { canonical: "/legal" },
 };
 
@@ -31,12 +31,40 @@ export default function LegalPage() {
             Found a security issue in OctaSec or octasec.ai itself? Report it in
             good faith and we&apos;ll work with you. Please give us reasonable time
             to remediate before any public disclosure. Contact{" "}
-            <code>security@octasec.ai</code>.
+            <a href="mailto:support@octasec.com" style={{ color: "var(--gold)" }}>support@octasec.com</a> (subject: &ldquo;Security&rdquo;).
           </p>
           <h3>security.txt</h3>
           <p>
             Our machine-readable security contact lives at{" "}
             <code>/.well-known/security.txt</code>.
+          </p>
+          <h3 id="privacy">Privacy</h3>
+          <p>
+            We collect only what we need to run your engagements: the details you
+            send through our contact and quote forms; your account, organisation
+            and contact details in the portal; and the scope, findings and reports
+            of the tests you request. We use them to respond to you, deliver and
+            support the service, and keep an audit trail of security-relevant
+            actions. We do not sell your data. Test findings are visible only to
+            your organisation and to OctaSec operators working on your engagement.
+            To access, correct or delete your data, email{" "}
+            <a href="mailto:support@octasec.com" style={{ color: "var(--gold)" }}>support@octasec.com</a>.
+          </p>
+          <h3 id="terms">Terms</h3>
+          <p>
+            OctaSec services are provided by Octagram Limited, Dhaka. Testing is
+            performed only on assets you own or are authorized to test, under
+            signed rules of engagement. Quotes are fixed for the agreed scope;
+            changes to scope are quoted separately before work starts. Reports are
+            confidential to your organisation. The full service agreement is
+            shared with every quote and signed before any engagement begins.
+          </p>
+          <h3>Contact</h3>
+          <p>
+            Email{" "}
+            <a href="mailto:support@octasec.com" style={{ color: "var(--gold)" }}>support@octasec.com</a>
+            {" "}&middot; Phone{" "}
+            <a href="tel:+8801326875385" style={{ color: "var(--gold)" }}>+880 1326-875385</a>
           </p>
           <h3>Rules of engagement</h3>
           <p>

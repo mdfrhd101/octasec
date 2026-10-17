@@ -1,5 +1,5 @@
-Contact: mailto:security@octasec.ai
-Contact: mailto:hassan@octagramltd.com
+Contact: mailto:support@octasec.com
+Contact: tel:+8801326875385
 Preferred-Languages: en, bn
 Canonical: https://octasec.ai/.well-known/security.txt
 Policy: https://octasec.ai/legal/#disclosure

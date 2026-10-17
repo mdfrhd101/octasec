@@ -115,8 +115,8 @@ change: redeploy `server/` and `pm2 reload octasec-api`.
   bound to localhost; optionally upgrade to Vite 6/7 later.
 - **Analytics**: pages carry a Plausible tag (`data-domain="octasec.ai"`).
   Create the site in Plausible or remove the tag.
-- **Email**: contact + security.txt use `hassan@octagramltd.com` /
-  `security@octasec.ai`. Swap to real OctaSec addresses when mail routing is live.
+- **Contact**: site, legal page and security.txt use `support@octasec.com` and
+  `+8801326875385` (footer, contact page, quote popup notes).
 - **Sessions**: the API re-checks the user in the DB on every request and
   revokes tokens on password change/reset/disable (see SECURITY_AUDIT.md round 4).
 - **Tests**: `cd server && npm test` runs all API suites against an isolated
