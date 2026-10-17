@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { get, post } from "../api.js";
 import Shell from "../components/Shell.jsx";
 import { Modal, Spinner, Empty } from "../ui.jsx";
-import { EngStatus, FindingsTable } from "../components/Engagement.jsx";
+import { EngStatus, FindingsTable, ScopingView, SEV_CLASS } from "../components/Engagement.jsx";
 
 const FILTERS = ["open", "requested", "assigned", "in_progress", "delivered", "all"];
 
@@ -53,6 +53,41 @@ export default function AdminEngagements() {
   );
 }
 
+const REVIEW_CHIP = { pending: ["warn", "Pending review"], verified: ["green", "Verified"], rejected: ["red", "Rejected"] };
+
+// the human gate: the assigned operator verifies or rejects each finding before sign-off
+function ReviewList({ e, busy, onReview }) {
+  const pending = e.findings.filter((f) => (f.review || "pending") === "pending").length;
+  return (
+    <>
+      <h3 style={{ fontSize: "0.95rem", margin: "4px 0 6px" }}>
+        Review findings {pending ? <span className="chip warn">{pending} pending</span> : <span className="chip green">all reviewed</span>}
+      </h3>
+      <p className="dimtxt" style={{ marginBottom: 8 }}>Check each finding's evidence. Only verified findings are delivered; rejected ones are kept out of the report.</p>
+      {e.findings.map((f) => {
+        const [cls, lbl] = REVIEW_CHIP[f.review || "pending"];
+        return (
+          <div key={f._id} className="card" style={{ padding: 12, marginBottom: 8 }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <span className={"cvss " + (SEV_CLASS[f.severity] || "l")}>{f.cvss ? f.cvss.toFixed(1) : "—"}</span>
+              <b style={{ fontSize: 13 }}>{f.title}</b>
+              <span className="mono dim" style={{ fontSize: 11 }}>{f.host}</span>
+              <span className={"chip " + cls} style={{ marginLeft: "auto" }}>{lbl}</span>
+            </div>
+            <div className="dimtxt" style={{ fontSize: 12, marginTop: 6 }}>{[f.owasp, f.cwe].filter(Boolean).join(" · ")}{f.detail ? " — " + f.detail : ""}</div>
+            {f.evidence && <pre className="mono" style={{ fontSize: 11, whiteSpace: "pre-wrap", wordBreak: "break-all", maxHeight: 160, overflow: "auto", background: "rgba(255,255,255,.03)", padding: 8, borderRadius: 8, marginTop: 6 }}>{f.evidence}</pre>}
+            {f.reviewNote && <div className="dimtxt" style={{ fontSize: 12, marginTop: 4 }}>Note: {f.reviewNote}</div>}
+            <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+              <button className="btn sm gold" disabled={busy || f.review === "verified"} onClick={() => onReview(f._id, "verified")}>Verify</button>
+              <button className="btn sm danger" disabled={busy || f.review === "rejected"} onClick={() => onReview(f._id, "rejected")}>Reject</button>
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
 function OpsView({ id, onClose }) {
   const [e, setE] = useState(null);
   const [err, setErr] = useState("");
@@ -68,15 +103,20 @@ function OpsView({ id, onClose }) {
     catch (e2) { setErr(e2.message); } finally { setBusy(false); }
   };
 
-  const next = (st) => {
+  // what the operator can do next, given the workflow + scan-engine state
+  const next = (x) => {
+    const st = x.status, eng = x.engine?.state;
     if (st === "requested") return [["assign", "Assign to me", "gold"], ["reject", "Reject", "danger"]];
     if (st === "assigned") return [["run", "Run scan", "gold"], ["reject", "Reject", "danger"]];
-    if (st === "in_progress") return [["sign", "Sign & deliver", "gold"]];
+    if (st === "in_progress" && eng === "failed") return [["run", "Re-run scan", "gold"]];
+    if (st === "in_progress" && eng && eng !== "completed") return [["sync", "Refresh from engine", "ghost"]];
+    if (st === "in_progress") return x.findings?.some((f) => (f.review || "pending") === "pending") ? [] : [["sign", "Sign & deliver", "gold"]];
     return [];
   };
+  const ENG = { queued: "warn", running: "gold", completed: "green", failed: "red" };
 
   return (
-    <Modal title={e ? e.domainName : "Engagement"} sub={e ? e.tenant : "Loading…"} onClose={onClose}>
+    <Modal wide title={e ? e.domainName : "Engagement"} sub={e ? e.tenant : "Loading…"} onClose={onClose}>
       {err && !e && <div className="form-err">{err}</div>}
       {!e && !err ? <Spinner /> : null}
       {e && (
@@ -86,19 +126,35 @@ function OpsView({ id, onClose }) {
             <span className="chip">{e.roe?.intensity}</span>
             <span className="chip dim">{e.targets?.length || 0} target(s)</span>
             {e.operatorName && <span className="chip gold">{e.operatorName}</span>}
+            {e.engine?.state && (
+              <span className={"chip " + (ENG[e.engine.state] || "dim")}>
+                engine: {e.engine.state}{e.engine.progress != null && e.engine.state === "running" ? ` ${e.engine.progress}%` : ""}
+              </span>
+            )}
           </div>
+          {e.engine?.state === "failed" && e.engine.error && <div className="form-err" style={{ marginBottom: 10 }}>Engine error: {e.engine.error}</div>}
           <div className="fdetail" style={{ marginBottom: 12 }}>
             <div><b style={{ color: "var(--gold)", fontFamily: "var(--m)", fontSize: 11 }}>REQUESTED BY</b> {e.requestedByEmail || "—"}</div>
             {e.roe?.window && <div style={{ marginTop: 6 }}><b style={{ color: "var(--gold)", fontFamily: "var(--m)", fontSize: 11 }}>WINDOW</b> {e.roe.window}</div>}
             {e.roe?.excludes && <div style={{ marginTop: 6 }}><b style={{ color: "var(--gold)", fontFamily: "var(--m)", fontSize: 11 }}>EXCLUDES</b> {e.roe.excludes}</div>}
             <div style={{ marginTop: 6 }}><b style={{ color: "var(--gold)", fontFamily: "var(--m)", fontSize: 11 }}>TARGETS</b> {(e.targets || []).join(", ") || e.domainName}</div>
           </div>
+          <ScopingView e={e} />
 
-          {e.findings?.length > 0 && (
+          {e.findings?.length > 0 && (e.status === "in_progress" && e.engine?.state === "completed" ? (
+            <ReviewList e={e} busy={busy} onReview={(fid, decision) => {
+              const note = decision === "rejected" ? prompt("Why is this a false positive? (recorded in the audit log)") : "";
+              if (decision === "rejected" && !note) return;
+              act(`findings/${encodeURIComponent(fid)}`, { decision, note: note || "" });
+            }} />
+          ) : (
             <>
-              <h3 style={{ fontSize: "0.95rem", margin: "4px 0 6px" }}>Findings {e.status !== "delivered" && <span className="chip warn">unverified</span>}</h3>
+              <h3 style={{ fontSize: "0.95rem", margin: "4px 0 6px" }}>Findings {e.status !== "delivered" && <span className="chip warn">not reviewed</span>}</h3>
               <FindingsTable findings={e.findings} />
             </>
+          ))}
+          {e.status === "delivered" && e.rejectedCount > 0 && (
+            <p className="dimtxt" style={{ marginTop: 6 }}>{e.rejectedCount} false positive(s) were removed by the operator before delivery.</p>
           )}
           {e.status === "delivered" && (
             <p style={{ color: "var(--muted)", fontSize: 12, marginTop: 10 }}>Signed by <b style={{ color: "var(--gold)" }}>{e.signedByName}</b> on {e.signedAt ? new Date(e.signedAt).toLocaleString() : "—"}.</p>
@@ -106,7 +162,7 @@ function OpsView({ id, onClose }) {
           {err && <div className="form-err">{err}</div>}
 
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
-            {next(e.status).map(([verb, label, cls]) => (
+            {next(e).map(([verb, label, cls]) => (
               <button key={verb} className={"btn sm " + cls} disabled={busy}
                 onClick={() => verb === "reject" ? act("reject", { reason: prompt("Reason for rejection?") || "" }) : act(verb)}>
                 {busy ? "…" : label}

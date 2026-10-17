@@ -2,7 +2,9 @@ import { useEffect, useState, useCallback } from "react";
 import { get, post } from "../api.js";
 import Shell from "../components/Shell.jsx";
 import { Modal, Spinner, Empty } from "../ui.jsx";
-import { EngStatus, FindingsTable } from "../components/Engagement.jsx";
+import { EngStatus, FindingsTable, ScopingView } from "../components/Engagement.jsx";
+import { useAuth } from "../auth.jsx";
+import { TEST_TYPES, ENVIRONMENTS, TARGET_TYPES, OBJECTIVES } from "../profileOptions.js";
 
 export default function Scans() {
   const [list, setList] = useState(null);
@@ -49,8 +51,15 @@ export default function Scans() {
 }
 
 function RequestScan({ onClose, onDone }) {
+  const { user } = useAuth();
   const [domains, setDomains] = useState(null);
   const [cfg, setCfg] = useState({ domainId: "", intensity: "standard", window: "", excludes: "" });
+  const [sc, setSc] = useState({
+    testType: "grey", environment: "production", targetTypes: ["web_app"], userRoles: "", testAccountsViaSecureChannel: false,
+    apiDocsUrl: "", wafInPlace: false, ipAllowlistOk: false, preferredStart: "", deadline: "", objective: "",
+    maxRps: "", emergencyName: "", emergencyPhone: "", notes: "",
+  });
+  const [signer, setSigner] = useState({ name: user.name || "", title: "" });
   const [authorized, setAuthorized] = useState(false);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
@@ -65,40 +74,103 @@ function RequestScan({ onClose, onDone }) {
     })();
   }, []);
   const set = (k) => (e) => setCfg((s) => ({ ...s, [k]: e.target.value }));
+  const setS = (k) => (e) => setSc((s) => ({ ...s, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value }));
+  const toggleTarget = (v) => setSc((s) => ({ ...s, targetTypes: s.targetTypes.includes(v) ? s.targetTypes.filter((x) => x !== v) : [...s.targetTypes, v] }));
+  const num = (v) => (v === "" ? 0 : Number(v));
+
   const submit = async () => {
     setErr(""); setBusy(true);
     try {
-      await post("/engagements", { domainId: cfg.domainId, roe: { intensity: cfg.intensity, window: cfg.window, excludes: cfg.excludes, authorized } });
+      await post("/engagements", {
+        domainId: cfg.domainId,
+        roe: { intensity: cfg.intensity, window: cfg.window, excludes: cfg.excludes, authorized, authorizerName: signer.name, authorizerTitle: signer.title },
+        scoping: {
+          testType: sc.testType, environment: sc.environment, targetTypes: sc.targetTypes, userRoles: num(sc.userRoles),
+          testAccountsViaSecureChannel: sc.testAccountsViaSecureChannel, apiDocsUrl: sc.apiDocsUrl, wafInPlace: sc.wafInPlace,
+          ipAllowlistOk: sc.ipAllowlistOk, preferredStart: sc.preferredStart, deadline: sc.deadline, objective: sc.objective,
+          maxRps: num(sc.maxRps), emergencyContact: { name: sc.emergencyName, phone: sc.emergencyPhone }, notes: sc.notes,
+        },
+      });
       onDone();
     } catch (e) { setErr(e.message); setBusy(false); }
   };
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <Modal title="Request a scan" sub="Choose a verified domain and the rules of engagement." onClose={onClose}>
+    <Modal wide title="Request a scan" sub="The scoping questions every professional pentest asks before it starts. Fields marked * are required." onClose={onClose}>
       {!domains ? <Spinner /> : domains.length === 0 ? (
         <Empty>You have no verified domains yet. Verify a domain first.</Empty>
       ) : (
         <>
-          <label>Domain
-            <select value={cfg.domainId} onChange={set("domainId")}>
-              {domains.map((d) => <option key={d._id} value={d._id}>{d.name}</option>)}
-            </select>
-          </label>
+          <div className="fsec" style={{ marginTop: 4, paddingTop: 0, borderTop: 0 }}>Target</div>
           <div className="fgrid">
+            <label><span>Domain <span className="req">*</span></span>
+              <select value={cfg.domainId} onChange={set("domainId")}>
+                {domains.map((d) => <option key={d._id} value={d._id}>{d.name}</option>)}
+              </select>
+            </label>
+            <label><span>Environment <span className="req">*</span></span>
+              <select value={sc.environment} onChange={setS("environment")}>{opts(ENVIRONMENTS)}</select>
+            </label>
+          </div>
+          <div className="chkgroup" style={{ marginTop: 10 }}>
+            <div className="gl">What should we test? <span className="req">*</span></div>
+            <div className="chkgrid">
+              {Object.entries(TARGET_TYPES).map(([v, l]) => (
+                <label key={v} className={"pick" + (sc.targetTypes.includes(v) ? " on" : "")}>
+                  <input type="checkbox" checked={sc.targetTypes.includes(v)} onChange={() => toggleTarget(v)} />{l}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="fsec">Approach</div>
+          <div className="fgrid">
+            <label><span>Test type <span className="req">*</span></span>
+              <select value={sc.testType} onChange={setS("testType")}>{opts(TEST_TYPES)}</select>
+            </label>
             <label>Intensity
               <select value={cfg.intensity} onChange={set("intensity")}>
-                <option value="safe">Safe — minimum-impact</option>
+                <option value="safe">Safe — minimum impact</option>
                 <option value="standard">Standard</option>
                 <option value="aggressive">Aggressive — deeper</option>
               </select>
             </label>
-            <label>Test window <span style={{ color: "var(--faint)" }}>(optional)</span><input value={cfg.window} onChange={set("window")} placeholder="weekends 02:00–06:00" /></label>
+            <label>User roles to test<input type="number" min="0" max="50" value={sc.userRoles} onChange={setS("userRoles")} placeholder="e.g. 3 (admin, staff, customer)" /></label>
+            <label>Max requests / second<input type="number" min="0" max="10000" value={sc.maxRps} onChange={setS("maxRps")} placeholder="0 = no limit" /></label>
+            <label className="full">API docs / OpenAPI URL<input value={sc.apiDocsUrl} onChange={setS("apiDocsUrl")} placeholder="https://api.example.com/openapi.json" maxLength={200} /></label>
+            <label className="chkline"><input type="checkbox" checked={sc.testAccountsViaSecureChannel} onChange={setS("testAccountsViaSecureChannel")} />We will share test accounts via a secure channel (never in this form)</label>
+            <label className="chkline"><input type="checkbox" checked={sc.wafInPlace} onChange={setS("wafInPlace")} />A WAF / IPS protects this target</label>
+            <label className="chkline"><input type="checkbox" checked={sc.ipAllowlistOk} onChange={setS("ipAllowlistOk")} />OK to allow-list the OctaSec testing IPs</label>
           </div>
-          <label>Excluded paths <span style={{ color: "var(--faint)" }}>(optional)</span><input value={cfg.excludes} onChange={set("excludes")} placeholder="/billing, /admin/export" /></label>
-          <div className="roe">
+
+          <div className="fsec">Schedule &amp; purpose</div>
+          <div className="fgrid">
+            <label><span>Preferred start <span className="req">*</span></span><input type="date" min={today} value={sc.preferredStart} onChange={setS("preferredStart")} /></label>
+            <label>Report needed by<input type="date" min={sc.preferredStart || today} value={sc.deadline} onChange={setS("deadline")} /></label>
+            <label>Test window<input value={cfg.window} onChange={set("window")} placeholder="weekends 02:00–06:00 (your time)" maxLength={120} /></label>
+            <label><span>Objective <span className="req">*</span></span>
+              <select value={sc.objective} onChange={setS("objective")}><option value="">Select…</option>{opts(OBJECTIVES)}</select>
+            </label>
+            <label className="full">Excluded paths / hosts<input value={cfg.excludes} onChange={set("excludes")} placeholder="/billing, /admin/export" maxLength={500} /></label>
+            <label className="full">Anything else we should know<textarea rows={2} value={sc.notes} onChange={setS("notes")} maxLength={1000} /></label>
+          </div>
+
+          <div className="fsec">During the test</div>
+          <div className="fgrid">
+            <label><span>Emergency contact name <span className="req">*</span></span><input value={sc.emergencyName} onChange={setS("emergencyName")} maxLength={80} /></label>
+            <label><span>Emergency phone (24×7) <span className="req">*</span></span><input value={sc.emergencyPhone} onChange={setS("emergencyPhone")} placeholder="+8801…" maxLength={20} /></label>
+          </div>
+
+          <div className="fsec">Authorisation (rules of engagement)</div>
+          <div className="fgrid">
+            <label><span>Your name <span className="req">*</span></span><input value={signer.name} onChange={(e) => setSigner((s) => ({ ...s, name: e.target.value }))} maxLength={80} /></label>
+            <label><span>Your title <span className="req">*</span></span><input value={signer.title} onChange={(e) => setSigner((s) => ({ ...s, title: e.target.value }))} placeholder="CTO, IT Manager…" maxLength={80} /></label>
+          </div>
+          <div className="roe" style={{ marginTop: 10 }}>
             <label className="chkrow">
               <input type="checkbox" checked={authorized} onChange={(e) => setAuthorized(e.target.checked)} />
-              <span>I confirm I'm authorised to test this domain and accept OctaSec's rules of engagement. Testing is non-destructive by default.</span>
+              <span>I am authorised by the owner of this domain to commission this test, and I accept the OctaSec rules of engagement. Testing is non-destructive by default. My name and title are recorded as the signature.</span>
             </label>
           </div>
           {err && <div className="form-err">{err}</div>}
@@ -108,6 +180,8 @@ function RequestScan({ onClose, onDone }) {
     </Modal>
   );
 }
+
+const opts = (m) => Object.entries(m).map(([v, l]) => <option key={v} value={v}>{l}</option>);
 
 function ScanView({ id, onClose }) {
   const [e, setE] = useState(null);
@@ -133,6 +207,7 @@ function ScanView({ id, onClose }) {
             <span className="chip">{e.roe?.intensity}</span>
             <span className="chip dim">{e.targets?.length || 0} target(s)</span>
           </div>
+          <ScopingView e={e} />
           {e.status === "delivered" ? (
             <>
               <p style={{ color: "var(--muted)", fontSize: 13, marginBottom: 8 }}>

@@ -12,8 +12,9 @@ const messageSchema = new mongoose.Schema(
 
 const ticketSchema = new mongoose.Schema(
   {
-    companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true, index: true },
-    openedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    // null = a self-serve client's ticket (owned by openedBy)
+    companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company", default: null, index: true },
+    openedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
     openedByEmail: String,
     subject: { type: String, required: true, trim: true },
     status: { type: String, enum: ["open", "in_progress", "resolved", "closed"], default: "open", index: true },

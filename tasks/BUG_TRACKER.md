@@ -4,10 +4,10 @@ Lifecycle: NEW → CONFIRMED → IN_PROGRESS → RESOLVED → CLOSED
 
 | ID | Title | Severity | Status |
 |----|-------|----------|--------|
-| BUG-001 | Company delete leaves orphan Engagements | Medium | CONFIRMED |
-| BUG-002 | Stale role/company in JWT for up to 7 days; no revocation | High | CONFIRMED |
-| BUG-003 | Self-serve client has no Support (tickets) | Low | CONFIRMED |
-| BUG-004 | portal/dist stale — Audit-log page missing from build | Medium | CONFIRMED |
+| BUG-001 | Company delete leaves orphan Engagements | Medium | CLOSED |
+| BUG-002 | Stale role/company in JWT for up to 7 days; no revocation | High | CLOSED |
+| BUG-003 | Self-serve client has no Support (tickets) | Low | CLOSED |
+| BUG-004 | portal/dist stale — Audit-log page missing from build | Medium | CLOSED |
 
 ---
 
@@ -32,3 +32,10 @@ Lifecycle: NEW → CONFIRMED → IN_PROGRESS → RESOLVED → CLOSED
 - **Severity:** Medium (deploy would ship without the Audit-log page)
 - **Root cause:** sources changed after the last `vite build`.
 - **Fix:** rebuilt after this phase's changes.
+
+---
+
+## Security assessment 2026-10-17 (SA-01 … SA-29)
+Tracked in `SECURITY_REPORT_OctaSec_2026-10-17.md` §3 (one row per finding with severity, CVSS and status).
+All CLOSED (fixed + regression-tested) except SA-29 (accepted risk) and the documented residuals of SA-04 / SA-19.
+Functional bugs found during the assessment and fixed: portal build typo in App.jsx; run-claim blocked legacy engagements without engine fields.

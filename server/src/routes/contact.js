@@ -1,11 +1,11 @@
 import { Router } from "express";
+import { EMAIL_RE } from "../utils/profile.js";
 import rateLimit from "express-rate-limit";
 import Lead from "../models/Lead.js";
 import { asyncHandler, asString } from "../utils/http.js";
 
 const r = Router();
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const TARGETS = ["Web app", "API", "Cloud", "Network", "AI feature", "Not sure"];
 
 // public endpoint → tight per-IP rate limit to deter spam

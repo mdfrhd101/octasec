@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandMark from "./BrandMark";
 
 export default function Footer() {
   return (
@@ -6,8 +7,8 @@ export default function Footer() {
       <div className="wrap">
         <div className="foot-grid">
           <div>
-            <span className="brand" style={{ color: "var(--text)" }}>
-              OCTASEC
+            <span className="brand foot-brand" style={{ color: "var(--text)" }}>
+              <BrandMark /> OCTASEC
             </span>
             <p
               className="muted"

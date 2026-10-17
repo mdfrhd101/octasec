@@ -35,7 +35,8 @@
   header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;padding-top:14px}
   .navbar{background:var(--navbg);border-radius:14px;box-shadow:0 12px 44px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px 12px 20px}
   .brand{display:flex;align-items:center;gap:9px;font-family:var(--m);font-weight:600;font-size:15.5px;letter-spacing:-.02em;color:#0d1a12}
-  .brand svg{width:20px;height:20px;flex:none}
+  .brand svg{width:26px;height:26px;flex:none}
+  .foot-brand svg{width:30px;height:30px}
   .nav-links{display:flex;align-items:center;gap:26px}
   .nav-links a{font-family:var(--m);font-size:13px;color:#4c5a51;transition:color .18s} .nav-links a:hover{color:#0d1a12}
   .nav-right{display:flex;align-items:center;gap:12px}
@@ -265,6 +266,11 @@
 .phero .hero-cta{margin-top:30px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 .blocks{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:10px}
 .blocks.c3{grid-template-columns:repeat(3,1fr)}
+/* numbered stage cards inside .blocks (how-it-works) — same voice as .steps, roomier */
+.blocks .st{padding:28px 26px;text-align:left}
+.blocks .st .sn{font-family:var(--m);font-size:12px;color:var(--gold);letter-spacing:.06em}
+.blocks .st h3{font-family:var(--m);font-weight:500;font-size:1.1rem;margin-top:14px;letter-spacing:-.03em}
+.blocks .st p{margin-top:10px;font-size:13.5px;color:var(--muted);line-height:1.6}
 .lead{max-width:60ch;margin:22px auto 0;color:var(--muted);font-size:clamp(1rem,1.6vw,1.12rem);line-height:1.6;text-align:center}
 .anchorb{max-width:62ch;margin-inline:auto;text-align:center}
 .anchorb .hero-cta{justify-content:center;margin-top:26px}

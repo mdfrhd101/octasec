@@ -16,11 +16,19 @@ import AdminLeads from "./pages/AdminLeads.jsx";
 import AdminEngagements from "./pages/AdminEngagements.jsx";
 import AdminAudit from "./pages/AdminAudit.jsx";
 import Scans from "./pages/Scans.jsx";
+import Organization from "./pages/Organization.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+import VerifyEmail from "./pages/VerifyEmail.jsx";
+import { ForcePasswordChange } from "./components/ChangePassword.jsx";
 
 export default function App() {
   const { user, loading } = useAuth();
   if (loading) return <div className="login"><span className="spin" /></div>;
+  const path = window.location.pathname.replace(/\/+$/, "");
+  if (path.endsWith("/reset-password")) return <ResetPassword />;
+  if (path.endsWith("/verify-email")) return <VerifyEmail />;
   if (!user) return <Login />;
+  if (user.mustChangePassword) return <ForcePasswordChange />;
   const role = user.role;
   const company = role === "company_admin" || role === "employee";
   return (
@@ -42,7 +50,8 @@ export default function App() {
           <Route path="/scans" element={<Scans />} />
           <Route path="/reports" element={<Reports />} />
           {company && <Route path="/clients" element={<Clients />} />}
-          {company && <Route path="/support" element={<Support />} />}
+          <Route path="/support" element={<Support />} />
+          <Route path="/organization" element={<Organization />} />
           {role === "company_admin" && <Route path="/employees" element={<Employees />} />}
           {role === "company_admin" && <Route path="/api" element={<ApiKeys />} />}
         </>

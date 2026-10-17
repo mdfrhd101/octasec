@@ -1,0 +1,26 @@
+// OctaSec "Facet Seal" mark (brand/octasec-logos/concept-1-facet-seal) — inline, no background.
+export default function BrandMark() {
+  return (
+    <svg viewBox="18 18 220 220" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="octasecFacet" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#f6dd8d" />
+          <stop offset=".5" stopColor="#e8c15a" />
+          <stop offset="1" stopColor="#c9a038" />
+        </linearGradient>
+      </defs>
+      <path fill="#f6dd8d" d="M24 85 85 24 99 58 58 99Z" />
+      <path fill="#efcf74" d="M85 24h86l-14 34H99Z" />
+      <path fill="#e8c15a" d="M24 171V85l34 14v58Z" />
+      <path fill="#d9b045" d="M171 24l61 61-34 14-41-41Z" />
+      <path fill="#cfa63d" d="M85 232l-61-61 34-14 41 41Z" />
+      <path fill="#b78e22" d="M232 85v86l-34-14V99Z" />
+      <path fill="#a98320" d="M171 232H85l14-34h58Z" />
+      <path fill="#8f6d18" d="M232 171l-61 61-14-34 41-41Z" />
+      <path fill="url(#octasecFacet)" d="M99 58h58l41 41v58l-41 41H99l-41-41V99Z" />
+      <path fill="#04080b" d="M109 82h38l27 27v38l-27 27h-38l-27-27v-38Z" />
+      <path fill="#e8c15a" d="M110 104l30 24-30 24H96l30-24-30-24Z" />
+      <rect x="148" y="115" width="12" height="26" fill="#45e0a8" />
+    </svg>
+  );
+}

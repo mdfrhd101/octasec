@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "../auth.jsx";
+import { api } from "../api.js";
+import BrandMark from "../components/BrandMark.jsx";
 
 export default function Login() {
-  const { login, register } = useAuth();
-  const [mode, setMode] = useState("login"); // "login" | "register"
+  const { login, register, notice } = useAuth();
+  const [mode, setMode] = useState("login"); // "login" | "register" | "forgot"
+  const [sent, setSent] = useState("");
   const [f, setF] = useState({ name: "", phone: "", email: "", password: "", org: "" });
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
@@ -13,8 +16,9 @@ export default function Login() {
     e.preventDefault();
     setErr(""); setBusy(true);
     try {
+      if (mode === "forgot") { setSent((await api("POST", "/auth/forgot-password", { email: f.email.trim() })).message); return; }
       if (mode === "login") await login(f.email.trim(), f.password);
-      else await register({ name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim(), password: f.password, orgName: f.org.trim() });
+      else { setSent(await register({ name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim(), password: f.password, orgName: f.org.trim() })); setF((s) => ({ ...s, password: "" })); }
       // AuthProvider sets user → App swaps to the shell
     } catch (e2) {
       setErr(e2.message || "Something went wrong");
@@ -27,14 +31,11 @@ export default function Login() {
     <div className="login">
       <div className="login-card card">
         <div className="brand">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M8 2.5h8l5.5 5.5v8L16 21.5H8L2.5 16v-8L8 2.5Z" stroke="#e8c15a" strokeWidth="1.6" strokeLinejoin="round" />
-            <path d="M8.5 12.2 11 14.8 15.6 9.4" stroke="#e8c15a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <BrandMark />
           OCTASEC <span>PORTAL</span>
         </div>
         <p className="login-sub">
-          {mode === "login" ? "Sign in to manage your domains, assets and scans." : "Create your account to get started."}
+          {mode === "login" ? "Sign in to manage your domains, assets and scans." : mode === "forgot" ? "Enter your account email and we will send you a password-reset link." : "Create your account to get started."}
         </p>
         <form onSubmit={submit}>
           {mode === "register" && (
@@ -44,19 +45,25 @@ export default function Login() {
             </div>
           )}
           <label>Email<input type="email" value={f.email} onChange={set("email")} placeholder="you@company.com" required /></label>
-          <label>Password<input type="password" value={f.password} onChange={set("password")} placeholder="••••••••" minLength={8} required /></label>
+          {mode !== "forgot" && <label>Password<input type="password" value={f.password} onChange={set("password")} placeholder="••••••••" minLength={8} required /></label>}
+          {mode === "login" && (
+            <div style={{ textAlign: "right", marginTop: -6, marginBottom: 10 }}>
+              <a href="#" className="forgot-link" onClick={(e) => { e.preventDefault(); setErr(""); setSent(""); setMode("forgot"); }}>Forgot password?</a>
+            </div>
+          )}
+          {sent && <div style={{ color: "var(--green)", fontSize: 13, marginBottom: 10 }}>{sent}</div>}
           {mode === "register" && (
             <label>Company name<input type="text" value={f.org} onChange={set("org")} placeholder="Company name" /></label>
           )}
-          {err && <div className="form-err">{err}</div>}
+          {err ? <div className="form-err">{err}</div> : notice ? <div className="form-err">{notice}</div> : null}
           <button className="btn gold" type="submit" disabled={busy}>
-            {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
+            {busy ? "Please wait…" : mode === "login" ? "Sign in" : mode === "forgot" ? "Send reset link" : "Create account"}
           </button>
         </form>
         <div className="login-roles">
           <span className="lbl">{mode === "login" ? "No account?" : "Have an account?"}</span>
           <div className="rolebtns">
-            <button type="button" onClick={() => { setErr(""); setMode(mode === "login" ? "register" : "login"); }}>
+            <button type="button" onClick={() => { setErr(""); setSent(""); setMode(mode === "login" ? "register" : "login"); }}>
               {mode === "login" ? "Create one" : "Sign in instead"}
             </button>
           </div>

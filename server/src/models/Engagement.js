@@ -7,10 +7,17 @@ const findingSchema = new mongoose.Schema(
     severity: { type: String, enum: ["low", "medium", "high", "critical"], default: "medium" },
     cvss: { type: Number, default: 0 },
     owasp: { type: String, default: "" },
+    cwe: { type: String, default: "" },
     detail: String,
+    evidence: { type: String, default: "" }, // raw request/response proof from the engine
     fix: String,
     host: String,
     verified: { type: Boolean, default: false },
+    // operator review — every finding is verified or rejected by a human before sign-off
+    review: { type: String, enum: ["pending", "verified", "rejected"], default: "pending" },
+    reviewNote: { type: String, default: "" },
+    reviewedAt: { type: Date, default: null },
+    reviewedByName: { type: String, default: "" },
   },
   { _id: true }
 );
@@ -33,6 +40,38 @@ const engagementSchema = new mongoose.Schema(
       window: { type: String, default: "" },
       excludes: { type: String, default: "" },
       authorized: { type: Boolean, default: false },
+      authorizerName: { type: String, default: "" },  // typed signature on the RoE
+      authorizerTitle: { type: String, default: "" },
+    },
+    // pre-engagement scoping questionnaire — docs/PORTAL_DATA_AND_DASHBOARDS.md §3
+    scoping: {
+      testType: { type: String, enum: ["black", "grey", "white", ""], default: "" },
+      environment: { type: String, enum: ["production", "staging", "development", ""], default: "" },
+      targetTypes: { type: [String], default: [] },
+      userRoles: { type: Number, default: 0 },
+      testAccountsViaSecureChannel: { type: Boolean, default: false },
+      apiDocsUrl: { type: String, default: "" },
+      wafInPlace: { type: Boolean, default: false },
+      ipAllowlistOk: { type: Boolean, default: false },
+      preferredStart: { type: Date, default: null },
+      deadline: { type: Date, default: null },
+      objective: { type: String, default: "" },
+      maxRps: { type: Number, default: 0 },
+      emergencyContact: { name: { type: String, default: "" }, phone: { type: String, default: "" } },
+      notes: { type: String, default: "" },
+    },
+    clientId: { type: mongoose.Schema.Types.ObjectId, ref: "Client", default: null },
+    // scan-engine job — docs/ENGINE_INTEGRATION.md
+    engine: {
+      driver: { type: String, default: "" },
+      jobId: { type: String, default: "", index: true },
+      state: { type: String, enum: ["", "queued", "running", "completed", "failed"], default: "" },
+      progress: { type: Number, default: null },
+      error: { type: String, default: "" },
+      startedAt: { type: Date, default: null },
+      completedAt: { type: Date, default: null },
+      lastEventAt: { type: Date, default: null },
+      lastEventTs: { type: Number, default: 0 }, // last applied callback timestamp (replay defence)
     },
 
     // workflow
@@ -46,6 +85,7 @@ const engagementSchema = new mongoose.Schema(
     signedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     signedByName: { type: String, default: "" },
     signedAt: { type: Date, default: null },
+    rejectedCount: { type: Number, default: 0 }, // false positives the operator removed before delivery
   },
   { timestamps: true }
 );

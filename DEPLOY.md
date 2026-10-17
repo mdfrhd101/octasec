@@ -25,6 +25,12 @@ cd ../portal && npm install
 VITE_API_URL=/api npm run build              # → portal/dist/
 ```
 
+On Windows run this from PowerShell (`$env:VITE_API_URL="/api"; npm run build`) —
+Git Bash rewrites `/api` into `C:/Program Files/Git/api` and breaks the build.
+
+Local preview of the whole site on ONE origin (mirrors nginx):
+`node deploy/local-serve.mjs` → http://127.0.0.1:3000 (site), `/portal/`, `/api/` → :5050.
+
 `VITE_API_URL=/api` makes the portal call the API same-origin (what the nginx
 CSP `connect-src 'self'` expects). Omit it only for local dev (defaults to
 `http://localhost:5050/api`).
@@ -71,6 +77,9 @@ cd /opt/octasec-api && npm ci --omit=dev
 #   JWT_SECRET=<openssl rand -hex 32>      # boot REJECTS placeholder values
 #   JWT_EXPIRES=7d
 #   CLIENT_ORIGIN=https://octasec.ai
+#   APP_URL=https://octasec.ai               # REQUIRED in production (emailed links); boot refuses otherwise
+#   SMTP_HOST=… SMTP_PORT=465 SMTP_SECURE=true SMTP_USER=… SMTP_PASS=… MAIL_FROM="OctaSec <no-reply@…>"
+#   ENGINE_DRIVER=mock|http  ENGINE_URL=…  ENGINE_API_KEY=…  ENGINE_WEBHOOK_SECRET=<openssl rand -hex 32>
 pm2 start src/index.js --name octasec-api
 pm2 save && pm2 startup
 ```
@@ -108,6 +117,12 @@ change: redeploy `server/` and `pm2 reload octasec-api`.
   Create the site in Plausible or remove the tag.
 - **Email**: contact + security.txt use `hassan@octagramltd.com` /
   `security@octasec.ai`. Swap to real OctaSec addresses when mail routing is live.
-- **Deferred (scheduled before admin features ship to customers)**: JWT role is
-  stale until the 7-day token expires — add short access tokens + refresh, or a
-  DB role re-check on admin/cross-tenant routes.
+- **Sessions**: the API re-checks the user in the DB on every request and
+  revokes tokens on password change/reset/disable (see SECURITY_AUDIT.md round 4).
+- **Tests**: `cd server && npm test` runs all API suites against an isolated
+  `octasec_test` database (needs a local MongoDB). Run before every release.
+
+## Accounts & email (since 2026-10-17)
+- Self-signup accounts stay **pending** until the emailed confirmation link is used.
+- New company admins / employees get an **emailed invite** to set their own password; admin "Reset password" emails a set-password link. Nobody ever sees another user's password — so **SMTP must be configured before onboarding customers** (`npm run mail:test -- you@domain`).
+- After deploying, check `nginx -t`, `curl -I https://octasec.ai/portal/` (CSP present) and that `/portal/assets/*.js` returns 200.

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050/api";
+// same-origin by default: nginx (prod) and deploy/local-serve.mjs (local) both proxy /api to the API
+const API = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 /** Contact form — posts to the OctaSec API; submissions land in the Super Admin inbox. */
 export default function ContactForm() {

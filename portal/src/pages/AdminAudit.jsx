@@ -3,7 +3,7 @@ import { get } from "../api.js";
 import Shell from "../components/Shell.jsx";
 import { Spinner, Empty } from "../ui.jsx";
 
-const CATEGORIES = ["all", "auth", "company", "user", "engagement", "lead"];
+const CATEGORIES = ["all", "auth", "company", "client", "user", "domain", "engagement", "ticket", "lead"];
 const PAGE = 50;
 
 // colour an action by what it signifies

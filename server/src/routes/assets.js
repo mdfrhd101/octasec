@@ -4,33 +4,16 @@ import Domain from "../models/Domain.js";
 import { auth } from "../middleware/auth.js";
 import { asyncHandler, isId, asString, isHostname, isBadParam } from "../utils/http.js";
 import { scopeFor, ownerStamp } from "../utils/tenancy.js";
+import * as engine from "../engine/index.js";
 
 const r = Router();
 r.use(auth);
 
-/* ------------------------------------------------------------------ *
- * NOTE: discovery + scanning here are MOCK/STUB only.
- * Real subdomain enumeration and tech fingerprinting (WhatWeb /
- * Wappalyzer) run in the separate scanning backend (owned by the MD).
- * These endpoints return placeholder data so the portal UI works end
- * to end; swap the mock blocks for calls to that service later.
- * ------------------------------------------------------------------ */
-const TECH = [
-  ["WordPress", "PHP", "cPanel"], ["Node.js", "Express", "nginx"],
-  ["React", "Vite", "Cloudflare"], ["Laravel", "MySQL", "Apache"],
-  ["Next.js", "Vercel"], ["Django", "PostgreSQL"],
-];
-const SUBS = ["www", "api", "mail", "staging", "admin", "cdn", "shop", "blog", "dev", "portal"];
-const FINDINGS = [
-  { title: "Missing security headers", severity: "medium", cvss: 4.3, owasp: "A05:2021 Security Misconfiguration", detail: "Served without HSTS / Content-Security-Policy.", fix: "Add HSTS, CSP and X-Content-Type-Options at the edge." },
-  { title: "Outdated component with known CVEs", severity: "high", cvss: 7.5, owasp: "A06:2021 Vulnerable & Outdated Components", detail: "A public component advertises a version with published advisories.", fix: "Upgrade to a supported release and re-test." },
-  { title: "Verbose server banner", severity: "low", cvss: 3.1, owasp: "A05:2021 Security Misconfiguration", detail: "Server discloses exact software/version, aiding fingerprinting.", fix: "Suppress version tokens in server config." },
-  { title: "Exposed non-production surface", severity: "high", cvss: 8.2, owasp: "A01:2021 Broken Access Control", detail: "A staging/admin host is reachable publicly.", fix: "Restrict to VPN/allowlist and require auth." },
-  { title: "Weak TLS configuration", severity: "medium", cvss: 5.9, owasp: "A02:2021 Cryptographic Failures", detail: "Endpoint negotiates a legacy protocol/cipher.", fix: "Disable legacy protocols; prefer TLS 1.2+." },
-  { title: "Authentication bypass on admin route", severity: "critical", cvss: 9.4, owasp: "A07:2021 Identification & Authentication Failures", detail: "An administrative endpoint can be reached without a valid session under a specific request sequence.", fix: "Enforce server-side session checks on every privileged route; add tests for the bypass path." },
-];
-const pick = (a) => a[Math.floor(Math.random() * a.length)];
+// Discovery runs in the scan engine (engine/index.js, ENGINE_DRIVER=mock|http).
 const PAGE_MAX = 200;
+// an asset always lands in the tenant that owns the domain
+const ownerOf = (domain, user) => (domain.companyId ? { userId: user.id, companyId: domain.companyId } : { userId: domain.userId, companyId: null });
+const ASSETS_PER_DOMAIN_MAX = 500;
 
 async function ownedDomain(user, domainId) {
   if (!isId(domainId)) return null;
@@ -55,29 +38,26 @@ r.get(
   })
 );
 
-// MOCK discovery — "Look for assets" on a verified domain
+// "Look for assets" on a verified domain — subdomain enumeration + fingerprinting by the engine
 r.post(
   "/discover",
   asyncHandler(async (req, res) => {
     const domain = await ownedDomain(req.user, asString(req.body?.domainId));
     if (!domain) return res.status(404).json({ error: "Domain not found" });
     if (!domain.verified) return res.status(409).json({ error: "Verify the domain first" });
-    const hosts = SUBS.filter(() => Math.random() < 0.5).slice(0, 5);
-    if (!hosts.length) hosts.push("www", "api");
+    const found = await engine.discover(domain.name); // in-scope hosts only
+    const room = Math.max(0, ASSETS_PER_DOMAIN_MAX - (await Asset.countDocuments({ domainId: domain._id })));
     const created = [];
-    for (const h of hosts) {
-      const host = `${h}.${domain.name}`;
+    for (const a of found.slice(0, room)) {
       try {
-        created.push(await Asset.create({ ...ownerStamp(req.user), domainId: domain._id, host, tech: pick(TECH).slice(), status: "unscanned" }));
+        created.push(await Asset.create({ ...ownerOf(domain, req.user), domainId: domain._id, host: a.host, tech: a.tech, status: "unscanned" }));
       } catch (e) {
         if (!(e && e.code === 11000)) throw e; // ignore already-known hosts
       }
     }
-    res.json({ discovered: created.length, assets: created, mock: true });
+    res.json({ discovered: created.length, assets: created, mock: engine.engineName() === "mock" });
   })
 );
-
-const ASSETS_PER_DOMAIN_MAX = 500;
 
 // manual add asset
 r.post(
@@ -97,7 +77,7 @@ r.post(
       return res.status(409).json({ error: "Asset limit reached for this domain" });
     }
     try {
-      const asset = await Asset.create({ ...ownerStamp(req.user), domainId: domain._id, host, tech: pick(TECH).slice() });
+      const asset = await Asset.create({ ...ownerOf(domain, req.user), domainId: domain._id, host, tech: [] });
       res.status(201).json({ asset });
     } catch (e) {
       if (e && e.code === 11000) return res.status(409).json({ error: "Host already added" });

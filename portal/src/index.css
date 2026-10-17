@@ -44,7 +44,7 @@ a{color:var(--gold);text-decoration:none}
 .login{min-height:100vh;display:grid;place-items:center;padding:24px}
 .login-card{width:min(420px,94vw);padding:34px 30px;text-align:center}
 .brand{display:inline-flex;align-items:center;gap:9px;font-family:var(--m);font-weight:600;letter-spacing:.18em;font-size:16px}
-.brand svg{width:22px;height:22px}
+.brand svg{width:28px;height:28px;flex:none}
 .brand span{color:var(--gold);font-size:11px;letter-spacing:.3em}
 .login-sub{color:var(--muted);font-size:13.5px;margin:12px 0 22px}
 #loginForm{display:grid;gap:13px;text-align:left}
@@ -108,7 +108,11 @@ input:focus,select:focus{outline:none;border-color:rgba(232,193,90,.55);box-shad
 /* modal */
 .modal{position:fixed;inset:0;background:rgba(0,5,8,.72);backdrop-filter:blur(6px);display:grid;place-items:center;z-index:50;padding:20px}
 .modal-card{width:min(540px,96vw);padding:26px;max-height:90vh;overflow:auto}
-.modal-card h3{font-size:1.15rem;font-weight:700;margin-bottom:6px}
+.modal-card h3{font-size:1.15rem;font-weight:700;margin-bottom:6px;padding-right:40px}
+.modal-x{position:absolute;top:14px;right:14px;z-index:3;width:34px;height:34px;display:grid;place-items:center;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;transition:color .2s,border-color .2s,background .2s}
+.modal-x svg{width:16px;height:16px}
+.modal-x:hover{color:var(--gold);border-color:rgba(232,193,90,.45);background:rgba(232,193,90,.06)}
+.modal-x:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(232,193,90,.25)}
 .modal-card .sub{color:var(--muted);font-size:13px;margin-bottom:16px}
 .modal-card label{display:grid;gap:6px;font-family:var(--m);font-size:11.5px;color:var(--muted);margin-bottom:14px}
 .mrow{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
@@ -245,3 +249,48 @@ textarea:focus{outline:none;border-color:rgba(232,193,90,.55);box-shadow:0 0 0 3
 .msg .body{font-size:13.5px;line-height:1.5;white-space:pre-wrap}
 .replybox{border-top:1px solid var(--line);padding-top:12px}
 .replybox .mrow{margin-top:10px}
+
+/* ---- organisation profile forms / views (Phase P) ---- */
+.modal-card.wide{width:min(900px,96vw)}
+.req{color:var(--gold);margin-left:3px}
+.fsec{font-family:var(--m);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:20px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
+.orgform .fsec:first-child{margin-top:4px;padding-top:0;border-top:0}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.contact-card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.015)}
+.contact-card .ct{font-weight:600;font-size:13px}
+.contact-card .ch{font-size:11.5px;color:var(--faint);margin:2px 0 10px}
+.contact-card .cv{font-size:12.5px;color:var(--muted);line-height:1.6;margin-top:6px}
+.contact-card .cv b{color:var(--text)}
+.contact-grid.view{margin:12px 0}
+.chkgroup{margin-bottom:12px}
+.chkgroup .gl{font-family:var(--m);font-size:11.5px;color:var(--muted);margin-bottom:8px}
+.chkgrid{display:flex;flex-wrap:wrap;gap:8px}
+.pick{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none;transition:border-color .2s,color .2s,background .2s}
+.pick input{width:auto;margin:0;accent-color:var(--gold)}
+.pick.on{color:var(--gold);border-color:rgba(232,193,90,.45);background:rgba(232,193,90,.06)}
+label.chkline{display:flex;align-items:center;gap:9px;font-family:var(--d);font-size:12.5px;color:var(--text);cursor:pointer;align-self:end;padding-bottom:10px}
+label.chkline input{width:auto;accent-color:var(--gold)}
+.kvgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 18px}
+.kv{display:grid;gap:3px;font-size:13px}
+.kv span{font-family:var(--m);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.kv b{font-weight:500;color:var(--text);word-break:break-word}
+.dimtxt{color:var(--muted);font-size:13px}
+.pbar-wrap{display:grid;gap:7px}
+.pbar-top{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:600}
+.pbar{height:7px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:99px;transition:width .5s}
+.pbar-miss{font-size:12px;color:var(--muted)}
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 14px}
+.subtabs button{background:none;border:1px solid var(--line);border-radius:999px;color:var(--muted);padding:6px 13px;font-family:var(--m);font-size:11.5px;cursor:pointer}
+.subtabs button.on{color:var(--gold);border-color:rgba(232,193,90,.45);background:rgba(232,193,90,.06)}
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.pipe div{border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.pipe b{display:block;font-family:var(--m);font-size:1.5rem;color:var(--gold)}
+.pipe span{font-family:var(--m);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.alertrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
+.alertrow:last-child{border-bottom:0}
+.alertrow .when{font-family:var(--m);font-size:11px;color:var(--faint)}
+@media(max-width:760px){.contact-grid,.fgrid{grid-template-columns:1fr}.pipe{grid-template-columns:1fr 1fr}}
+
+.forgot-link{font-family:var(--m);font-size:11.5px;color:var(--gold)}
+.forgot-link:hover{text-decoration:underline}

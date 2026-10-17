@@ -59,7 +59,7 @@ export default function AdminLeads() {
             {["new", "contacted", "closed"].map((s) => (
               <button key={s} className={"btn sm " + (view.status === s ? "gold" : "ghost")} onClick={() => setStatus(view._id, s)}>{s}</button>
             ))}
-            <a className="btn sm ghost" href={`mailto:${view.email}`} style={{ marginLeft: "auto" }}>Reply by email</a>
+            <a className="btn sm ghost" href={"mailto:" + encodeURIComponent(view.email)} style={{ marginLeft: "auto" }}>Reply by email</a>
           </div>
         </Modal>
       )}

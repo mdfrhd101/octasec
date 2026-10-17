@@ -6,7 +6,11 @@ import Client from "../models/Client.js";
 import { auth } from "../middleware/auth.js";
 import { asyncHandler, isId, asString, isHostname, isBadParam } from "../utils/http.js";
 import { scopeFor, ownerStamp, isCompanyUser } from "../utils/tenancy.js";
-import { verifyDomainOwnership } from "../utils/verifyDomain.js";
+import { verifyDomainOwnership, isClaimableDomain } from "../utils/verifyDomain.js";
+import Engagement from "../models/Engagement.js";
+import { audit } from "../utils/audit.js";
+
+const OPEN_STATES = ["requested", "assigned", "in_progress"];
 
 const r = Router();
 r.use(auth);
@@ -63,6 +67,7 @@ r.post(
   asyncHandler(async (req, res) => {
     const name = cleanName(req.body?.name);
     if (!isHostname(name)) return res.status(400).json({ error: "Enter a valid domain (e.g. example.com)" });
+    if (!isClaimableDomain(name)) return res.status(400).json({ error: "That is a shared platform / public-suffix name — add your own domain (e.g. yourapp.com)" });
     let ownerType = asString(req.body?.ownerType) === "client" ? "client" : "self";
     let clientId = null;
     if (ownerType === "client") {
@@ -98,16 +103,31 @@ r.patch(
     const domain = await Domain.findOne({ _id: req.params.id, ...scopeFor(req.user) });
     if (!domain) return res.status(404).json({ error: "Not found" });
     const ownerType = asString(req.body?.ownerType);
-    if (ownerType === "client") {
-      const clientId = asString(req.body?.clientId);
-      if (!(await ownsClient(req.user, clientId))) return res.status(400).json({ error: "Unknown client" });
-      domain.ownerType = "client";
-      domain.clientId = clientId;
-    } else if (ownerType === "self") {
-      domain.ownerType = "self";
-      domain.clientId = null;
+    if (!["client", "self"].includes(ownerType)) return res.json({ domain });
+    const from = domain.ownerType === "client" ? String(domain.clientId) : "self";
+    const to = ownerType === "client" ? asString(req.body?.clientId) : "self";
+    if (from === to) return res.json({ domain });
+
+    // ownership decides whose authorisation-to-test applies, so changes are tightly controlled:
+    // a client's domain can never become "your own" (that would skip the client's authorisation)
+    if (from !== "self" && to === "self") {
+      return res.status(409).json({ error: "A client's domain cannot be moved to your own organisation. Contact OctaSec support if it was assigned by mistake." });
     }
+    if (from !== "self" && req.user.role !== "company_admin") {
+      return res.status(403).json({ error: "Only a company admin can move a domain between clients" });
+    }
+    if (await Engagement.exists({ domainId: domain._id, status: { $in: OPEN_STATES } })) {
+      return res.status(409).json({ error: "This domain has an open scan — finish or cancel it first" });
+    }
+    if (to !== "self" && !(await ownsClient(req.user, to))) return res.status(400).json({ error: "Unknown client" });
+    domain.ownerType = to === "self" ? "self" : "client";
+    domain.clientId = to === "self" ? null : to;
+    if (from !== "self") { domain.verified = false; domain.verifiedAt = null; } // moving between clients requires re-verification
     await domain.save();
+    await audit(req, "domain.reassign", {
+      targetType: "Domain", targetId: domain._id.toString(), targetLabel: domain.name, companyId: domain.companyId,
+      meta: { from, to, reverify: from !== "self" },
+    });
     res.json({ domain });
   })
 );
@@ -126,6 +146,7 @@ r.post(
       domain.verified = true;
       domain.verifiedAt = new Date();
       await domain.save();
+      await audit(req, "domain.verify", { targetType: "Domain", targetId: domain._id.toString(), targetLabel: domain.name, companyId: domain.companyId });
       return res.json({ verified: true, domain });
     }
     res.status(422).json({ verified: false, reason: "Could not find a matching verification file on the domain." });
@@ -139,6 +160,12 @@ r.delete(
     const domain = await Domain.findOneAndDelete({ _id: req.params.id, ...scopeFor(req.user) });
     if (!domain) return res.status(404).json({ error: "Not found" });
     await Asset.deleteMany({ domainId: domain._id });
+    // nothing may be scanned against a domain that is gone
+    const cancelled = await Engagement.updateMany({ domainId: domain._id, status: { $in: OPEN_STATES } }, { $set: { status: "cancelled", reason: "Domain removed by the tenant" } });
+    await audit(req, "domain.delete", {
+      targetType: "Domain", targetId: domain._id.toString(), targetLabel: domain.name, companyId: domain.companyId,
+      meta: { cancelledEngagements: cancelled.modifiedCount },
+    });
     res.json({ ok: true });
   })
 );

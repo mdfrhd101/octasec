@@ -16,6 +16,9 @@ import ticketRoutes from "./routes/tickets.js";
 import adminRoutes from "./routes/admin.js";
 import contactRoutes from "./routes/contact.js";
 import engagementRoutes from "./routes/engagements.js";
+import engineCallbackRoutes from "./routes/engineCallback.js";
+import PasswordReset from "./models/PasswordReset.js";
+import User from "./models/User.js";
 
 /* ---- fail fast on missing / weak config ---- */
 function requireEnv() {
@@ -32,6 +35,15 @@ function requireEnv() {
   }
 }
 requireEnv();
+if (process.env.ENGINE_WEBHOOK_SECRET && process.env.ENGINE_WEBHOOK_SECRET.length < 32) {
+  console.error("[boot] ENGINE_WEBHOOK_SECRET must be >= 32 chars (openssl rand -hex 32)"); process.exit(1);
+}
+if (process.env.NODE_ENV === "production" && !/^https:\/\//.test(process.env.APP_URL || "")) {
+  console.error("[boot] APP_URL must be set to the public https:// URL in production (used in emailed links)"); process.exit(1);
+}
+if (process.env.NODE_ENV === "production" && !process.env.SMTP_HOST) {
+  console.warn("[boot] SMTP_HOST is not set — password-reset emails cannot be sent (see docs/EMAIL_AND_PASSWORD_RESET.md)");
+}
 
 const app = express();
 app.set("trust proxy", 1); // behind nginx on the VPS — needed for correct client IP (rate limiting)
@@ -48,6 +60,8 @@ app.use(cors({
 }));
 
 app.use(helmet());
+// engine webhook verifies an HMAC over the RAW body, so it is mounted before the JSON parser
+app.use("/api/engine", engineCallbackRoutes);
 app.use(express.json({ limit: "256kb" }));
 app.use(morgan("dev"));
 
@@ -89,5 +103,8 @@ process.on("unhandledRejection", (e) => { console.error("[unhandledRejection]", 
 const PORT = process.env.PORT || 5050;
 const HOST = process.env.HOST || "127.0.0.1"; // bind localhost; nginx reverse-proxies on the VPS
 connectDB(process.env.MONGO_URI)
+  .then(() => PasswordReset.syncIndexes()) // keeps the token TTL index in step with the schema
+  // accounts created before the status field existed are active (one-time backfill, idempotent)
+  .then(() => User.updateMany({ status: { $exists: false } }, { $set: { status: "active" } }))
   .then(() => app.listen(PORT, HOST, () => console.log(`[api] http://${HOST}:${PORT}`)))
   .catch((e) => { console.error("[db] connection failed:", e.message); process.exit(1); });

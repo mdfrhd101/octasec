@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import BrandMark from "./BrandMark";
 import { useState } from "react";
 
 const NAVITEMS: [string, string][] = [
@@ -10,26 +11,6 @@ const NAVITEMS: [string, string][] = [
   ["/faq", "FAQ"],
   ["/about", "About"],
 ];
-
-function BrandMark() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M8 2.5h8l5.5 5.5v8L16 21.5H8L2.5 16v-8L8 2.5Z"
-        stroke="#0d1a12"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M8.5 12.2 11 14.8 15.6 9.4"
-        stroke="#b78e22"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 export default function Nav() {
   const [open, setOpen] = useState(false);

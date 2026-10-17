@@ -21,15 +21,21 @@ export function Empty({ children }) {
   return <div className="empty">{children}</div>;
 }
 
-export function Modal({ title, sub, children, onClose }) {
+export function Modal({ title, sub, children, onClose, wide }) {
   useEffect(() => {
     const h = (e) => e.key === "Escape" && onClose && onClose();
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, [onClose]);
   return (
-    <div className="modal" onMouseDown={(e) => e.target === e.currentTarget && onClose && onClose()}>
-      <div className="modal-card card">
+    // long forms (wide) don't close on a stray backdrop click — use X / Cancel / Esc
+    <div className="modal" onMouseDown={(e) => !wide && e.target === e.currentTarget && onClose && onClose()}>
+      <div className={"modal-card card" + (wide ? " wide" : "")} role="dialog" aria-modal="true">
+        {onClose && (
+          <button type="button" className="modal-x" onClick={onClose} aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+          </button>
+        )}
         {title && <h3>{title}</h3>}
         {sub && <p className="sub">{sub}</p>}
         {children}

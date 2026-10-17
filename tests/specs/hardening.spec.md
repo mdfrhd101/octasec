@@ -7,7 +7,7 @@ Executable form: `server/tests/hardening.test.mjs` + `server/tests/support-clien
 
 ## H3.1 / H3.2 Per-request re-check + revocation
 - Deleted user's token → 401.
-- Disabled user's existing token → 403; login → 403.
+- Disabled user's existing token → 403 (ACCOUNT_DISABLED); login → 403; after re-enable the old token stays revoked (401).
 - Re-enabled user can log in again (200).
 - Suspended company: existing employee token → 403.
 - Token issued before a password change → 401 (tv mismatch).
