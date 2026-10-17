@@ -4,7 +4,8 @@ import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Domains from "./pages/Domains.jsx";
 import Assets from "./pages/Assets.jsx";
-import Reports from "./pages/Reports.jsx";
+import Reports, { ReportPage } from "./pages/Reports.jsx";
+import AdminReports, { AdminReportPage } from "./pages/AdminReports.jsx";
 import Clients from "./pages/Clients.jsx";
 import ApiKeys from "./pages/ApiKeys.jsx";
 import Employees from "./pages/Employees.jsx";
@@ -39,6 +40,8 @@ export default function App() {
           <Route path="/admin/companies" element={<AdminCompanies />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/engagements" element={<AdminEngagements />} />
+          <Route path="/admin/reports" element={<AdminReports />} />
+          <Route path="/admin/reports/:id" element={<AdminReportPage />} />
           <Route path="/admin/tickets" element={<AdminTickets />} />
           <Route path="/admin/leads" element={<AdminLeads />} />
           <Route path="/admin/audit" element={<AdminAudit />} />
@@ -49,6 +52,7 @@ export default function App() {
           <Route path="/assets" element={<Assets />} />
           <Route path="/scans" element={<Scans />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/reports/:id" element={<ReportPage />} />
           {company && <Route path="/clients" element={<Clients />} />}
           <Route path="/support" element={<Support />} />
           <Route path="/organization" element={<Organization />} />

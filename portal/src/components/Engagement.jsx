@@ -11,7 +11,7 @@ export const SEV_CLASS = { critical: "c", high: "h", medium: "m", low: "l" };
 export function FindingsTable({ findings }) {
   if (!findings?.length) return <div className="empty">No findings.</div>;
   return (
-    <table className="tbl">
+    <div className="tbl-wrap"><table className="tbl">
       <thead><tr><th>CVSS</th><th>Finding</th><th>Host</th></tr></thead>
       <tbody>
         {findings.map((f, i) => (
@@ -22,7 +22,7 @@ export function FindingsTable({ findings }) {
           </tr>
         ))}
       </tbody>
-    </table>
+    </table></div>
   );
 }
 

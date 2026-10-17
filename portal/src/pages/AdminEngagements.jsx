@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import { get, post } from "../api.js";
+import { useNavigate } from "react-router-dom";
+import { admin } from "../services/index.js";
 import Shell from "../components/Shell.jsx";
-import { Modal, Spinner, Empty } from "../ui.jsx";
+import { Modal, Spinner, Empty, LoadError, TableWrap, useUI } from "../ui.jsx";
 import { EngStatus, FindingsTable, ScopingView, SEV_CLASS } from "../components/Engagement.jsx";
 
 const FILTERS = ["open", "requested", "assigned", "in_progress", "delivered", "all"];
@@ -13,10 +14,8 @@ export default function AdminEngagements() {
   const [err, setErr] = useState("");
 
   const load = useCallback(async () => {
-    try {
-      const q = filter === "all" ? "" : `?status=${encodeURIComponent(filter)}`;
-      setList((await get("/admin/engagements" + q)).engagements);
-    } catch (e) { setErr(e.message); }
+    setErr("");
+    try { setList((await admin.engagements.list(filter === "all" ? "" : filter)).engagements); } catch (e) { setErr(e.message); }
   }, [filter]);
   useEffect(() => { load(); }, [load]);
 
@@ -24,20 +23,20 @@ export default function AdminEngagements() {
     <Shell title="Engagements">
       <div className="card panel">
         <h3>Scan operations<span className="sp">
-          <select className="minisel" value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <select className="minisel" value={filter} onChange={(e) => { setList(null); setFilter(e.target.value); }} aria-label="Status">
             {FILTERS.map((f) => <option key={f} value={f}>{f === "all" ? "All" : f.replace("_", " ")}</option>)}
           </select>
         </span></h3>
-        <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>Tenant scan requests. Assign, run, verify and sign each one.</p>
-        {err && <div className="form-err" style={{ marginTop: 10 }}>{err}</div>}
-        {!list ? <div style={{ padding: 20 }}><Spinner /></div> : list.length === 0 ? <Empty>No engagements.</Empty> : (
-          <table className="tbl">
-            <thead><tr><th>Domain</th><th>Tenant</th><th>Intensity</th><th>Status</th><th>Operator</th><th>Requested</th></tr></thead>
+        <p className="dimtxt" style={{ marginTop: 4 }}>Tenant scan and retest requests. Assign, run, verify and sign each one.</p>
+        {err ? <LoadError msg={err} onRetry={load} /> : !list ? <div style={{ padding: 20 }}><Spinner /></div> : list.length === 0 ? <Empty>No engagements.</Empty> : (
+          <TableWrap><table className="tbl">
+            <thead><tr><th>Domain</th><th>Tenant</th><th>Type</th><th>Intensity</th><th>Status</th><th>Operator</th><th>Requested</th></tr></thead>
             <tbody>
               {list.map((e) => (
                 <tr key={e.id} className="frow" onClick={() => setViewId(e.id)}>
                   <td className="mono">{e.domainName}</td>
                   <td className="dim">{e.tenant}</td>
+                  <td>{e.kind === "retest" ? <span className="chip gold">Retest</span> : <span className="chip">Scan</span>}</td>
                   <td><span className="chip">{e.intensity}</span></td>
                   <td><EngStatus status={e.status} /></td>
                   <td className="dim">{e.operator || "—"}</td>
@@ -45,7 +44,7 @@ export default function AdminEngagements() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></TableWrap>
         )}
       </div>
       {viewId && <OpsView id={viewId} onClose={() => { setViewId(null); load(); }} />}
@@ -89,18 +88,40 @@ function ReviewList({ e, busy, onReview }) {
 }
 
 function OpsView({ id, onClose }) {
+  const ui = useUI();
+  const nav = useNavigate();
   const [e, setE] = useState(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const load = useCallback(async () => {
-    try { setE((await get("/admin/engagements/" + encodeURIComponent(id))).engagement); } catch (e2) { setErr(e2.message); }
+    try { setE((await admin.engagements.get(id)).engagement); } catch (e2) { setErr(e2.message); }
   }, [id]);
   useEffect(() => { load(); }, [load]);
 
+  const DONE = { assign: "Assigned to you", run: "Scan started", sync: "Refreshed from the engine", sign: "Signed and delivered to the customer", reject: "Request rejected" };
   const act = async (verb, body) => {
     setBusy(true); setErr("");
-    try { await post(`/admin/engagements/${encodeURIComponent(id)}/${verb}`, body); await load(); }
-    catch (e2) { setErr(e2.message); } finally { setBusy(false); }
+    try { await admin.engagements.action(id, verb, body); if (DONE[verb]) ui.toast(DONE[verb]); await load(); }
+    catch (e2) { setErr(e2.message); ui.toast(e2.message, "err"); } finally { setBusy(false); }
+  };
+  const review = async (fid, decision) => {
+    let note = "";
+    if (decision === "rejected") {
+      note = await ui.prompt({ title: "Reject finding as a false positive", body: "It is removed from the report. The reason is recorded in the audit log.", label: "Why is this a false positive?", required: true, multiline: true, confirmLabel: "Reject finding", danger: true });
+      if (note === null) return;
+    }
+    setBusy(true); setErr("");
+    try { await admin.engagements.review(id, fid, decision, note); await load(); }
+    catch (e2) { setErr(e2.message); ui.toast(e2.message, "err"); } finally { setBusy(false); }
+  };
+  const doVerb = async (verb) => {
+    if (verb === "reject") {
+      const reason = await ui.prompt({ title: "Reject this request", body: "The customer sees this reason on their Scans page.", label: "Reason", required: true, multiline: true, confirmLabel: "Reject request", danger: true });
+      if (reason !== null) act("reject", { reason });
+    } else if (verb === "sign") {
+      const n = e.findings.filter((f) => f.review === "verified").length;
+      if (await ui.confirm({ title: "Sign and deliver?", body: `${n} verified finding${n === 1 ? "" : "s"} will be delivered to the customer under your name. Rejected findings are left out.`, confirmLabel: "Sign & deliver" })) act("sign");
+    } else act(verb);
   };
 
   // what the operator can do next, given the workflow + scan-engine state
@@ -123,6 +144,7 @@ function OpsView({ id, onClose }) {
         <>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
             <EngStatus status={e.status} />
+            {e.kind === "retest" && <span className="chip gold">Retest</span>}
             <span className="chip">{e.roe?.intensity}</span>
             <span className="chip dim">{e.targets?.length || 0} target(s)</span>
             {e.operatorName && <span className="chip gold">{e.operatorName}</span>}
@@ -139,14 +161,21 @@ function OpsView({ id, onClose }) {
             {e.roe?.excludes && <div style={{ marginTop: 6 }}><b style={{ color: "var(--gold)", fontFamily: "var(--m)", fontSize: 11 }}>EXCLUDES</b> {e.roe.excludes}</div>}
             <div style={{ marginTop: 6 }}><b style={{ color: "var(--gold)", fontFamily: "var(--m)", fontSize: 11 }}>TARGETS</b> {(e.targets || []).join(", ") || e.domainName}</div>
           </div>
+          {e.kind === "retest" && e.retestFindings?.length > 0 && (
+            <div className="fdetail" style={{ marginBottom: 12 }}>
+              <b style={{ color: "var(--gold)", fontFamily: "var(--m)", fontSize: 11 }}>RE-CHECK THESE FIXED FINDINGS</b>
+              {e.retestFindings.map((f) => (
+                <div key={f._id} style={{ marginTop: 6 }}>
+                  <span className={"sev " + (SEV_CLASS[f.severity] || "l")}>{f.severity}</span> {f.title} <span className="mono dim">{f.host}</span>
+                  {f.stateNote && <div className="dimtxt" style={{ fontSize: 12 }}>Customer note: “{f.stateNote}”</div>}
+                </div>
+              ))}
+            </div>
+          )}
           <ScopingView e={e} />
 
           {e.findings?.length > 0 && (e.status === "in_progress" && e.engine?.state === "completed" ? (
-            <ReviewList e={e} busy={busy} onReview={(fid, decision) => {
-              const note = decision === "rejected" ? prompt("Why is this a false positive? (recorded in the audit log)") : "";
-              if (decision === "rejected" && !note) return;
-              act(`findings/${encodeURIComponent(fid)}`, { decision, note: note || "" });
-            }} />
+            <ReviewList e={e} busy={busy} onReview={review} />
           ) : (
             <>
               <h3 style={{ fontSize: "0.95rem", margin: "4px 0 6px" }}>Findings {e.status !== "delivered" && <span className="chip warn">not reviewed</span>}</h3>
@@ -163,11 +192,11 @@ function OpsView({ id, onClose }) {
 
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
             {next(e).map(([verb, label, cls]) => (
-              <button key={verb} className={"btn sm " + cls} disabled={busy}
-                onClick={() => verb === "reject" ? act("reject", { reason: prompt("Reason for rejection?") || "" }) : act(verb)}>
+              <button key={verb} className={"btn sm " + cls} disabled={busy} onClick={() => doVerb(verb)}>
                 {busy ? "…" : label}
               </button>
             ))}
+            {e.status === "delivered" && <button className="btn sm ghost" onClick={() => nav("/admin/reports/" + (e._id || id))}>Open report</button>}
           </div>
         </>
       )}

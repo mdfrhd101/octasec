@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
-const DOMAIN = "https://octasec.ai";
+import { SITE_URL } from "./site";
+const DOMAIN = SITE_URL;
 
 // Public pages only — the portal is a separate app and is not indexed.
 const PATHS = [

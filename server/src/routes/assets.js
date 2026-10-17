@@ -5,6 +5,8 @@ import { auth } from "../middleware/auth.js";
 import { asyncHandler, isId, asString, isHostname, isBadParam } from "../utils/http.js";
 import { scopeFor, ownerStamp } from "../utils/tenancy.js";
 import * as engine from "../engine/index.js";
+import Engagement from "../models/Engagement.js";
+import { audit } from "../utils/audit.js";
 
 const r = Router();
 r.use(auth);
@@ -83,6 +85,22 @@ r.post(
       if (e && e.code === 11000) return res.status(409).json({ error: "Host already added" });
       throw e;
     }
+  })
+);
+
+// remove an asset (not while a scan is open on its domain — the scan's target list was snapshotted)
+r.delete(
+  "/:id",
+  asyncHandler(async (req, res) => {
+    if (!isId(req.params.id)) return res.status(400).json({ error: "Invalid id" });
+    const asset = await Asset.findOne({ _id: req.params.id, ...scopeFor(req.user) });
+    if (!asset) return res.status(404).json({ error: "Not found" });
+    if (await Engagement.exists({ domainId: asset.domainId, status: { $in: ["requested", "assigned", "in_progress"] } })) {
+      return res.status(409).json({ error: "This domain has an open scan — remove the asset after it finishes" });
+    }
+    await asset.deleteOne();
+    await audit(req, "asset.delete", { targetType: "Asset", targetId: asset._id.toString(), targetLabel: asset.host, companyId: asset.companyId });
+    res.json({ ok: true });
   })
 );
 

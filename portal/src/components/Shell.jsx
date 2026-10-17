@@ -8,11 +8,11 @@ export const NAV = {
   client: [["/", "Dashboard"], ["/domains", "Domains"], ["/assets", "Assets"], ["/scans", "Scans"], ["/reports", "Reports"], ["/support", "Support"], ["/organization", "Organisation"]],
   employee: [["/", "Dashboard"], ["/clients", "Clients"], ["/domains", "Domains"], ["/assets", "Assets"], ["/scans", "Scans"], ["/reports", "Reports"], ["/support", "Support"], ["/organization", "Organisation"]],
   company_admin: [["/", "Dashboard"], ["/employees", "Employees"], ["/clients", "Clients"], ["/domains", "Domains"], ["/assets", "Assets"], ["/scans", "Scans"], ["/reports", "Reports"], ["/support", "Support"], ["/organization", "Organisation"], ["/api", "API & integrations"]],
-  super_admin: [["/", "Overview"], ["/admin/companies", "Companies"], ["/admin/users", "Users"], ["/admin/engagements", "Engagements"], ["/admin/tickets", "Tickets"], ["/admin/leads", "Leads"], ["/admin/audit", "Audit log"]],
+  super_admin: [["/", "Overview"], ["/admin/companies", "Companies"], ["/admin/users", "Users"], ["/admin/engagements", "Engagements"], ["/admin/reports", "Reports"], ["/admin/tickets", "Tickets"], ["/admin/leads", "Leads"], ["/admin/audit", "Audit log"]],
 };
 const ROLE_LABEL = { client: "CLIENT", employee: "EMPLOYEE", company_admin: "COMPANY ADMIN", super_admin: "SUPER ADMIN" };
 
-export default function Shell({ title, children }) {
+export default function Shell({ title, actions, children }) {
   const { user, logout } = useAuth();
   const nav = useNavigate();
   const items = NAV[user.role] || NAV.client;
@@ -35,7 +35,7 @@ export default function Shell({ title, children }) {
         </div>
       </aside>
       <main className="main">
-        <header className="topbar"><h1>{title}</h1><span className="demo-chip">PREVIEW</span></header>
+        <header className="topbar"><h1>{title}</h1>{actions ? <div className="top-acts">{actions}</div> : null}</header>
         <div className="view">{children}</div>
       </main>
       {pwOpen && <ChangePasswordModal onClose={() => setPwOpen(false)} />}

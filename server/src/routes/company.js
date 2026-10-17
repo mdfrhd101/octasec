@@ -124,21 +124,34 @@ async function ownEmployee(req, res) {
   return target;
 }
 
-// disable / re-enable an employee (disabling revokes their live sessions)
+// edit an employee: name / phone, and/or disable / re-enable (disabling revokes their live sessions)
 r.patch(
   "/employees/:id",
   requireRole("company_admin"),
   asyncHandler(async (req, res) => {
-    const status = asString(req.body?.status);
-    if (!USER_STATUS.includes(status)) return res.status(400).json({ error: "Invalid status" });
+    const body = req.body || {};
+    const status = "status" in body ? asString(body.status) : "";
+    if ("status" in body && !USER_STATUS.includes(status)) return res.status(400).json({ error: "Invalid status" });
+    const hasDetails = "name" in body || "phone" in body;
+    if (!status && !hasDetails) return res.status(400).json({ error: "Nothing to update" });
     const target = await ownEmployee(req, res);
     if (!target) return;
-    applyStatus(target, status);
+    if ("name" in body) target.name = asString(body.name).trim().slice(0, 80);
+    if ("phone" in body) target.phone = asString(body.phone).trim().slice(0, 32);
+    const statusChanged = status && status !== (target.status || "active");
+    if (status) applyStatus(target, status);
     await target.save();
-    await audit(req, status === "disabled" ? "user.disable" : "user.enable", {
-      targetType: "User", targetId: target._id.toString(), targetLabel: target.email, companyId: target.companyId, meta: { role: "employee" },
-    });
-    res.json({ employee: { id: target._id, email: target.email, status: target.status } });
+    if (hasDetails) {
+      await audit(req, "user.update", {
+        targetType: "User", targetId: target._id.toString(), targetLabel: target.email, companyId: target.companyId, meta: { role: "employee" },
+      });
+    }
+    if (statusChanged) {
+      await audit(req, status === "disabled" ? "user.disable" : "user.enable", {
+        targetType: "User", targetId: target._id.toString(), targetLabel: target.email, companyId: target.companyId, meta: { role: "employee" },
+      });
+    }
+    res.json({ employee: { id: target._id, email: target.email, name: target.name, phone: target.phone, status: target.status } });
   })
 );
 
@@ -161,5 +174,12 @@ r.post(
     res.json({ employee: { id: target._id, email: target.email }, emailSent });
   })
 );
+
+// ---- API keys: NOT BUILT YET — contract in docs/PORTAL_FRONTEND_PLAN.md §3 ----
+// The portal (services/apiKeys.js) already calls these and shows "not available yet" on 501.
+const notImplemented = (req, res) => res.status(501).json({ error: "API keys are not available yet", code: "NOT_IMPLEMENTED" });
+r.get("/api-keys", requireRole("company_admin"), notImplemented);
+r.post("/api-keys", requireRole("company_admin"), notImplemented);
+r.delete("/api-keys/:id", requireRole("company_admin"), notImplemented);
 
 export default r;

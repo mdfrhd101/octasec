@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../api.js";
+import { auth } from "../services/index.js";
 import BrandMark from "../components/BrandMark.jsx";
 
 // Opened from the emailed link: /portal/reset-password?token=…
@@ -37,7 +37,7 @@ export default function ResetPassword() {
     if (f.next.length < 8) return setErr("Password must be at least 8 characters");
     if (f.next !== f.confirm) return setErr("The passwords do not match");
     setBusy(true);
-    try { await api("POST", "/auth/reset-password", { token, newPassword: f.next }); setDone(true); }
+    try { await auth.resetPassword(token, f.next); setDone(true); }
     catch (e2) { setErr(e2.message); } finally { setBusy(false); }
   };
   const toLogin = () => { window.location.href = (import.meta.env.BASE_URL || "/"); };

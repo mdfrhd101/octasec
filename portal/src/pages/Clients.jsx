@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { get, post, patch } from "../api.js";
+import { clients as clientsApi } from "../services/index.js";
 import Shell from "../components/Shell.jsx";
-import { Modal, Spinner, Empty } from "../ui.jsx";
+import { Modal, Spinner, Empty, LoadError, useUI } from "../ui.jsx";
 import { OrgProfileForm, OrgProfileView, Completeness } from "../components/OrgProfile.jsx";
 import { INDUSTRIES, AUTH_CHIP, fillProfile } from "../profileOptions.js";
 import { EngStatus } from "../components/Engagement.jsx";
@@ -18,7 +18,8 @@ export default function Clients() {
   const [err, setErr] = useState("");
 
   const load = useCallback(async () => {
-    try { setClients((await get("/clients")).clients); } catch (e) { setErr(e.message); }
+    setErr("");
+    try { setClients((await clientsApi.list()).clients); } catch (e) { setErr(e.message); }
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -30,9 +31,8 @@ export default function Clients() {
           The businesses you manage. Each needs its own contacts and a written <b>authorisation to test</b> on file —
           scans on a client's domains are blocked until it is recorded and in date.
         </p>
-        {err && <div className="form-err" style={{ marginTop: 10 }}>{err}</div>}
-        {!clients ? <div style={{ padding: 20 }}><Spinner /></div> : (
-          <table className="tbl">
+        {err ? <LoadError msg={err} onRetry={load} /> : !clients ? <div style={{ padding: 20 }}><Spinner /></div> : (
+          <div className="tbl-wrap"><table className="tbl">
             <thead><tr><th>Client</th><th>Industry</th><th>Primary contact</th><th>Authorisation</th><th>Domains</th><th>Assets</th><th>Profile</th><th></th></tr></thead>
             <tbody>
               <tr>
@@ -56,7 +56,7 @@ export default function Clients() {
               ))}
               {clients.length === 0 && <tr><td colSpan={8}><Empty>No client accounts yet.</Empty></td></tr>}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
 
@@ -67,6 +67,7 @@ export default function Clients() {
 }
 
 function ClientEditor({ id, onClose, onSaved }) {
+  const ui = useUI();
   const [profile, setProfile] = useState(id ? null : fillProfile(null));
   const [auth, setAuth] = useState({ onFile: false, authorizerName: "", authorizerTitle: "", documentRef: "", validUntil: "" });
   const [status, setStatus] = useState("active");
@@ -77,7 +78,7 @@ function ClientEditor({ id, onClose, onSaved }) {
     if (!id) return;
     (async () => {
       try {
-        const { client } = await get("/clients/" + encodeURIComponent(id));
+        const { client } = await clientsApi.get(id);
         setProfile(fillProfile(client.profile || { legalName: client.name }));
         const a = client.authorization || {};
         setAuth({ onFile: !!a.onFile, authorizerName: a.authorizerName || "", authorizerTitle: a.authorizerTitle || "", documentRef: a.documentRef || "", validUntil: day(a.validUntil) });
@@ -91,7 +92,8 @@ function ClientEditor({ id, onClose, onSaved }) {
     setErr(""); setBusy(true);
     const body = { profile, authorization: auth, status };
     try {
-      if (id) await patch("/clients/" + encodeURIComponent(id), body); else await post("/clients", body);
+      if (id) await clientsApi.update(id, body); else await clientsApi.create(body);
+      ui.toast(id ? "Client saved" : `Client ${profile.tradeName || profile.legalName} created`);
       onSaved();
     } catch (e) { setErr(e.message); setBusy(false); }
   };
@@ -134,7 +136,7 @@ function ClientView({ id, onClose, onEdit }) {
   const [d, setD] = useState(null);
   const [err, setErr] = useState("");
   useEffect(() => {
-    (async () => { try { setD(await get("/clients/" + encodeURIComponent(id))); } catch (e) { setErr(e.message); } })();
+    (async () => { try { setD(await clientsApi.get(id)); } catch (e) { setErr(e.message); } })();
   }, [id]);
   const c = d?.client;
   const a = c?.authorization || {};
@@ -162,15 +164,15 @@ function ClientView({ id, onClose, onEdit }) {
           <OrgProfileView profile={c.profile} />
           <div className="fsec">Domains ({d.domains.length})</div>
           {d.domains.length ? (
-            <table className="tbl"><tbody>{d.domains.map((x) => (
+            <div className="tbl-wrap"><table className="tbl narrow"><tbody>{d.domains.map((x) => (
               <tr key={x._id}><td className="mono">{x.name}</td><td>{x.verified ? <span className="chip green">Verified</span> : <span className="chip warn">Unverified</span>}</td><td className="dimtxt">{x.env} · {x.criticality}</td></tr>
-            ))}</tbody></table>
+            ))}</tbody></table></div>
           ) : <p className="dimtxt">No domains assigned yet — assign them from the Domains page.</p>}
           <div className="fsec">Engagements</div>
           {d.engagements.length ? (
-            <table className="tbl"><tbody>{d.engagements.map((e) => (
+            <div className="tbl-wrap"><table className="tbl narrow"><tbody>{d.engagements.map((e) => (
               <tr key={e.id}><td className="mono">{e.domainName}</td><td><EngStatus status={e.status} /></td><td className="mono dim">{new Date(e.createdAt).toLocaleDateString()}</td><td className="mono">{e.findings} findings</td></tr>
-            ))}</tbody></table>
+            ))}</tbody></table></div>
           ) : <p className="dimtxt">No scans requested for this client yet.</p>}
         </>
       )}

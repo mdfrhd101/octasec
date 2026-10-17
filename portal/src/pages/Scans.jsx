@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import { get, post } from "../api.js";
+import { useNavigate } from "react-router-dom";
+import { engagements, domains as domainsApi } from "../services/index.js";
 import Shell from "../components/Shell.jsx";
-import { Modal, Spinner, Empty } from "../ui.jsx";
-import { EngStatus, FindingsTable, ScopingView } from "../components/Engagement.jsx";
+import { Modal, Spinner, Empty, LoadError, useUI } from "../ui.jsx";
+import { EngStatus, ScopingView } from "../components/Engagement.jsx";
 import { useAuth } from "../auth.jsx";
 import { TEST_TYPES, ENVIRONMENTS, TARGET_TYPES, OBJECTIVES } from "../profileOptions.js";
 
@@ -13,7 +14,8 @@ export default function Scans() {
   const [err, setErr] = useState("");
 
   const load = useCallback(async () => {
-    try { setList((await get("/engagements")).engagements); } catch (e) { setErr(e.message); }
+    setErr("");
+    try { setList((await engagements.list()).engagements); } catch (e) { setErr(e.message); }
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -24,16 +26,16 @@ export default function Scans() {
         <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
           Request a scan on a verified domain. An OctaSec operator runs it, human-verifies every finding, and signs the report before it reaches you.
         </p>
-        {err && <div className="form-err" style={{ marginTop: 10 }}>{err}</div>}
-        {!list ? <div style={{ padding: 20 }}><Spinner /></div> : list.length === 0 ? (
+        {err ? <LoadError msg={err} onRetry={load} /> : !list ? <div style={{ padding: 20 }}><Spinner /></div> : list.length === 0 ? (
           <Empty>No scans yet. Request one to get started.</Empty>
         ) : (
-          <table className="tbl">
-            <thead><tr><th>Domain</th><th>Intensity</th><th>Status</th><th>Findings</th><th>Requested</th></tr></thead>
+          <div className="tbl-wrap"><table className="tbl">
+            <thead><tr><th>Domain</th><th>Type</th><th>Intensity</th><th>Status</th><th>Findings</th><th>Requested</th></tr></thead>
             <tbody>
               {list.map((e) => (
                 <tr key={e.id} className="frow" onClick={() => setViewId(e.id)}>
                   <td className="mono">{e.domainName}</td>
+                  <td>{e.kind === "retest" ? <span className="chip gold">Retest</span> : <span className="chip">Scan</span>}</td>
                   <td><span className="chip">{e.intensity}</span></td>
                   <td><EngStatus status={e.status} /></td>
                   <td>{e.status === "delivered" ? e.findings : "—"}</td>
@@ -41,7 +43,7 @@ export default function Scans() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
       {requesting && <RequestScan onClose={() => setRequesting(false)} onDone={() => { setRequesting(false); load(); }} />}
@@ -52,6 +54,7 @@ export default function Scans() {
 
 function RequestScan({ onClose, onDone }) {
   const { user } = useAuth();
+  const ui = useUI();
   const [domains, setDomains] = useState(null);
   const [cfg, setCfg] = useState({ domainId: "", intensity: "standard", window: "", excludes: "" });
   const [sc, setSc] = useState({
@@ -67,7 +70,7 @@ function RequestScan({ onClose, onDone }) {
   useEffect(() => {
     (async () => {
       try {
-        const ds = (await get("/domains?owner=all")).domains.filter((d) => d.verified);
+        const ds = (await domainsApi.list("all")).domains.filter((d) => d.verified);
         setDomains(ds);
         if (ds[0]) setCfg((c) => ({ ...c, domainId: ds[0]._id }));
       } catch (e) { setErr(e.message); }
@@ -81,7 +84,7 @@ function RequestScan({ onClose, onDone }) {
   const submit = async () => {
     setErr(""); setBusy(true);
     try {
-      await post("/engagements", {
+      await engagements.request({
         domainId: cfg.domainId,
         roe: { intensity: cfg.intensity, window: cfg.window, excludes: cfg.excludes, authorized, authorizerName: signer.name, authorizerTitle: signer.title },
         scoping: {
@@ -91,6 +94,7 @@ function RequestScan({ onClose, onDone }) {
           maxRps: num(sc.maxRps), emergencyContact: { name: sc.emergencyName, phone: sc.emergencyPhone }, notes: sc.notes,
         },
       });
+      ui.toast("Scan requested — an operator will pick it up");
       onDone();
     } catch (e) { setErr(e.message); setBusy(false); }
   };
@@ -184,16 +188,19 @@ function RequestScan({ onClose, onDone }) {
 const opts = (m) => Object.entries(m).map(([v, l]) => <option key={v} value={v}>{l}</option>);
 
 function ScanView({ id, onClose }) {
+  const ui = useUI();
+  const nav = useNavigate();
   const [e, setE] = useState(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const load = useCallback(async () => {
-    try { setE((await get("/engagements/" + encodeURIComponent(id))).engagement); } catch (e2) { setErr(e2.message); }
+    try { setE((await engagements.get(id)).engagement); } catch (e2) { setErr(e2.message); }
   }, [id]);
   useEffect(() => { load(); }, [load]);
   const cancel = async () => {
+    if (!(await ui.confirm({ title: "Cancel this request?", body: "It is withdrawn from the operator queue. You can request a new scan at any time.", confirmLabel: "Cancel request", cancelLabel: "Keep it", danger: true }))) return;
     setBusy(true); setErr("");
-    try { await post(`/engagements/${encodeURIComponent(id)}/cancel`); await load(); } catch (e2) { setErr(e2.message); } finally { setBusy(false); }
+    try { await engagements.cancel(id); ui.toast("Request cancelled"); await load(); } catch (e2) { setErr(e2.message); } finally { setBusy(false); }
   };
 
   return (
@@ -204,6 +211,7 @@ function ScanView({ id, onClose }) {
         <>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
             <EngStatus status={e.status} />
+            {e.kind === "retest" && <span className="chip gold">Retest</span>}
             <span className="chip">{e.roe?.intensity}</span>
             <span className="chip dim">{e.targets?.length || 0} target(s)</span>
           </div>
@@ -211,9 +219,12 @@ function ScanView({ id, onClose }) {
           {e.status === "delivered" ? (
             <>
               <p style={{ color: "var(--muted)", fontSize: 13, marginBottom: 8 }}>
-                Signed by <b style={{ color: "var(--gold)" }}>{e.signedByName || "OctaSec"}</b> on {e.signedAt ? new Date(e.signedAt).toLocaleString() : "—"}.
+                Signed by <b style={{ color: "var(--gold)" }}>{e.signedByName || "OctaSec"}</b> on {e.signedAt ? new Date(e.signedAt).toLocaleString() : "—"} —
+                {" "}{e.findings.length} verified finding{e.findings.length === 1 ? "" : "s"}.
               </p>
-              <FindingsTable findings={e.findings} />
+              <div className="mrow" style={{ justifyContent: "flex-start", marginTop: 8 }}>
+                <button className="btn gold sm" onClick={() => nav("/reports/" + e.id)}>Open full report</button>
+              </div>
             </>
           ) : e.status === "rejected" ? (
             <div className="fdetail">This request was declined.{e.reason ? ` Reason: ${e.reason}` : ""}</div>

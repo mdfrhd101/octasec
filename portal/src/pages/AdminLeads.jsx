@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
-import { get, patch } from "../api.js";
+import { admin } from "../services/index.js";
 import Shell from "../components/Shell.jsx";
-import { Modal, Spinner, Empty } from "../ui.jsx";
+import { Modal, Spinner, Empty, LoadError, useUI } from "../ui.jsx";
 
 const ST = { new: "warn", contacted: "gold", closed: "dim" };
 const PLAN = { assessment: "One-off assessment", continuous: "Continuous testing", enterprise: "Enterprise & MSSP" };
@@ -9,33 +9,39 @@ const SCOPE = { "1": "1 app / API", "2-5": "2–5 apps", "6-20": "6–20 apps", 
 const Source = ({ l }) => (l.source === "pricing" ? <span className="chip gold">Quote request</span> : <span className="chip dim">Contact form</span>);
 
 export default function AdminLeads() {
+  const ui = useUI();
   const [list, setList] = useState(null);
+  const [filter, setFilter] = useState("");
   const [view, setView] = useState(null);
   const [err, setErr] = useState("");
 
   const load = useCallback(async () => {
-    try { setList((await get("/admin/leads")).leads); } catch (e) { setErr(e.message); }
+    setErr("");
+    try { setList((await admin.leads.list()).leads); } catch (e) { setErr(e.message); }
   }, []);
   useEffect(() => { load(); }, [load]);
 
   const setStatus = async (id, status) => {
-    try { await patch("/admin/leads/" + encodeURIComponent(id), { status }); await load(); setView((v) => v && v._id === id ? { ...v, status } : v); }
-    catch (e) { setErr(e.message); }
+    try { await admin.leads.setStatus(id, status); ui.toast("Lead marked " + status); await load(); setView((v) => v && v._id === id ? { ...v, status } : v); }
+    catch (e) { ui.toast(e.message, "err"); }
   };
 
   return (
     <Shell title="Leads">
       <div className="card panel">
-        <h3>Contact & quote requests</h3>
+        <h3>Contact & quote requests<span className="sp">
+          <select className="minisel" value={filter} onChange={(e) => setFilter(e.target.value)} aria-label="Status">
+            <option value="">All</option><option value="new">New</option><option value="contacted">Contacted</option><option value="closed">Closed</option>
+          </select>
+        </span></h3>
         <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
           Submissions from the marketing site's contact form and the Pricing page's quote popup land here instantly.
         </p>
-        {err && <div className="form-err" style={{ marginTop: 10 }}>{err}</div>}
-        {!list ? <div style={{ padding: 20 }}><Spinner /></div> : list.length === 0 ? <Empty>No contact requests yet.</Empty> : (
-          <table className="tbl">
+        {err ? <LoadError msg={err} onRetry={load} /> : !list ? <div style={{ padding: 20 }}><Spinner /></div> : list.filter((l) => !filter || l.status === filter).length === 0 ? <Empty>{list.length ? "No leads with this status." : "No contact requests yet."}</Empty> : (
+          <div className="tbl-wrap"><table className="tbl">
             <thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Source</th><th>Plan</th><th>Interest</th><th>Status</th><th>When</th></tr></thead>
             <tbody>
-              {list.map((l) => (
+              {list.filter((l) => !filter || l.status === filter).map((l) => (
                 <tr key={l._id} className="frow" onClick={() => setView(l)}>
                   <td>{l.name}</td>
                   <td className="mono">{l.email}</td>
@@ -48,7 +54,7 @@ export default function AdminLeads() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
 

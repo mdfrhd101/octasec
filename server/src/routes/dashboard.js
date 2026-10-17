@@ -48,9 +48,9 @@ async function posture(match) {
     Domain.countDocuments(match),
     Domain.countDocuments({ ...match, verified: true }),
     Asset.countDocuments(match),
-    Engagement.aggregate([{ $match: delivered }, { $unwind: "$findings" }, { $group: { _id: "$findings.severity", n: { $sum: 1 } } }]),
+    Engagement.aggregate([{ $match: delivered }, { $unwind: "$findings" }, { $match: { "findings.state": { $nin: ["fixed", "accepted_risk"] } } }, { $group: { _id: "$findings.severity", n: { $sum: 1 } } }]),
     Engagement.aggregate([
-      { $match: delivered }, { $unwind: "$findings" }, { $sort: { "findings.cvss": -1 } }, { $limit: 6 },
+      { $match: delivered }, { $unwind: "$findings" }, { $match: { "findings.state": { $nin: ["fixed", "accepted_risk"] } } }, { $sort: { "findings.cvss": -1 } }, { $limit: 6 },
       { $project: { _id: 0, host: "$findings.host", title: "$findings.title", severity: "$findings.severity", cvss: "$findings.cvss", owasp: "$findings.owasp" } },
     ]),
     Asset.find(match).sort({ createdAt: -1 }).limit(6).select("host tech status createdAt").lean(),
@@ -93,7 +93,7 @@ async function companyBlocks(user) {
   const [clients, domains, delivered, company, openTickets] = await Promise.all([
     Client.find({ companyId }).select("name status authorization").lean(),
     Domain.find({ companyId, clientId: { $ne: null } }).select("clientId verified").lean(),
-    Engagement.find({ companyId, status: "delivered" }).sort({ signedAt: -1 }).limit(2000).select("domainId clientId signedAt findings.severity").lean(),
+    Engagement.find({ companyId, status: "delivered" }).sort({ signedAt: -1 }).limit(2000).select("domainId clientId signedAt findings.severity findings.state").lean(),
     Company.findById(companyId).select("profile").lean(),
     Ticket.countDocuments({ companyId, status: { $in: ["open", "in_progress"] } }),
   ]);
@@ -104,7 +104,10 @@ async function companyBlocks(user) {
   for (const e of delivered) {
     const s = stats[String(e.clientId || "")] || stats[clientOf[String(e.domainId)]];
     if (!s) continue;
-    for (const f of e.findings || []) { if (f.severity === "critical") s.critical++; if (f.severity === "high") s.high++; }
+    for (const f of e.findings || []) {
+      if (f.state === "fixed" || f.state === "accepted_risk") continue;
+      if (f.severity === "critical") s.critical++; if (f.severity === "high") s.high++;
+    }
     if (!s.lastAssessed || e.signedAt > s.lastAssessed) s.lastAssessed = e.signedAt;
   }
   const soon = Date.now() + EXPIRY_WINDOW_DAYS * DAY;
@@ -136,7 +139,7 @@ async function opsBlocks() {
     Lead.countDocuments({ createdAt: { $gte: new Date(now - 7 * DAY) } }),
     Lead.countDocuments({ status: "new" }),
     Engagement.aggregate([
-      { $match: { status: "delivered" } }, { $unwind: "$findings" }, { $match: { "findings.severity": { $in: ["critical", "high"] } } },
+      { $match: { status: "delivered" } }, { $unwind: "$findings" }, { $match: { "findings.severity": { $in: ["critical", "high"] }, "findings.state": { $nin: ["fixed", "accepted_risk"] } } },
       { $group: { _id: { companyId: "$companyId", userId: { $cond: [{ $eq: ["$companyId", null] }, "$userId", null] } }, critical: { $sum: { $cond: [{ $eq: ["$findings.severity", "critical"] }, 1, 0] } }, high: { $sum: { $cond: [{ $eq: ["$findings.severity", "high"] }, 1, 0] } } } },
       { $sort: { critical: -1, high: -1 } }, { $limit: 5 },
     ]),

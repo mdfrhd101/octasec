@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { api, setToken, getToken, setAuthErrorHandler } from "./api.js";
+import { auth, setToken, getToken, setAuthErrorHandler } from "./services/index.js";
 
 const AuthCtx = createContext(null);
 export const useAuth = () => useContext(AuthCtx);
@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
     (async () => {
       if (!getToken()) { setLoading(false); return; }
       try {
-        const { user } = await api("GET", "/auth/me");
+        const { user } = await auth.me();
         if (alive) setUser(user);
       } catch {
         setToken(null);
@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = useCallback(async (email, password) => {
-    const { token, user } = await api("POST", "/auth/login", { email, password });
+    const { token, user } = await auth.login(email, password);
     setToken(token);
     setNotice("");
     setUser(user);
@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
 
   // signup does not sign you in: the account activates from the emailed confirmation link
   const register = useCallback(async (payload) => {
-    const r = await api("POST", "/auth/register", payload);
+    const r = await auth.register(payload);
     return r.message;
   }, []);
 
@@ -63,7 +63,7 @@ export function AuthProvider({ children }) {
 
   // changing the password revokes every old token; the API returns a fresh one
   const changePassword = useCallback(async (currentPassword, newPassword) => {
-    const { token, user } = await api("POST", "/auth/change-password", { currentPassword, newPassword });
+    const { token, user } = await auth.changePassword(currentPassword, newPassword);
     setToken(token);
     setUser(user);
     return user;
@@ -71,7 +71,7 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(() => {
     // revoke every session server-side (best effort), then forget the token locally
-    if (getToken()) api("POST", "/auth/logout").catch(() => {});
+    if (getToken()) auth.logout().catch(() => {});
     setToken(null);
     setNotice("");
     setUser(null);

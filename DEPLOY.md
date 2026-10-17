@@ -113,8 +113,9 @@ change: redeploy `server/` and `pm2 reload octasec-api`.
   `esbuild` (a Vite **dev-server** dependency) — it does not ship in the
   production `vite build`, so it has no production exposure. Keep dev servers
   bound to localhost; optionally upgrade to Vite 6/7 later.
-- **Analytics**: pages carry a Plausible tag (`data-domain="octasec.ai"`).
-  Create the site in Plausible or remove the tag.
+- **Analytics / site URL**: build-time settings in `web/.env.example`. No Plausible tag is
+  shipped unless `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set when building. `NEXT_PUBLIC_SITE_URL`
+  (default `https://octasec.ai`) drives canonical links, sitemap and the social card (`/og.png`).
 - **Contact**: site, legal page and security.txt use `support@octasec.com` and
   `+8801326875385` (footer, contact page, quote popup notes).
 - **Sessions**: the API re-checks the user in the DB on every request and

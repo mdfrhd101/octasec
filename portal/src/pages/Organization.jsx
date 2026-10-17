@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { get, patch } from "../api.js";
+import { auth, company } from "../services/index.js";
 import { useAuth } from "../auth.jsx";
 import Shell from "../components/Shell.jsx";
 import { Spinner } from "../ui.jsx";
@@ -12,7 +12,7 @@ export default function Organization() {
   const { user } = useAuth();
   const isClient = user.role === "client";
   const canEdit = isClient || user.role === "company_admin";
-  const path = isClient ? "/auth/profile" : "/company/profile";
+  const svc = isClient ? { get: auth.getProfile, save: auth.updateProfile } : { get: company.getProfile, save: company.updateProfile };
 
   const [data, setData] = useState(null);
   const [form, setForm] = useState(null);
@@ -23,17 +23,17 @@ export default function Organization() {
 
   const load = useCallback(async () => {
     try {
-      const d = await get(path);
+      const d = await svc.get();
       setData(d);
       if (!d.profile && canEdit) { setForm(fillProfile(null)); setEditing(true); }
     } catch (e) { setErr(e.message); }
-  }, [path, canEdit]);
+  }, [isClient, canEdit]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [load]);
 
   const save = async () => {
     setErr(""); setMsg(""); setBusy(true);
     try {
-      const d = await patch(path, { profile: form });
+      const d = await svc.save(form);
       setData((x) => ({ ...x, ...d }));
       setEditing(false); setMsg("Saved.");
     } catch (e) { setErr(e.message); } finally { setBusy(false); }

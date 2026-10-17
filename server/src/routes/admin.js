@@ -271,13 +271,13 @@ r.get(
     if (st === "open") q.status = { $in: ["requested", "assigned", "in_progress"] };
     else if (["requested", "assigned", "in_progress", "delivered", "rejected", "cancelled"].includes(st)) q.status = st;
     const engagements = await Engagement.find(q).sort({ createdAt: -1 }).skip(skip).limit(limit)
-      .select("domainName status roe operatorName requestedByEmail companyId targets findings createdAt updatedAt signedAt").lean();
+      .select("domainName status kind parentId roe operatorName requestedByEmail companyId targets findings createdAt updatedAt signedAt").lean();
     const cids = [...new Set(engagements.map((e) => String(e.companyId)).filter((x) => x !== "null"))];
     const companies = cids.length ? await Company.find({ _id: { $in: cids } }).select("name").lean() : [];
     const cmap = Object.fromEntries(companies.map((c) => [String(c._id), c.name]));
     res.json({
       engagements: engagements.map((e) => ({
-        id: e._id, domainName: e.domainName, status: e.status, intensity: e.roe?.intensity,
+        id: e._id, domainName: e.domainName, status: e.status, intensity: e.roe?.intensity, kind: e.kind || "scan", parentId: e.parentId || null,
         operator: e.operatorName, requestedByEmail: e.requestedByEmail,
         tenant: e.companyId ? cmap[String(e.companyId)] || "—" : "Self-serve client",
         targets: e.targets?.length || 0, findings: e.findings?.length || 0,
@@ -294,7 +294,15 @@ r.get(
     const e = await Engagement.findById(req.params.id).lean();
     if (!e) return res.status(404).json({ error: "Not found" });
     const company = e.companyId ? await Company.findById(e.companyId).select("name").lean() : null;
-    res.json({ engagement: { ...e, tenant: company?.name || "Self-serve client" } });
+    // a retest: show the operator exactly which earlier findings to re-check
+    let retestFindings = [];
+    if (e.kind === "retest" && e.parentId) {
+      const parent = await Engagement.findById(e.parentId).select("findings").lean();
+      const want = new Set((e.retestOf || []).map(String));
+      retestFindings = (parent?.findings || []).filter((f) => want.has(String(f._id)))
+        .map((f) => ({ _id: f._id, title: f.title, severity: f.severity, host: f.host, stateNote: f.stateNote || "" }));
+    }
+    res.json({ engagement: { ...e, tenant: company?.name || "Self-serve client", retestFindings } });
   })
 );
 
@@ -542,7 +550,7 @@ r.delete(
 );
 
 /* ===== audit log (append-only; super_admin oversight) ===== */
-const AUDIT_CATEGORIES = { auth: /^auth\./, company: /^company\./, client: /^client\./, user: /^(user|profile)\./, engagement: /^(engagement|engine)\./, domain: /^domain\./, ticket: /^ticket\./, lead: /^lead\./ };
+const AUDIT_CATEGORIES = { auth: /^auth\./, company: /^company\./, client: /^client\./, user: /^(user|profile)\./, engagement: /^(engagement|engine)\./, domain: /^domain\./, ticket: /^ticket\./, lead: /^lead\./, asset: /^asset\./, finding: /^finding\./ };
 
 r.get(
   "/audit",
@@ -551,7 +559,7 @@ r.get(
     const { limit, skip } = page(req);
     const q = {};
     const cat = asString(req.query.category);
-    if (AUDIT_CATEGORIES[cat]) q.action = AUDIT_CATEGORIES[cat];
+    if (Object.hasOwn(AUDIT_CATEGORIES, cat)) q.action = AUDIT_CATEGORIES[cat];
     const search = asString(req.query.q).trim().slice(0, 120);
     if (search) {
       const rx = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"); // escape — no regex injection

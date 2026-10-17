@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "../api.js";
+import { auth } from "../services/index.js";
 import { useAuth } from "../auth.jsx";
 import BrandMark from "../components/BrandMark.jsx";
 
@@ -19,7 +19,7 @@ export default function VerifyEmail() {
     if (!token) { setState("failed"); setErr("This confirmation link is incomplete. Open it from your email again."); return; }
     (async () => {
       try {
-        const { token: session, user } = await api("POST", "/auth/verify-email", { token });
+        const { token: session, user } = await auth.verifyEmail(token);
         setState("done");
         adoptSession(session, user);
         setTimeout(() => window.location.replace(import.meta.env.BASE_URL || "/"), 900);

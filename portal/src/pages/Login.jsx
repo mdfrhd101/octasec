@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../auth.jsx";
-import { api } from "../api.js";
+import { auth } from "../services/index.js";
 import BrandMark from "../components/BrandMark.jsx";
 
 export default function Login() {
@@ -16,7 +16,7 @@ export default function Login() {
     e.preventDefault();
     setErr(""); setBusy(true);
     try {
-      if (mode === "forgot") { setSent((await api("POST", "/auth/forgot-password", { email: f.email.trim() })).message); return; }
+      if (mode === "forgot") { setSent((await auth.forgotPassword(f.email.trim())).message); return; }
       if (mode === "login") await login(f.email.trim(), f.password);
       else { setSent(await register({ name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim(), password: f.password, orgName: f.org.trim() })); setF((s) => ({ ...s, password: "" })); }
       // AuthProvider sets user → App swaps to the shell

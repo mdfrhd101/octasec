@@ -18,6 +18,11 @@ const findingSchema = new mongoose.Schema(
     reviewNote: { type: String, default: "" },
     reviewedAt: { type: Date, default: null },
     reviewedByName: { type: String, default: "" },
+    // remediation state, set by the tenant after delivery (open → fixed / accepted_risk)
+    state: { type: String, enum: ["open", "fixed", "accepted_risk"], default: "open" },
+    stateNote: { type: String, default: "" },
+    stateAt: { type: Date, default: null },
+    stateByEmail: { type: String, default: "" },
   },
   { _id: true }
 );
@@ -30,6 +35,10 @@ const engagementSchema = new mongoose.Schema(
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
     companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company", default: null, index: true },
     requestedByEmail: String,
+    // "retest" = re-check of fixed findings from a delivered engagement (parentId)
+    kind: { type: String, enum: ["scan", "retest"], default: "scan" },
+    parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Engagement", default: null, index: true },
+    retestOf: { type: [mongoose.Schema.Types.ObjectId], default: [] },
 
     // scope
     domainId: { type: mongoose.Schema.Types.ObjectId, ref: "Domain", required: true },

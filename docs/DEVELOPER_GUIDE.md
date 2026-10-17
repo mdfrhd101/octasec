@@ -38,6 +38,7 @@ octasec/
 │   ├── scripts/mail-test.js     SMTP connectivity check
 │   └── tests/              API test suites + runner (isolated test DB)
 ├── portal/                 React 18 SPA (Vite), served under /portal/
+│   └── src/services/       THE portal's API layer — every endpoint, one function each (see §9.1)
 ├── web/                    Next.js marketing site, static export → web/out
 ├── deploy/                 nginx.conf, security headers snippet, local-serve.mjs (local stand-in for nginx)
 ├── docs/                   design + requirements docs (index in §15)
@@ -187,6 +188,8 @@ tenant requests ──► requested ──assign (operator)──► assigned �
 
 **State changes:** every transition is an atomic conditional update, so concurrent clicks cannot interleave.
 
+**After delivery (remediation):** the tenant marks each finding `fixed`, `accepted_risk` (reason required) or back to `open`. Only `open` findings count in dashboards and the posture score. Fixed findings can be sent for a **retest**: a new engagement (`kind:"retest"`, `parentId`, `retestOf`) whose targets are those findings' hosts; it goes through the same queue, and the operator sees which findings to re-check (`retestFindings` on the admin view). *Engine note:* the mock engine returns random findings for a retest too; the real engine should re-test exactly `retestOf`.
+
 **What tenants see:** an allowlisted view. There are no findings, and no finding counts, until delivery, and no operator or engine internals.
 
 ## 8. Scan-engine integration — where to work
@@ -239,24 +242,28 @@ Everything below is mounted under `/api`. 🔒 means authentication is required;
 | Method | Path | Notes |
 |---|---|---|
 | GET/POST | `/domains` | list (`?owner=self\|all\|<clientId>`) / add (generates a verify file + token) |
-| PATCH | `/domains/:id` | reassign owner: client→self refused; between clients company_admin only, then re-verify |
+| PATCH | `/domains/:id` | edit details `{label, env, criticality, contact, tags, notes}` (any subset), and/or reassign owner `{ownerType, clientId}`: client→self refused; between clients company_admin only, then re-verify |
 | POST | `/domains/:id/verify` | fetches the token file (SSRF-hardened) |
 | DELETE | `/domains/:id` | removes assets, cancels open scans |
-| GET/POST | `/assets` | list / add a host (must be the domain or a subdomain) |
+| GET/POST | `/assets[?domainId=]` | list / add a host (must be the domain or a subdomain) |
+| DELETE | `/assets/:id` | remove a host; 409 while a scan is open on its domain |
 | POST | `/assets/discover` | engine discovery on a verified domain |
 | GET/POST | `/engagements` | list / request a scan (`{domainId, roe, scoping}`) |
-| GET | `/engagements/:id` | tenant view |
+| GET | `/engagements/:id` | tenant view (findings with remediation `state`; `retests[]`) |
 | POST | `/engagements/:id/cancel` | only while `requested` |
+| PATCH | `/engagements/:id/findings/:fid` | tenant, delivered only: `{state:"open"\|"fixed"\|"accepted_risk", note}` (note required for accepted_risk) |
+| POST | `/engagements/:id/retest` | tenant: `{findingIds}` — all must be `fixed`; creates a `kind:"retest"` engagement in the operator queue (same request checks) |
 | GET/POST | `/tickets` | list / open |
 | GET | `/tickets/:id` | thread |
 | POST | `/tickets/:id/messages` | reply |
 | GET/POST/GET/PATCH | `/clients`, `/clients/:id` | company users: managed client accounts plus authorisation |
 | GET | `/company`, `/company/profile` | company users |
 | PATCH | `/company/profile` | company_admin |
-| GET/POST/PATCH/DELETE | `/company/employees[/:id]` | company_admin: invite, disable/enable, remove |
+| GET/POST/PATCH/DELETE | `/company/employees[/:id]` | company_admin: invite, edit `{name, phone}`, disable/enable `{status}`, remove |
+| GET/POST/DELETE | `/company/api-keys[/:id]` | **501 NOT_IMPLEMENTED stub** — contract in `docs/PORTAL_FRONTEND_PLAN.md` §3; the portal page is already wired |
 | POST | `/company/employees/:id/reset-password` | company_admin: emails a set-password link |
 
-**Super admin** 🔒 (`/admin/*`)
+**Super admin** 🔒 (`/admin/*`) — `/admin/engagements?status=delivered` also feeds the portal's admin **Reports** page
 
 | Method | Path | Notes |
 |---|---|---|
@@ -294,6 +301,19 @@ Everything below is mounted under `/api`. 🔒 means authentication is required;
 | 413 | body too large |
 | 429 | rate limited |
 | 502 | engine unavailable |
+
+### 9.1 Portal API layer (`portal/src/services/`)
+
+The portal never calls `fetch` or builds API URLs inside screens. Every endpoint is one documented function:
+
+| File | Contents |
+|---|---|
+| `services/http.js` | `request()`, `ApiError {message, status, code}`, `isNotImplemented(e)`, token storage, the auth-error hook |
+| `services/index.js` | `auth`, `dashboard`, `domains`, `assets`, `clients`, `company` (+`employees`), `engagements`, `tickets`, `apiKeys`, `admin` (+`companies`, `users`, `engagements`, `leads`, `audit`) |
+
+**To add an endpoint:** add a function (with its `METHOD /path · body → response` comment) to the matching object in `services/index.js`, then call it from the screen. If the backend is not ready, return **501 `{code:"NOT_IMPLEMENTED"}`**: screens check `isNotImplemented(e)` and show a "Not available yet" panel instead of an error (see `pages/ApiKeys.jsx`).
+
+**UI kit (`portal/src/ui.jsx`):** `useUI()` gives `toast(msg, "ok"|"err")`, `confirm({title, body, confirmLabel, danger})`, `prompt({title, label, required, multiline})` and `run(fn, okMsg)`. Never use the browser's `alert/confirm/prompt`. Wrap every table in `<TableWrap>` (or `.tbl-wrap`) so it scrolls on phones; show load failures with `<LoadError msg onRetry>`.
 
 ## 10. Email
 
@@ -344,7 +364,9 @@ After deploying, check:
 |---|---|
 | Connect the real scan engine | §8. The contract doc is pending owner review. |
 | Billing / plans (Phase C) | Specified in `OCTASEC_PORTAL_SPEC.md`; deferred by the owner. |
-| CMS / platform settings / report PDF export | Not built. |
+| CMS / platform settings | Not built. |
+| API keys for customers | UI + service ready; backend is a 501 stub — build the contract in `docs/PORTAL_FRONTEND_PLAN.md` §3 (hash keys at rest, show once, scopes `read`/`request`). |
+| Server-side PDF | Reports print to PDF in the browser (print stylesheet). A signed server-generated PDF is optional later. |
 | Quota counters | Count-then-create today; move to atomic counters if limits get tight (SA-19). |
 | Login lockout store | In-memory, so it assumes one API process. Use Redis if you scale out. |
 | Domain verification success path | Needs a real public domain to test end to end. |
@@ -356,6 +378,7 @@ After deploying, check:
 |---|---|
 | `docs/DEVELOPER_GUIDE.md` | this guide |
 | `docs/PRICING_PAGE.md` | pricing page + quote popup spec |
+| `docs/PORTAL_FRONTEND_PLAN.md` | portal completion: report view/PDF, remediation + retest, API contract of the new endpoints |
 | `docs/PORTAL_DATA_AND_DASHBOARDS.md` | what data the product collects and why; dashboards per role |
 | `docs/EMAIL_AND_PASSWORD_RESET.md` | email, sign-up verification, invites, resets, SMTP setup |
 | `docs/ENGINE_INTEGRATION.md` | scan-engine contract (**incomplete — pending owner review**) |

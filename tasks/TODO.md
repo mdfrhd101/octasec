@@ -53,8 +53,25 @@ Requirements: `docs/PORTAL_DATA_AND_DASHBOARDS.md` · Tests: `tests/specs/profil
 - **P5 Role dashboards** — `DONE`
   - AC: §Dashboards in the spec passes; each role's dashboard browser-verified.
 
+## Phase F — Portal completion (2026-10-18)
+Plan + API contract: `docs/PORTAL_FRONTEND_PLAN.md` · Tests: `tests/specs/portal-frontend.spec.md`, `server/tests/findings.test.mjs`
+- **F1 Portal API layer** (`portal/src/services/`) — `DONE`. Every endpoint is one documented function; the screens no longer build URLs.
+- **F2 UX kit** — `DONE`. Toasts, styled confirm/prompt dialogs (all native dialogs removed), `TableWrap`, `LoadError`, `Pending`. The PREVIEW chip is gone.
+- **F3 Full report + PDF** — `DONE`. `/reports/:id`: cover, executive summary, scope, findings with description/evidence/fix/CWE/OWASP. The print stylesheet gives a PDF.
+- **F4 Remediation + retest** — `DONE`.
+  - API: `PATCH /engagements/:id/findings/:fid` and `POST /engagements/:id/retest`.
+  - Only open findings count in dashboards.
+  - The operator sees `retestFindings`.
+- **F5 Super-admin Reports** — `DONE`. `/admin/reports`, with filters (customer, type, period, search), the read-only report, and PDF.
+- **F6 API keys page** — `DONE (UI)`. It is wired to `services/apiKeys.js`. The backend is a 501 stub, and the build is pending.
+- **F7 CRUD gaps** — `DONE`.
+  - Domains: the details are editable, and the `corp` role bug that hid client assignment is fixed.
+  - Assets: add a host, delete, filter by domain.
+  - Employees: name and phone are editable.
+- **F8 Website** — `DONE`. `og.png` plus OG/Twitter metadata. Plausible loads only when `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set.
+
 ## Later (not in this phase)
-- Phase C billing (deferred by owner), CMS/Settings, super-admin Reports oversight, email-based "forgot password" (needs mail infra), real scan engine integration, deployment.
+- Phase C billing (deferred by owner), CMS/Settings, real scan engine integration (incl. retest = re-check `retestOf` only), API-key backend (contract ready), deployment, domain decision (octasec.ai vs octasec.com).
 
 > Phase P result (2026-10-17): `npm test` → 12/12 suites (profiles 65, scoping 24, dashboards 27 + all earlier suites green).
 > Also added: accounts created by an admin (new company admin, new employee) get `mustChangePassword` — they set their own password at first sign-in.

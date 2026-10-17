@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
-import { get, post, patch, del } from "../api.js";
+import { admin } from "../services/index.js";
 import Shell from "../components/Shell.jsx";
-import { Modal, CopyBox, Spinner, Empty, Tile } from "../ui.jsx";
+import { Modal, CopyBox, Spinner, Empty, Tile, LoadError, TableWrap, useUI } from "../ui.jsx";
 import { OrgProfileForm, OrgProfileView, Completeness } from "../components/OrgProfile.jsx";
 import { INDUSTRIES, AUTH_CHIP, fillProfile } from "../profileOptions.js";
 
 export default function AdminCompanies() {
+  const ui = useUI();
   const [list, setList] = useState(null);
   const [adding, setAdding] = useState(false);
   const [viewId, setViewId] = useState(null);
@@ -13,30 +14,38 @@ export default function AdminCompanies() {
   const [err, setErr] = useState("");
 
   const load = useCallback(async () => {
-    try { setList((await get("/admin/companies")).companies); } catch (e) { setErr(e.message); }
+    setErr("");
+    try { setList((await admin.companies.list()).companies); } catch (e) { setErr(e.message); }
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const setStatus = async (id, status) => {
-    setBusyId(id); setErr("");
-    try { await patch("/admin/companies/" + encodeURIComponent(id), { status }); await load(); }
-    catch (e) { setErr(e.message); } finally { setBusyId(null); }
+  const setStatus = async (c, status) => {
+    if (status === "suspended" && !(await ui.confirm({ title: `Suspend ${c.name}?`, body: "All of its users are signed out and cannot sign in until the company is activated again. No data is deleted.", confirmLabel: "Suspend", danger: true }))) return;
+    setBusyId(c.id);
+    if (await ui.run(() => admin.companies.setStatus(c.id, status), status === "suspended" ? `${c.name} suspended` : `${c.name} activated`)) await load();
+    setBusyId(null);
   };
-  const remove = async (id, name) => {
-    if (busyId || !confirm(`Delete "${name}" and ALL its users, clients, domains, assets and tickets? This cannot be undone.`)) return;
-    setBusyId(id); setErr("");
-    try { await del("/admin/companies/" + encodeURIComponent(id)); await load(); }
-    catch (e) { setErr(e.message); } finally { setBusyId(null); }
+  const remove = async (c) => {
+    if (busyId) return;
+    const typed = await ui.prompt({
+      title: `Delete ${c.name}?`,
+      body: "This permanently deletes the company and ALL its users, clients, domains, assets, scans and tickets. It cannot be undone. Type the company name to confirm.",
+      label: "Company name", required: true, confirmLabel: "Delete permanently", danger: true,
+    });
+    if (typed === null) return;
+    if (typed !== c.name) { ui.toast("The name did not match — nothing was deleted.", "err"); return; }
+    setBusyId(c.id);
+    if (await ui.run(() => admin.companies.remove(c.id), `${c.name} deleted`)) await load();
+    setBusyId(null);
   };
 
   return (
     <Shell title="Companies">
       <div className="card panel">
         <h3>Companies<span className="sp"><button className="btn gold sm" onClick={() => setAdding(true)}>+ Add company</button></span></h3>
-        <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>Provision companies, see what each handles, and suspend or remove them.</p>
-        {err && <div className="form-err" style={{ marginTop: 10 }}>{err}</div>}
-        {!list ? <div style={{ padding: 20 }}><Spinner /></div> : list.length === 0 ? <Empty>No companies yet.</Empty> : (
-          <table className="tbl">
+        <p className="dimtxt" style={{ marginTop: 4 }}>Provision companies, see what each handles, and suspend or remove them. Click a row for the full profile.</p>
+        {err ? <LoadError msg={err} onRetry={load} /> : !list ? <div style={{ padding: 20 }}><Spinner /></div> : list.length === 0 ? <Empty>No companies yet.</Empty> : (
+          <TableWrap><table className="tbl">
             <thead><tr><th>Company</th><th>Industry</th><th>Profile</th><th>Status</th><th>Staff</th><th>Clients</th><th>Domains</th><th>Assets</th><th></th></tr></thead>
             <tbody>
               {list.map((c) => (
@@ -49,16 +58,18 @@ export default function AdminCompanies() {
                   <td className="mono">{c.clients}</td>
                   <td className="mono">{c.domains}</td>
                   <td className="mono">{c.assets}</td>
-                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }} onClick={(e) => e.stopPropagation()}>
-                    {c.status === "suspended"
-                      ? <button className="btn sm ghost" disabled={busyId === c.id} onClick={() => setStatus(c.id, "active")}>Activate</button>
-                      : <button className="btn sm ghost" disabled={busyId === c.id} onClick={() => setStatus(c.id, "suspended")}>Suspend</button>}{" "}
-                    <button className="btn sm danger" disabled={busyId === c.id} onClick={() => remove(c.id, c.name)}>{busyId === c.id ? "…" : "Delete"}</button>
+                  <td onClick={(e) => e.stopPropagation()}>
+                    <div className="acts">
+                      {c.status === "suspended"
+                        ? <button className="btn sm ghost" disabled={busyId === c.id} onClick={() => setStatus(c, "active")}>Activate</button>
+                        : <button className="btn sm ghost" disabled={busyId === c.id} onClick={() => setStatus(c, "suspended")}>Suspend</button>}
+                      <button className="btn sm danger" disabled={busyId === c.id} onClick={() => remove(c)}>{busyId === c.id ? "…" : "Delete"}</button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></TableWrap>
         )}
       </div>
       {viewId && <CompanyView id={viewId} onClose={() => setViewId(null)} onChanged={load} />}
@@ -77,7 +88,7 @@ function AddCompany({ onClose, onAdded }) {
   const submit = async () => {
     setErr(""); setBusy(true);
     try {
-      const res = await post("/admin/companies", { ...f, name: profile.tradeName || profile.legalName, profile });
+      const res = await admin.companies.create({ ...f, name: profile.tradeName || profile.legalName, profile });
       setDone(res);
     } catch (e) { setErr(e.message); setBusy(false); }
   };
@@ -108,17 +119,18 @@ function AddCompany({ onClose, onAdded }) {
 }
 
 function CompanyView({ id, onClose, onChanged }) {
+  const ui = useUI();
   const [d, setD] = useState(null);
   const [form, setForm] = useState(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const load = useCallback(async () => {
-    try { setD(await get("/admin/companies/" + encodeURIComponent(id))); } catch (e) { setErr(e.message); }
+    try { setD(await admin.companies.get(id)); } catch (e) { setErr(e.message); }
   }, [id]);
   useEffect(() => { load(); }, [load]);
   const save = async () => {
     setErr(""); setBusy(true);
-    try { await patch(`/admin/companies/${encodeURIComponent(id)}/profile`, { profile: form }); setForm(null); await load(); onChanged(); }
+    try { await admin.companies.updateProfile(id, form); setForm(null); ui.toast("Company details saved"); await load(); onChanged(); }
     catch (e) { setErr(e.message); } finally { setBusy(false); }
   };
   const e = d?.counts?.engagements || {};
@@ -141,15 +153,15 @@ function CompanyView({ id, onClose, onChanged }) {
           <div className="fsec">Organisation</div>
           <OrgProfileView profile={d.profile} />
           <div className="fsec">People ({d.users.length})</div>
-          <table className="tbl"><tbody>{d.users.map((u) => (
+          <TableWrap><table className="tbl narrow"><tbody>{d.users.map((u) => (
             <tr key={u.id}><td>{u.name || "—"}</td><td className="mono">{u.email}</td><td>{u.role === "company_admin" ? <span className="chip gold">Company admin</span> : <span className="chip">Employee</span>}</td><td>{u.status === "disabled" ? <span className="chip red">Disabled</span> : <span className="chip green">Active</span>}</td></tr>
-          ))}</tbody></table>
+          ))}</tbody></table></TableWrap>
           <div className="fsec">Clients they manage ({d.clients.length})</div>
           {d.clients.length ? (
-            <table className="tbl"><tbody>{d.clients.map((c) => {
+            <TableWrap><table className="tbl narrow"><tbody>{d.clients.map((c) => {
               const [cls, lbl] = AUTH_CHIP[c.authorization] || AUTH_CHIP.missing;
               return <tr key={c.id}><td>{c.name}</td><td className="dimtxt">{INDUSTRIES[c.industry] || "—"}</td><td><span className={"chip " + cls}>{lbl}</span></td></tr>;
-            })}</tbody></table>
+            })}</tbody></table></TableWrap>
           ) : <p className="dimtxt">No clients.</p>}
         </>
       ))}

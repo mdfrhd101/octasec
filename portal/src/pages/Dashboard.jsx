@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { get } from "../api.js";
+import { dashboard } from "../services/index.js";
 import { useAuth } from "../auth.jsx";
 import Shell from "../components/Shell.jsx";
 import { Tile, StatusChip, Spinner, Empty } from "../ui.jsx";
@@ -37,7 +37,7 @@ export default function Dashboard() {
   const [err, setErr] = useState("");
   const [at, setAt] = useState(null);
   const load = useCallback(async () => {
-    try { setD(await get("/dashboard")); setAt(new Date()); setErr(""); } catch (e) { setErr(e.message); }
+    try { setD(await dashboard.get()); setAt(new Date()); setErr(""); } catch (e) { setErr(e.message); }
   }, []);
   // live: refresh every minute while the tab is visible, and immediately when it becomes visible again
   useEffect(() => {
@@ -103,11 +103,11 @@ function Ops({ d }) {
           <h3>Tenants at risk</h3>
           <p className="dimtxt">Most open critical / high findings from delivered reports — escalate these first.</p>
           {o.tenantsAtRisk.length ? (
-            <table className="tbl"><thead><tr><th>Tenant</th><th>Type</th><th>Critical</th><th>High</th></tr></thead><tbody>
+            <div className="tbl-wrap"><table className="tbl"><thead><tr><th>Tenant</th><th>Type</th><th>Critical</th><th>High</th></tr></thead><tbody>
               {o.tenantsAtRisk.map((t, i) => (
                 <tr key={i}><td>{t.name}</td><td><span className="chip dim">{t.kind}</span></td><td className="mono" style={{ color: t.critical ? "var(--red)" : undefined }}>{t.critical}</td><td className="mono">{t.high}</td></tr>
               ))}
-            </tbody></table>
+            </tbody></table></div>
           ) : <Empty>No critical or high findings delivered yet.</Empty>}
         </div>
         <div className="card panel">
@@ -184,7 +184,7 @@ function Tenant({ d, role }) {
         <div className="card panel">
           <h3>Clients — who needs attention?<span className="sp"><button className="btn ghost sm" onClick={() => nav("/clients")}>All clients</button></span></h3>
           {d.clients?.length ? (
-            <table className="tbl">
+            <div className="tbl-wrap"><table className="tbl">
               <thead><tr><th>Client</th><th>Authorisation</th><th>Domains</th><th>Critical</th><th>High</th><th>Last assessed</th></tr></thead>
               <tbody>{d.clients.map((c) => (
                 <tr key={c.id} className="frow" onClick={() => nav("/clients")}>
@@ -196,7 +196,7 @@ function Tenant({ d, role }) {
                   <td className="mono dim">{c.lastAssessed ? timeAgo(c.lastAssessed) : "never"}</td>
                 </tr>
               ))}</tbody>
-            </table>
+            </table></div>
           ) : <Empty>No clients yet. Add the businesses you manage under Clients.</Empty>}
         </div>
       )}

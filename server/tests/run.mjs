@@ -42,6 +42,7 @@ const SUITES = [
   "security-fixes.test.mjs",
   "lockout.test.mjs",
   "leads.test.mjs",
+  "findings.test.mjs",
 ];
 
 const env = {

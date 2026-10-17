@@ -102,11 +102,39 @@ r.patch(
     if (!isId(req.params.id)) return res.status(400).json({ error: "Invalid id" });
     const domain = await Domain.findOne({ _id: req.params.id, ...scopeFor(req.user) });
     if (!domain) return res.status(404).json({ error: "Not found" });
-    const ownerType = asString(req.body?.ownerType);
-    if (!["client", "self"].includes(ownerType)) return res.json({ domain });
+    const body = req.body || {};
+
+    // descriptive details (label, environment, criticality, contact, tags, notes) — any subset
+    const meta = {};
+    if ("label" in body) meta.label = asString(body.label).trim().slice(0, 80);
+    if ("contact" in body) meta.contact = asString(body.contact).trim().slice(0, 120);
+    if ("notes" in body) meta.notes = asString(body.notes).trim().slice(0, 500);
+    if ("tags" in body) meta.tags = cleanTags(body.tags);
+    if ("env" in body) {
+      if (!ENVS.includes(asString(body.env))) return res.status(400).json({ error: "Invalid environment" });
+      meta.env = body.env;
+    }
+    if ("criticality" in body) {
+      if (!CRITS.includes(asString(body.criticality))) return res.status(400).json({ error: "Invalid criticality" });
+      meta.criticality = body.criticality;
+    }
+    const saveMeta = async () => {
+      if (!Object.keys(meta).length) return;
+      domain.set(meta);
+      await domain.save();
+      await audit(req, "domain.update", {
+        targetType: "Domain", targetId: domain._id.toString(), targetLabel: domain.name, companyId: domain.companyId,
+        meta: { fields: Object.keys(meta) },
+      });
+    };
+
+    const ownerType = asString(body.ownerType);
     const from = domain.ownerType === "client" ? String(domain.clientId) : "self";
-    const to = ownerType === "client" ? asString(req.body?.clientId) : "self";
-    if (from === to) return res.json({ domain });
+    const to = ownerType === "client" ? asString(body.clientId) : "self";
+    if (!["client", "self"].includes(ownerType) || from === to) {
+      await saveMeta();
+      return res.json({ domain });
+    }
 
     // ownership decides whose authorisation-to-test applies, so changes are tightly controlled:
     // a client's domain can never become "your own" (that would skip the client's authorisation)
@@ -120,6 +148,7 @@ r.patch(
       return res.status(409).json({ error: "This domain has an open scan — finish or cancel it first" });
     }
     if (to !== "self" && !(await ownsClient(req.user, to))) return res.status(400).json({ error: "Unknown client" });
+    domain.set(meta);
     domain.ownerType = to === "self" ? "self" : "client";
     domain.clientId = to === "self" ? null : to;
     if (from !== "self") { domain.verified = false; domain.verifiedAt = null; } // moving between clients requires re-verification

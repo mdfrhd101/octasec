@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import { get, post, patch } from "../api.js";
+import { tickets } from "../services/index.js";
 import { useAuth } from "../auth.jsx";
 import Shell from "../components/Shell.jsx";
-import { Modal, Spinner, Empty } from "../ui.jsx";
+import { Modal, Spinner, Empty, LoadError, useUI } from "../ui.jsx";
 import { TicketStatus, TicketThread } from "../components/Ticket.jsx";
 
 const FILTERS = ["all", "open", "in_progress", "resolved", "closed"];
@@ -14,10 +14,8 @@ export default function AdminTickets() {
   const [err, setErr] = useState("");
 
   const load = useCallback(async () => {
-    try {
-      const q = filter === "all" ? "" : `?status=${encodeURIComponent(filter)}`;
-      setList((await get("/tickets" + q)).tickets);
-    } catch (e) { setErr(e.message); }
+    setErr("");
+    try { setList((await tickets.list(filter === "all" ? "" : filter)).tickets); } catch (e) { setErr(e.message); }
   }, [filter]);
   useEffect(() => { load(); }, [load]);
 
@@ -25,13 +23,12 @@ export default function AdminTickets() {
     <Shell title="Tickets">
       <div className="card panel">
         <h3>Support queue<span className="sp">
-          <select className="minisel" value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <select className="minisel" value={filter} onChange={(e) => { setList(null); setFilter(e.target.value); }} aria-label="Status">
             {FILTERS.map((f) => <option key={f} value={f}>{f === "all" ? "All" : f.replace("_", " ")}</option>)}
           </select>
         </span></h3>
-        {err && <div className="form-err" style={{ marginTop: 10 }}>{err}</div>}
-        {!list ? <div style={{ padding: 20 }}><Spinner /></div> : list.length === 0 ? <Empty>No tickets.</Empty> : (
-          <table className="tbl">
+        {err ? <LoadError msg={err} onRetry={load} /> : !list ? <div style={{ padding: 20 }}><Spinner /></div> : list.length === 0 ? <Empty>No tickets.</Empty> : (
+          <div className="tbl-wrap"><table className="tbl">
             <thead><tr><th>Subject</th><th>Company</th><th>Priority</th><th>Status</th><th>Updated</th></tr></thead>
             <tbody>
               {list.map((t) => (
@@ -44,7 +41,7 @@ export default function AdminTickets() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
       {viewId && <AdminTicketView id={viewId} onClose={() => { setViewId(null); load(); }} />}
@@ -54,19 +51,20 @@ export default function AdminTickets() {
 
 function AdminTicketView({ id, onClose }) {
   const { user } = useAuth();
+  const ui = useUI();
   const [ticket, setTicket] = useState(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const load = useCallback(async () => {
-    try { setTicket((await get("/tickets/" + encodeURIComponent(id))).ticket); } catch (e) { setErr(e.message); }
+    try { setTicket((await tickets.get(id)).ticket); } catch (e) { setErr(e.message); }
   }, [id]);
   useEffect(() => { load(); }, [load]);
-  const reply = async (body) => { await post(`/tickets/${encodeURIComponent(id)}/messages`, { body }); await load(); };
+  const reply = async (body) => { await tickets.reply(id, body); await load(); };
   const setStatus = async (status) => {
     if (busy) return;
     setBusy(true); setErr("");
-    try { await patch("/tickets/" + encodeURIComponent(id), { status }); await load(); }
-    catch (e) { setErr(e.message); } finally { setBusy(false); }
+    try { await tickets.setStatus(id, status); ui.toast("Status: " + status.replace("_", " ")); await load(); }
+    catch (e) { setErr(e.message); ui.toast(e.message, "err"); } finally { setBusy(false); }
   };
 
   const controls = ticket && (

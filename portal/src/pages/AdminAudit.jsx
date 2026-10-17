@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import { get } from "../api.js";
+import { admin } from "../services/index.js";
 import Shell from "../components/Shell.jsx";
 import { Spinner, Empty } from "../ui.jsx";
 
-const CATEGORIES = ["all", "auth", "company", "client", "user", "domain", "engagement", "ticket", "lead"];
+const CATEGORIES = ["all", "auth", "company", "client", "user", "domain", "asset", "engagement", "finding", "ticket", "lead"];
 const PAGE = 50;
 
 // colour an action by what it signifies
@@ -30,10 +30,7 @@ export default function AdminAudit() {
   const load = useCallback(async () => {
     setErr(""); setData(null);
     try {
-      const params = new URLSearchParams({ limit: String(PAGE), skip: String(skip) });
-      if (category !== "all") params.set("category", category);
-      if (term) params.set("q", term);
-      setData(await get("/admin/audit?" + params.toString()));
+      setData(await admin.audit({ limit: PAGE, skip, category: category === "all" ? "" : category, q: term }));
     } catch (e) { setErr(e.message); }
   }, [category, term, skip]);
   useEffect(() => { load(); }, [load]);
@@ -68,7 +65,7 @@ export default function AdminAudit() {
         {err && <div className="form-err" style={{ marginBottom: 10 }}>{err}</div>}
         {!data ? <div style={{ padding: 20 }}><Spinner /></div> : entries.length === 0 ? <Empty>No audit entries match.</Empty> : (
           <>
-            <table className="tbl">
+            <div className="tbl-wrap"><table className="tbl">
               <thead><tr><th>Time</th><th>Actor</th><th>Action</th><th>Target</th><th>IP</th></tr></thead>
               <tbody>
                 {entries.map((a) => (
@@ -87,7 +84,7 @@ export default function AdminAudit() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
             <div className="coverage-line" style={{ marginTop: 12 }}>
               <span className="dim" style={{ fontSize: 13 }}>Showing <b>{from}</b>–<b>{to}</b> of <b>{total}</b></span>
               <span style={{ display: "flex", gap: 8 }}>
