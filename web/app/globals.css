@@ -466,3 +466,25 @@ input:-webkit-autofill:active{
   caret-color:var(--text,#f0f6fa);
   transition:background-color 9999s ease-in-out 0s;
 }
+
+/* ---- pricing page: quote popup + included list ---- */
+.pr h3{font-family:var(--m);font-weight:500;font-size:1.15rem;letter-spacing:-.02em}
+.incl{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:12px 22px;font-size:14px;color:var(--muted)}
+.incl li{display:flex;gap:10px}
+.incl li::before{content:"\2713";color:var(--gold);font-weight:700}
+.qmodal{position:fixed;inset:0;z-index:100;background:rgba(0,5,8,.74);backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px;overflow:auto}
+.qcard{position:relative;width:min(640px,100%);padding:26px 26px 22px;max-height:calc(100vh - 32px);overflow:auto}
+.qcard h3{font-family:var(--m);font-weight:500;font-size:1.25rem;margin:0 0 6px;padding-right:44px;color:var(--text)}
+.qsub{color:var(--muted);font-size:13.5px;line-height:1.55;margin:0 0 16px}
+.qform{max-width:none;margin:0}
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qx{position:absolute;top:14px;right:14px;z-index:3;width:34px;height:34px;display:grid;place-items:center;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer}
+.qx svg{width:16px;height:16px}
+.qx:hover{color:var(--gold);border-color:rgba(232,193,90,.45)}
+.qrow{display:flex;justify-content:flex-end;align-items:center;gap:18px;margin-top:4px}
+.qrow .link{background:none;border:0;cursor:pointer}
+.qerr{color:var(--red,#ff5d6c);font-family:var(--m);font-size:13px;margin:0}
+@media(max-width:640px){.qgrid,.incl{grid-template-columns:1fr}}
+.pr .amt small{display:block;margin-top:4px}
+/* section labels are pills, not full-width bars (the older display:block rule predates the pill style) */
+.section-head .eyebrow{display:inline-flex}

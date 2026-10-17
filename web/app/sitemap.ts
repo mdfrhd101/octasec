@@ -8,6 +8,7 @@ const PATHS = [
   "how-it-works",
   "services",
   "benchmarks",
+  "pricing",
   "faq",
   "about",
   "contact",

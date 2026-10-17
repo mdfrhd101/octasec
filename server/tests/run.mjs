@@ -41,6 +41,7 @@ const SUITES = [
   "engine-http.test.mjs",
   "security-fixes.test.mjs",
   "lockout.test.mjs",
+  "leads.test.mjs",
 ];
 
 const env = {

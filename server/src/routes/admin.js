@@ -499,6 +499,8 @@ r.get(
     const q = {};
     const st = asString(req.query.status);
     if (["new", "contacted", "closed"].includes(st)) q.status = st;
+    const src = asString(req.query.source);
+    if (["contact", "pricing"].includes(src)) q.source = src;
     const leads = await Lead.find(q).sort({ createdAt: -1 }).skip(skip).limit(limit).lean();
     res.json({ leads });
   })

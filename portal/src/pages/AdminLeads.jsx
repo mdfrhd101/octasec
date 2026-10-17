@@ -4,6 +4,9 @@ import Shell from "../components/Shell.jsx";
 import { Modal, Spinner, Empty } from "../ui.jsx";
 
 const ST = { new: "warn", contacted: "gold", closed: "dim" };
+const PLAN = { assessment: "One-off assessment", continuous: "Continuous testing", enterprise: "Enterprise & MSSP" };
+const SCOPE = { "1": "1 app / API", "2-5": "2–5 apps", "6-20": "6–20 apps", "20+": "20+ apps", "Not sure": "Scope not sure" };
+const Source = ({ l }) => (l.source === "pricing" ? <span className="chip gold">Quote request</span> : <span className="chip dim">Contact form</span>);
 
 export default function AdminLeads() {
   const [list, setList] = useState(null);
@@ -23,20 +26,22 @@ export default function AdminLeads() {
   return (
     <Shell title="Leads">
       <div className="card panel">
-        <h3>Contact requests</h3>
+        <h3>Contact & quote requests</h3>
         <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>
-          Submissions from the marketing site's contact form land here instantly.
+          Submissions from the marketing site's contact form and the Pricing page's quote popup land here instantly.
         </p>
         {err && <div className="form-err" style={{ marginTop: 10 }}>{err}</div>}
         {!list ? <div style={{ padding: 20 }}><Spinner /></div> : list.length === 0 ? <Empty>No contact requests yet.</Empty> : (
           <table className="tbl">
-            <thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Interest</th><th>Status</th><th>When</th></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Source</th><th>Plan</th><th>Interest</th><th>Status</th><th>When</th></tr></thead>
             <tbody>
               {list.map((l) => (
                 <tr key={l._id} className="frow" onClick={() => setView(l)}>
                   <td>{l.name}</td>
                   <td className="mono">{l.email}</td>
                   <td>{l.company || "—"}</td>
+                  <td><Source l={l} /></td>
+                  <td>{PLAN[l.plan] || <span className="dimtxt">—</span>}</td>
                   <td><span className="chip">{l.target}</span></td>
                   <td><span className={"chip " + (ST[l.status] || "dim")}>{l.status}</span></td>
                   <td className="mono dim">{new Date(l.createdAt).toLocaleDateString()}</td>
@@ -50,6 +55,9 @@ export default function AdminLeads() {
       {view && (
         <Modal title={view.name} sub={view.email} onClose={() => setView(null)}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+            <Source l={view} />
+            {view.plan && <span className="chip gold">{PLAN[view.plan]}</span>}
+            {view.scope && <span className="chip">{SCOPE[view.scope] || view.scope}</span>}
             <span className="chip">{view.target}</span>
             {view.company && <span className="chip dim">{view.company}</span>}
             <span className={"chip " + (ST[view.status] || "dim")}>{view.status}</span>

@@ -8,6 +8,7 @@ const NAVITEMS: [string, string][] = [
   ["/how-it-works", "How it works"],
   ["/services", "Services"],
   ["/benchmarks", "Benchmarks"],
+  ["/pricing", "Pricing"],
   ["/faq", "FAQ"],
   ["/about", "About"],
 ];

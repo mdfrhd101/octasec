@@ -7,6 +7,10 @@ import { asyncHandler, asString } from "../utils/http.js";
 const r = Router();
 
 const TARGETS = ["Web app", "API", "Cloud", "Network", "AI feature", "Not sure"];
+const SOURCES = ["contact", "pricing"];
+const PLANS = ["assessment", "continuous", "enterprise"];
+const SCOPES = ["1", "2-5", "6-20", "20+", "Not sure"];
+const pick = (v, list, fallback) => (list.includes(asString(v).trim()) ? asString(v).trim() : fallback);
 
 // public endpoint → tight per-IP rate limit to deter spam
 const contactLimiter = rateLimit({
@@ -35,7 +39,10 @@ r.post(
     if (!name) return res.status(400).json({ error: "Name is required" });
     if (!EMAIL_RE.test(email)) return res.status(400).json({ error: "A valid email is required" });
 
-    await Lead.create({ name, email, company, target, message });
+    const source = pick(req.body?.source, SOURCES, "contact");
+    const plan = pick(req.body?.plan, PLANS, "");
+    const scope = pick(req.body?.scope, SCOPES, "");
+    await Lead.create({ name, email, company, target, message, source, plan, scope });
     res.status(201).json({ ok: true });
   })
 );

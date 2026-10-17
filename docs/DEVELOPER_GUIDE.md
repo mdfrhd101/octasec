@@ -216,7 +216,7 @@ Everything below is mounted under `/api`. 🔒 means authentication is required;
 | Method | Path | Notes |
 |---|---|---|
 | GET | `/health` | liveness |
-| POST | `/contact` | marketing contact form (rate-limited, honeypot) |
+| POST | `/contact` | contact form + Pricing-page quote popup (rate-limited, honeypot); optional `source` (`contact`/`pricing`), `plan`, `scope` |
 | POST | `/auth/register` | always 202 "check your email"; account stays pending until verified |
 | POST | `/auth/verify-email` | `{token}` → activates and returns a session |
 | POST | `/auth/login` | `{email,password}` → `{token,user}` |
@@ -278,7 +278,7 @@ Everything below is mounted under `/api`. 🔒 means authentication is required;
 | POST | `/admin/engagements/:id/findings/:fid` | `{decision:"verified"\|"rejected", note}` |
 | POST | `/admin/engagements/:id/sign` | all findings reviewed → `delivered` |
 | POST | `/admin/engagements/:id/reject` | `{reason}` |
-| GET/PATCH | `/admin/leads[/:id]` | contact-form inbox |
+| GET/PATCH | `/admin/leads[/:id]` | contact + quote-request inbox (`?status=`, `?source=pricing`) |
 | GET | `/admin/audit` | `?category=auth\|company\|client\|user\|domain\|engagement\|ticket\|lead&q=` |
 | PATCH | `/tickets/:id` | ticket status (super admin) |
 
@@ -355,6 +355,7 @@ After deploying, check:
 | Document | What it covers |
 |---|---|
 | `docs/DEVELOPER_GUIDE.md` | this guide |
+| `docs/PRICING_PAGE.md` | pricing page + quote popup spec |
 | `docs/PORTAL_DATA_AND_DASHBOARDS.md` | what data the product collects and why; dashboards per role |
 | `docs/EMAIL_AND_PASSWORD_RESET.md` | email, sign-up verification, invites, resets, SMTP setup |
 | `docs/ENGINE_INTEGRATION.md` | scan-engine contract (**incomplete — pending owner review**) |
