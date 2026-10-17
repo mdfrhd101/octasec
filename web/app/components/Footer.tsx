@@ -2,7 +2,7 @@ import Link from "next/link";
 import BrandMark from "./BrandMark";
 import BackToTop from "./BackToTop";
 
-export const CONTACT = { email: "support@octasec.com", phone: "+8801326875385", phoneLabel: "+880 1326-875385" };
+export const CONTACT = { email: "support@octasec.ai", phone: "+8801326875385", phoneLabel: "+880 1326-875385" };
 
 // Octagram Limited's official profiles (as linked from octagramltd.com)
 const SOCIAL = [

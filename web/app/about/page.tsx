@@ -60,21 +60,22 @@ export default function AboutPage() {
         <SectionHead
           eyebrow="One firm, two faces"
           title="The engine, and the full-service team behind it."
+          text="OctaSec is a product of Octagram Limited — built, run and signed off by Octagram's own security team."
           center
         />
         <div className="blocks stagger">
           <Card className="cov">
-            <h4>octasec.ai</h4>
+            <h4>OctaSec</h4>
             <p>
-              The productized offensive engine &mdash; AI-orchestrated hunting,
-              human-gated, fixed-price.
+              Octagram&apos;s productized offensive engine &mdash; AI-orchestrated
+              hunting, human-gated, fixed-price.
             </p>
           </Card>
           <Card className="cov">
-            <h4>octagramltd.com</h4>
+            <h4>Octagram</h4>
             <p>
-              The parent firm &mdash; full-service security, red team, and six
-              service lines.{" "}
+              The parent firm behind OctaSec &mdash; full-service security, red
+              team, and six service lines.{" "}
               <a href="https://octagramltd.com" style={{ color: "var(--gold)" }}>
                 Visit Octagram &#8599;
               </a>

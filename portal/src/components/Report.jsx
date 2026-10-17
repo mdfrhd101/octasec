@@ -215,7 +215,7 @@ export default function ReportDocument({ e, editable, onChange }) {
           ))}
         </section>
       )}
-      <footer className="rep-foot">OctaSec by Octagram Limited · support@octasec.com · Generated {day(new Date())}</footer>
+      <footer className="rep-foot">OctaSec by Octagram Limited · support@octasec.ai · Generated {day(new Date())}</footer>
     </article>
   );
 }

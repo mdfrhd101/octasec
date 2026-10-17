@@ -31,7 +31,7 @@ export default function LegalPage() {
             Found a security issue in OctaSec or octasec.ai itself? Report it in
             good faith and we&apos;ll work with you. Please give us reasonable time
             to remediate before any public disclosure. Contact{" "}
-            <a href="mailto:support@octasec.com" style={{ color: "var(--gold)" }}>support@octasec.com</a> (subject: &ldquo;Security&rdquo;).
+            <a href="mailto:support@octasec.ai" style={{ color: "var(--gold)" }}>support@octasec.ai</a> (subject: &ldquo;Security&rdquo;).
           </p>
           <h3>security.txt</h3>
           <p>
@@ -48,7 +48,7 @@ export default function LegalPage() {
             actions. We do not sell your data. Test findings are visible only to
             your organisation and to OctaSec operators working on your engagement.
             To access, correct or delete your data, email{" "}
-            <a href="mailto:support@octasec.com" style={{ color: "var(--gold)" }}>support@octasec.com</a>.
+            <a href="mailto:support@octasec.ai" style={{ color: "var(--gold)" }}>support@octasec.ai</a>.
           </p>
           <h3 id="terms">Terms</h3>
           <p>
@@ -62,7 +62,7 @@ export default function LegalPage() {
           <h3>Contact</h3>
           <p>
             Email{" "}
-            <a href="mailto:support@octasec.com" style={{ color: "var(--gold)" }}>support@octasec.com</a>
+            <a href="mailto:support@octasec.ai" style={{ color: "var(--gold)" }}>support@octasec.ai</a>
             {" "}&middot; Phone{" "}
             <a href="tel:+8801326875385" style={{ color: "var(--gold)" }}>+880 1326-875385</a>
           </p>

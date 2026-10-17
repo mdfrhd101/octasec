@@ -71,7 +71,7 @@ Plan + API contract: `docs/PORTAL_FRONTEND_PLAN.md` · Tests: `tests/specs/porta
 - **F8 Website** — `DONE`. `og.png` plus OG/Twitter metadata. Plausible loads only when `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set.
 
 ## Later (not in this phase)
-- Phase C billing (deferred by owner), CMS/Settings, real scan engine integration (incl. retest = re-check `retestOf` only), API-key backend (contract ready), deployment, domain decision (octasec.ai vs octasec.com).
+- Phase C billing (deferred by owner), CMS/Settings, real scan engine integration (incl. retest = re-check `retestOf` only), API-key backend (contract ready), deployment, domain confirmed: octasec.ai (contact support@octasec.ai).
 
 > Phase P result (2026-10-17): `npm test` → 12/12 suites (profiles 65, scoping 24, dashboards 27 + all earlier suites green).
 > Also added: accounts created by an admin (new company admin, new employee) get `mustChangePassword` — they set their own password at first sign-in.

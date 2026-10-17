@@ -116,7 +116,7 @@ change: redeploy `server/` and `pm2 reload octasec-api`.
 - **Analytics / site URL**: build-time settings in `web/.env.example`. No Plausible tag is
   shipped unless `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set when building. `NEXT_PUBLIC_SITE_URL`
   (default `https://octasec.ai`) drives canonical links, sitemap and the social card (`/og.png`).
-- **Contact**: site, legal page and security.txt use `support@octasec.com` and
+- **Contact**: site, legal page and security.txt use `support@octasec.ai` and
   `+8801326875385` (footer, contact page, quote popup notes).
 - **Sessions**: the API re-checks the user in the DB on every request and
   revokes tokens on password change/reset/disable (see SECURITY_AUDIT.md round 4).
