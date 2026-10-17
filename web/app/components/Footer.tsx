@@ -79,12 +79,6 @@ export default function Footer() {
             <a href="/portal/">Client portal</a>
             <a href="/portal/">Corporate portal</a>
           </div>
-          <div>
-            <h5>Legal</h5>
-            <Link href="/legal">Legal &amp; RoE</Link>
-            <Link href="/legal#disclosure">Responsible disclosure</Link>
-            <a href="/.well-known/security.txt">security.txt</a>
-          </div>
         </div>
         <p className="foot-roe">
           Authorized testing only &middot; Signed rules of engagement &middot; Scope
