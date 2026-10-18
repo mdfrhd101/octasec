@@ -1,4 +1,4 @@
-// Regression proofs for the 2026-10-17 security assessment (SECURITY_REPORT_OctaSec_2026-10-17.md).
+// Regression proofs for the 2026-10-17 security assessment (internal report).
 // Each check maps to a finding id (SA-xx) and must stay green.
 import mongoose from "mongoose";
 import { BASE, J, token, login, chk, done, db, engagementBody, mailsTo, latestLink } from "./lib.mjs";
