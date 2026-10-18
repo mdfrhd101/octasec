@@ -88,7 +88,6 @@ export default function RootLayout({
       </head>
       <body>
         <JsonLd data={[organizationLd, websiteLd]} />
-        <div className="scroll-prog" id="scrollProg" aria-hidden="true" />
         <Nav />
         <main>{children}</main>
         <Footer />

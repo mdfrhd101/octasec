@@ -183,8 +183,7 @@ export default function SiteMotion() {
       if (fallbackTimer) clearTimeout(fallbackTimer);
     });
 
-    /* scroll engine: progress bar + .section-head parallax */
-    const sProg = document.getElementById("scrollProg");
+    /* scroll engine: .section-head parallax */
     type Par = { el: HTMLElement; sp: number };
     const pars: Par[] = [];
     document.querySelectorAll<HTMLElement>(".section-head").forEach((el) => {
@@ -195,10 +194,6 @@ export default function SiteMotion() {
       ticking = false;
     function update() {
       ticking = false;
-      const max = document.documentElement.scrollHeight - vh;
-      if (sProg)
-        sProg.style.transform =
-          "scaleX(" + (max > 0 ? Math.min(1, sy / max) : 0) + ")";
       if (reduce) return;
       for (let i = 0; i < pars.length; i++) {
         const p = pars[i],
