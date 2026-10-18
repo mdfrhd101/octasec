@@ -36,6 +36,5 @@ Lifecycle: NEW → CONFIRMED → IN_PROGRESS → RESOLVED → CLOSED
 ---
 
 ## Security assessment 2026-10-17 (SA-01 … SA-29)
-Tracked in `SECURITY_REPORT_OctaSec_2026-10-17.md` §3 (one row per finding with severity, CVSS and status).
-All CLOSED (fixed + regression-tested) except SA-29 (accepted risk) and the documented residuals of SA-04 / SA-19.
+Tracked in the internal security assessment report (kept by Octagram, not in this repository). Fixes are regression-tested in `server/tests/security-fixes.test.mjs` and `lockout.test.mjs`.
 Functional bugs found during the assessment and fixed: portal build typo in App.jsx; run-claim blocked legacy engagements without engine fields.

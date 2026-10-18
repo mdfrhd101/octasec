@@ -383,9 +383,8 @@ After deploying, check:
 | `docs/EMAIL_AND_PASSWORD_RESET.md` | email, sign-up verification, invites, resets, SMTP setup |
 | `docs/ENGINE_INTEGRATION.md` | scan-engine contract (**incomplete — pending owner review**) |
 | `OCTASEC_PORTAL_SPEC.md` | product panels and workflow spec (phases A–D) |
-| `SECURITY_REPORT_OctaSec_2026-10-17.md` / `.pdf` | security assessment: 29 findings and their fixes |
-| `server/SECURITY_AUDIT.md` | history of the security review rounds |
+| Security assessment report + review history | kept internally by Octagram (not in this repository) |
 | `DEPLOY.md` | VPS deployment |
 | `tasks/TODO.md`, `tasks/BUG_TRACKER.md` | work breakdown, bugs |
 | `tests/specs/*.md` | test specifications |
-| `OCTASEC_PRODUCT_DETAIL.md`, `OCTASEC_WEBSITE_BRIEF.md`, `OCTASEC_SITEMAP.md`, `MARKET_RESEARCH.md` | product and market background |
+| `OCTASEC_PRODUCT_DETAIL.md`, `OCTASEC_WEBSITE_BRIEF.md`, `OCTASEC_SITEMAP.md` | product background |

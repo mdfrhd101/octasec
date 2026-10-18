@@ -205,4 +205,4 @@ Every finding is a complete **case file**, not an alert:
 4. **Continuous + integrations** — CI/CD, retest, ticketing
 5. **Full autonomous + offline** — local-model air-gapped mode, enterprise governance
 
-> Companion docs in this folder: `MARKET_RESEARCH.md` (competitors), `OCTASEC_WEBSITE_BRIEF.md` (site/trust), `OCTASEC_SITEMAP.md` (pages), `octasec-home.html` (home page prototype).
+> Companion docs in this folder: `OCTASEC_WEBSITE_BRIEF.md` (site/trust), `OCTASEC_SITEMAP.md` (pages), `octasec-home.html` (home page prototype).

@@ -24,3 +24,6 @@ brand/*.zip
 *.log
 .DS_Store
 Thumbs.db
+
+# internal docs kept locally only (not published)
+private-docs/

@@ -23,7 +23,7 @@ cd server && npm install && cp .env.example .env && npm run seed && npm start
 cd server && npm test        # 19 suites against an isolated test database
 ```
 
-Security: see [`SECURITY_REPORT_OctaSec_2026-10-17.md`](SECURITY_REPORT_OctaSec_2026-10-17.md).
+Security: the security checklist for new code is in [`docs/DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md) §11. Report vulnerabilities to support@octasec.ai.
 Deployment: see [`DEPLOY.md`](DEPLOY.md).
 
 © 2026 Octagram Limited. Proprietary and confidential.

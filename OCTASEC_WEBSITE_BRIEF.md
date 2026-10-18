@@ -121,4 +121,4 @@ If we deliver evidence + visible guardrails + transparent pricing + a cleaner no
 2. **Write the copy** — full homepage copy (EN + Bangla) in the one-thesis style.
 3. **Design system first** — colors, type scale, components, logo direction for OctaSec.
 
-> Dependency: the product's **scope/authorization + audit** design (from MARKET_RESEARCH.md §7) should inform the "guardrails" section — the site's biggest trust asset mirrors a real product capability, not marketing.
+> Dependency: the product's **scope/authorization + audit** design should inform the "guardrails" section — the site's biggest trust asset mirrors a real product capability, not marketing.

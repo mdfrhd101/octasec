@@ -119,7 +119,7 @@ change: redeploy `server/` and `pm2 reload octasec-api`.
 - **Contact**: site, legal page and security.txt use `support@octasec.ai` and
   `+8801326875385` (footer, contact page, quote popup notes).
 - **Sessions**: the API re-checks the user in the DB on every request and
-  revokes tokens on password change/reset/disable (see SECURITY_AUDIT.md round 4).
+  revokes tokens on password change/reset/disable (security review round 4).
 - **Tests**: `cd server && npm test` runs all API suites against an isolated
   `octasec_test` database (needs a local MongoDB). Run before every release.
 
