@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import BrandMark from "./BrandMark";
+import BrandLockup from "./BrandLockup";
 import { useState } from "react";
 
 const NAVITEMS: [string, string][] = [
   ["/how-it-works", "How it works"],
   ["/services", "Services"],
   ["/benchmarks", "Benchmarks"],
+  ["/blog", "Blog"],
   ["/pricing", "Pricing"],
   ["/faq", "FAQ"],
   ["/about", "About"],
@@ -26,7 +27,7 @@ export default function Nav() {
         <div className="wrap">
           <div className="navbar">
             <Link className="brand" href="/" aria-label="OctaSec home">
-              <BrandMark /> OCTASEC
+              <BrandLockup height={26} />
             </Link>
             <nav className="nav-links" aria-label="Primary">
               {NAVITEMS.map(([h, t]) => (
@@ -75,7 +76,7 @@ export default function Nav() {
               </Link>
             ))}
             <a href="/portal/">Sign in</a>
-            <Link href="/contact" style={{ color: "#b78e22" }}>
+            <Link href="/contact" style={{ color: "#9a1f18" }}>
               Book a scoping call
             </Link>
           </div>

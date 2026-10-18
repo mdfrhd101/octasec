@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
+import { pageMeta } from "../lib/seo";
 import PageHero from "../components/PageHero";
 import FinalCTA from "../components/FinalCTA";
 
-export const metadata: Metadata = {
-  title: "OctaSec — Legal",
+export const metadata = pageMeta({
+  title: "Legal, Privacy & Terms",
   description:
-    "Authorized testing only. Privacy, terms, responsible disclosure and security.txt.",
-  alternates: { canonical: "/legal" },
-};
+    "OctaSec legal: authorized testing only, privacy policy, terms of service, responsible disclosure and security.txt.",
+  keywords: ["OctaSec legal", "penetration testing terms of service", "responsible disclosure", "security.txt"],
+  path: "/legal",
+});
 
 export default function LegalPage() {
   return (

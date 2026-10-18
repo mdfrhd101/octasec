@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../auth.jsx";
 import { Modal } from "../ui.jsx";
-import BrandMark from "./BrandMark.jsx";
+import BrandLockup from "./BrandLockup.jsx";
 
 function PasswordForm({ onDone, onCancel, submitLabel = "Change password" }) {
   const { changePassword } = useAuth();
@@ -40,7 +40,7 @@ export function ForcePasswordChange() {
   return (
     <div className="login">
       <div className="login-card card">
-        <div className="brand"><BrandMark /> OCTASEC <span>PORTAL</span></div>
+        <div className="brand"><BrandLockup height={26} /> <span>PORTAL</span></div>
         <p className="login-sub">Your password was reset by an administrator. Choose a new password to continue, {user.email}.</p>
         <PasswordForm submitLabel="Set new password" />
         <p className="login-note"><a href="#" onClick={(e) => { e.preventDefault(); logout(); }}>Sign out</a></p>

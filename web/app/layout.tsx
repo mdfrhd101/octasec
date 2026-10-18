@@ -6,40 +6,64 @@ import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import SiteMotion from "./components/SiteMotion";
 import SmoothScroll from "./components/SmoothScroll";
+import JsonLd from "./components/JsonLd";
 import { SITE_URL, PLAUSIBLE_DOMAIN } from "./site";
+import { organizationLd, websiteLd } from "./lib/seo";
 
+// Primary + secondary keyword clusters (grounded in PTaaS / AI-pentest / VAPT research).
 const KEYWORDS = [
+  "AI penetration testing",
+  "penetration testing as a service",
+  "PTaaS",
+  "automated penetration testing",
+  "VAPT",
+  "vulnerability assessment and penetration testing",
   "affordable penetration testing",
-  "AI pentest service",
-  "VAPT Bangladesh",
-  "API security assessment",
+  "web application penetration testing",
+  "API security testing",
+  "human-verified pentest",
+  "OWASP Top 10 testing",
+  "red teaming",
+  "penetration testing Bangladesh",
   "pentest for startups",
 ];
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "OctaSec — Affordable penetration testing",
+  title: {
+    default: "OctaSec — AI Penetration Testing & Affordable VAPT",
+    template: "%s | OctaSec",
+  },
   description:
-    "Affordable penetration testing at enterprise depth. OctaSec is Octagram's AI pentest service — human-verified findings, startup-grade pricing. VAPT for Bangladesh and beyond.",
+    "AI-orchestrated, human-verified penetration testing. Web, API, mobile & network VAPT — every finding proven and signed by a named operator. Startup-grade pricing.",
   keywords: KEYWORDS,
   applicationName: "OctaSec",
+  authors: [{ name: "Octagram Limited", url: "https://octagramltd.com" }],
+  creator: "Octagram Limited",
+  publisher: "Octagram Limited",
+  category: "technology",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName: "OctaSec",
-    title: "OctaSec — Affordable penetration testing",
+    locale: "en_US",
+    title: "OctaSec — AI Penetration Testing, Human-Verified",
     description:
-      "Octagram's human-gated, AI-orchestrated pentest service. Every finding human-verified. Enterprise-grade pentesting. Startup-grade pricing.",
+      "Octagram's human-gated, AI-orchestrated pentest service. Every finding proven and signed. Enterprise-grade pentesting. Startup-grade pricing.",
     url: SITE_URL,
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "OctaSec — Enterprise-grade pentesting. Startup-grade pricing." }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "OctaSec — Affordable penetration testing",
-    description: "Human-gated, AI-orchestrated pentesting. Every finding human-verified.",
+    title: "OctaSec — AI Penetration Testing, Human-Verified",
+    description: "Human-gated, AI-orchestrated pentesting. Every finding proven and signed by a named operator.",
     images: ["/og.png"],
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
 };
 
 export default function RootLayout({
@@ -63,6 +87,7 @@ export default function RootLayout({
         ) : null}
       </head>
       <body>
+        <JsonLd data={[organizationLd, websiteLd]} />
         <div className="scroll-prog" id="scrollProg" aria-hidden="true" />
         <Nav />
         <main>{children}</main>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMeta } from "../lib/seo";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import PageHero from "../components/PageHero";
@@ -6,12 +6,13 @@ import ScopeCTA from "../components/ScopeCTA";
 import SectionHead from "../components/SectionHead";
 import FinalCTA from "../components/FinalCTA";
 
-export const metadata: Metadata = {
-  title: "OctaSec — Services",
+export const metadata = pageMeta({
+  title: "Penetration Testing Services",
   description:
-    "Web application pentest, API security assessment, attack-surface audit, continuous monitoring, AI/LLM testing — a pentest for startups and enterprises alike.",
-  alternates: { canonical: "/services" },
-};
+    "Web app, API, mobile & network penetration testing, attack-surface mapping, continuous testing and AI/LLM security assessment — VAPT for startups and enterprises.",
+  keywords: ["web application penetration testing", "API security testing", "mobile app penetration testing", "network penetration testing", "AI LLM security testing", "attack surface assessment"],
+  path: "/services",
+});
 
 function Svc({
   tag,

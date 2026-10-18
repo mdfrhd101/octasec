@@ -1,0 +1,28 @@
+// OctaSec lockup (brand/octasec-logo/lockup.svg) — mark + two-tone wordmark
+// (cream "OCTA" + red "SEC"). Transparent (background rect removed) so it blends
+// on any dark surface. Sized by `height`; width scales with the 714×200 viewBox.
+export default function BrandLockup({ height = 24 }: { height?: number }) {
+  return (
+    <svg
+      viewBox="0 0 714 200" role="img" aria-label="OctaSec" focusable="false"
+      style={{ height, width: "auto", display: "block" }}
+    >
+      <defs>
+        <linearGradient id="octasecLockup" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ff9a86" />
+          <stop offset=".5" stopColor="#e8433a" />
+          <stop offset="1" stopColor="#9a1f18" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(28 20) scale(.625)">
+        <path d="M91.3 39.3 L164.7 39.3 L216.7 91.3 L216.7 164.7 L164.7 216.7 L91.3 216.7 L39.3 164.7 L39.3 91.3 Z" fill="none" stroke="url(#octasecLockup)" strokeWidth="11" strokeLinejoin="round" />
+        <path d="M173.2 47.8 L208.2 82.8" fill="none" stroke="#ffd9cf" strokeWidth="7" strokeLinecap="round" opacity=".85" />
+        <path d="M110.4 85.5 L145.6 85.5 L170.5 110.4 L170.5 145.6 L145.6 170.5 L110.4 170.5 L85.5 145.6 L85.5 110.4 Z" fill="#05090d" />
+        <path d="M109 110 L129 128 L109 146" fill="none" stroke="#e8433a" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="139" y="111" width="9" height="34" rx="3.5" fill="#15a06b" />
+      </g>
+      <path fill="#f9f0d4" d="M230.32 134L219.28 122.96L219.28 77.84L230.32 66.80L264.88 66.80L275.92 77.84L275.92 122.96L264.88 134L230.32 134M237.23 122.86L257.97 122.86L262.86 117.97L262.86 82.83L257.97 77.94L237.23 77.94L232.34 82.83L232.34 117.97 M302.52 134L291.48 122.96L291.48 77.84L302.52 66.80L335.35 66.80L346.20 77.65L346.20 87.92L333.14 87.92L333.14 82.45L328.63 77.94L309.43 77.94L304.54 82.83L304.54 117.97L309.43 122.86L328.63 122.86L333.14 118.35L333.14 112.88L346.20 112.88L346.20 123.15L335.35 134 M375.58 134L375.58 77.84L355.52 77.84L355.52 66.80L408.70 66.80L408.70 77.84L388.64 77.84L388.64 134 M415.62 134L440.20 66.80L452.10 66.80L476.68 134L463.43 134L457.96 119.12L434.34 119.12L428.87 134L415.62 134M437.32 108.37L455.08 108.37L446.15 82.83L445.96 82.83" />
+      <path fill="#e8433a" d="M497.33 134L486.96 123.63L486.96 114.03L499.82 114.03L499.82 119.70L502.99 122.86L522.86 122.86L526.13 119.60L526.13 108.46L522.96 105.30L497.52 105.30L487.15 94.93L487.15 77.17L497.52 66.80L527.86 66.80L538.22 77.17L538.22 86.86L525.36 86.86L525.36 81.10L522.19 77.94L503.18 77.94L500.02 81.10L500.02 90.99L503.18 94.16L528.62 94.16L538.99 104.53L538.99 123.44L528.43 134 M554.55 134L554.55 66.80L603.13 66.80L603.13 77.84L567.61 77.84L567.61 94.83L600.34 94.83L600.34 105.68L567.61 105.68L567.61 122.96L603.13 122.96L603.13 134 M627.81 134L616.77 122.96L616.77 77.84L627.81 66.80L660.64 66.80L671.49 77.65L671.49 87.92L658.43 87.92L658.43 82.45L653.92 77.94L634.72 77.94L629.82 82.83L629.82 117.97L634.72 122.86L653.92 122.86L658.43 118.35L658.43 112.88L671.49 112.88L671.49 123.15L660.64 134" />
+    </svg>
+  );
+}

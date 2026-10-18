@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { auth } from "../services/index.js";
-import BrandMark from "../components/BrandMark.jsx";
+import BrandLockup from "../components/BrandLockup.jsx";
 
 // Opened from the emailed link: /portal/reset-password?token=…
 // The token is read once and immediately removed from the address bar/history.
@@ -45,7 +45,7 @@ export default function ResetPassword() {
   return (
     <div className="login">
       <div className="login-card card">
-        <div className="brand"><BrandMark /> OCTASEC <span>PORTAL</span></div>
+        <div className="brand"><BrandLockup height={26} /> <span>PORTAL</span></div>
         {done ? (
           <>
             <p className="login-sub" style={{ color: "var(--green)" }}>Password updated. Every other session has been signed out.</p>

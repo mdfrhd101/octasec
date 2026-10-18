@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
+import { pageMeta } from "../lib/seo";
 import Link from "next/link";
 import PageHero from "../components/PageHero";
 import SectionHead from "../components/SectionHead";
 import FaqAccordion, { type FaqItem } from "../components/FaqAccordion";
 import { QuoteProvider, QuoteButton } from "../components/QuoteRequest";
 
-export const metadata: Metadata = {
-  title: "OctaSec — Pricing",
+export const metadata = pageMeta({
+  title: "Penetration Testing Pricing",
   description:
-    "Penetration testing priced by scope: one-off assessments, continuous testing and enterprise / MSSP plans. Get a fixed quote within one business day.",
+    "Penetration testing priced by scope: one-off assessments, continuous testing and enterprise / MSSP plans. Get a custom quote fast — enterprise depth, startup-grade pricing.",
   keywords: ["pentest pricing", "penetration testing cost", "VAPT pricing Bangladesh", "API security assessment price"],
-  alternates: { canonical: "/pricing" },
-};
+  path: "/pricing",
+});
 
 const PLANS = [
   {

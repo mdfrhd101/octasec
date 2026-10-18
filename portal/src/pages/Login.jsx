@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../auth.jsx";
 import { auth } from "../services/index.js";
-import BrandMark from "../components/BrandMark.jsx";
+import BrandLockup from "../components/BrandLockup.jsx";
 
 export default function Login() {
   const { login, register, notice } = useAuth();
@@ -31,8 +31,7 @@ export default function Login() {
     <div className="login">
       <div className="login-card card">
         <div className="brand">
-          <BrandMark />
-          OCTASEC <span>PORTAL</span>
+          <BrandLockup height={26} /> <span>PORTAL</span>
         </div>
         <p className="login-sub">
           {mode === "login" ? "Sign in to manage your domains, assets and scans." : mode === "forgot" ? "Enter your account email and we will send you a password-reset link." : "Create your account to get started."}

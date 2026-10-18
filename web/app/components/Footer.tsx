@@ -1,5 +1,5 @@
 import Link from "next/link";
-import BrandMark from "./BrandMark";
+import BrandLockup from "./BrandLockup";
 import BackToTop from "./BackToTop";
 
 export const CONTACT = { email: "support@octasec.ai", phone: "+8801326875385", phoneLabel: "+880 1326-875385" };
@@ -37,7 +37,7 @@ export default function Footer() {
         <div className="foot-grid">
           <div>
             <span className="brand foot-brand" style={{ color: "var(--text)" }}>
-              <BrandMark /> OCTASEC
+              <BrandLockup height={26} />
             </span>
             <p
               className="muted"
@@ -64,6 +64,7 @@ export default function Footer() {
             <Link href="/how-it-works">How it works</Link>
             <Link href="/services">Services</Link>
             <Link href="/benchmarks">Benchmarks</Link>
+            <Link href="/blog">Blog</Link>
             <Link href="/pricing">Pricing</Link>
             <Link href="/faq">FAQ</Link>
           </div>

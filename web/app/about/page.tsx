@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMeta } from "../lib/seo";
 import Link from "next/link";
 import PageHero from "../components/PageHero";
 import ScopeCTA from "../components/ScopeCTA";
@@ -6,12 +6,13 @@ import SectionHead from "../components/SectionHead";
 import Card from "../components/Card";
 import FinalCTA from "../components/FinalCTA";
 
-export const metadata: Metadata = {
-  title: "OctaSec — About",
+export const metadata = pageMeta({
+  title: "About — An Octagram Company",
   description:
-    "OctaSec is the offensive-security engine of Octagram Ltd, trusted by CID, DMP, RAB & CTTC.",
-  alternates: { canonical: "/about" },
-};
+    "OctaSec is the offensive-security product of Octagram Limited, a Dhaka-based cybersecurity firm trusted by CID, DMP, RAB & CTTC. Human-gated AI penetration testing.",
+  keywords: ["about OctaSec", "Octagram Limited", "cybersecurity company Bangladesh", "Dhaka penetration testing company"],
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

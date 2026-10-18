@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth.jsx";
 import { ChangePasswordModal } from "./ChangePassword.jsx";
-import BrandMark from "./BrandMark.jsx";
+import BrandLockup from "./BrandLockup.jsx";
 
 export const NAV = {
   client: [["/", "Dashboard"], ["/domains", "Domains"], ["/assets", "Assets"], ["/scans", "Scans"], ["/reports", "Reports"], ["/support", "Support"], ["/organization", "Organisation"]],
@@ -21,7 +21,7 @@ export default function Shell({ title, actions, children }) {
   return (
     <div className="app">
       <aside className="side">
-        <div className="brand sm"><BrandMark /> OCTASEC</div>
+        <div className="brand sm"><BrandLockup height={22} /></div>
         <span className="rolebadge">{ROLE_LABEL[user.role] || user.role}</span>
         <nav id="sideNav">
           {items.map(([to, label]) => (

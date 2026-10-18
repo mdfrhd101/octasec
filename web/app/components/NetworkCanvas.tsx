@@ -63,7 +63,7 @@ export default function NetworkCanvas({ variant }: { variant: Variant }) {
             dy = pts[a].y - pts[b].y,
             d = dx * dx + dy * dy;
           if (d < 11000) {
-            ctx.strokeStyle = "rgba(232,193,90," + (1 - d / 11000) * 0.11 + ")";
+            ctx.strokeStyle = "rgba(232,67,58," + (1 - d / 11000) * 0.11 + ")";
             ctx.lineWidth = 0.6;
             ctx.beginPath();
             ctx.moveTo(pts[a].x, pts[a].y);
@@ -83,14 +83,14 @@ export default function NetworkCanvas({ variant }: { variant: Variant }) {
         }
         if (p.big) {
           const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 11);
-          g.addColorStop(0, "rgba(232,193,90,.55)");
-          g.addColorStop(1, "rgba(232,193,90,0)");
+          g.addColorStop(0, "rgba(232,67,58,.55)");
+          g.addColorStop(1, "rgba(232,67,58,0)");
           ctx.fillStyle = g;
           ctx.beginPath();
           ctx.arc(p.x, p.y, 11, 0, 7);
           ctx.fill();
         }
-        ctx.fillStyle = p.big ? "rgba(246,221,141,.85)" : "rgba(200,210,216,.45)";
+        ctx.fillStyle = p.big ? "rgba(255,154,134,.85)" : "rgba(200,210,216,.45)";
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, 7);
         ctx.fill();
@@ -119,7 +119,7 @@ export default function NetworkCanvas({ variant }: { variant: Variant }) {
             dy = pts[a].y - pts[b].y,
             d = dx * dx + dy * dy;
           if (d < 9000) {
-            ctx.strokeStyle = "rgba(232,193,90," + (1 - d / 9000) * 0.08 + ")";
+            ctx.strokeStyle = "rgba(232,67,58," + (1 - d / 9000) * 0.08 + ")";
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(pts[a].x, pts[a].y);
@@ -135,7 +135,7 @@ export default function NetworkCanvas({ variant }: { variant: Variant }) {
         if (p.x > W) p.x -= W;
         if (p.y < 0) p.y += H;
         if (p.y > H) p.y -= H;
-        ctx.fillStyle = "rgba(232,193,90,.34)";
+        ctx.fillStyle = "rgba(232,67,58,.34)";
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, 7);
         ctx.fill();
@@ -146,7 +146,7 @@ export default function NetworkCanvas({ variant }: { variant: Variant }) {
     function finalStatic() {
       ctx.clearRect(0, 0, W, H);
       for (let i = 0; i < pts.length; i++) {
-        ctx.fillStyle = "rgba(232,193,90,.3)";
+        ctx.fillStyle = "rgba(232,67,58,.3)";
         ctx.beginPath();
         ctx.arc(pts[i].x, pts[i].y, pts[i].r, 0, 7);
         ctx.fill();

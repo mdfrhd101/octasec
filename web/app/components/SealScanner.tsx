@@ -11,8 +11,8 @@ import { useEffect, useRef } from "react";
  * - the glow ring is pre-rendered once (no per-frame shadowBlur)
  */
 const TAU = Math.PI * 2;
-const GOLD = "232,193,90";
-const GREEN = "69,224,168";
+const GOLD = "232,67,58";
+const GREEN = "21,160,107";
 
 function octagon(ctx: CanvasRenderingContext2D, r: number, rot = 0) {
   ctx.beginPath();
@@ -63,7 +63,7 @@ export default function SealScanner() {
       g.scale(dpr, dpr);
       g.translate(W / 2, W / 2);
       const grad = g.createLinearGradient(-R, -R, R, R);
-      grad.addColorStop(0, "#f6dd8d"); grad.addColorStop(0.45, "#e8c15a"); grad.addColorStop(1, "#a97f2a");
+      grad.addColorStop(0, "#ff9a86"); grad.addColorStop(0.45, "#e8433a"); grad.addColorStop(1, "#9a1f18");
       g.lineJoin = "round";
       for (const [blur, alpha, width] of [[40, 0.55, R * 0.075], [14, 0.85, R * 0.06], [0, 1, R * 0.05]] as const) {
         g.save();
@@ -184,7 +184,7 @@ export default function SealScanner() {
       const u = R * 0.075;
       ctx!.fillStyle = "rgba(4,8,11,.85)";
       octagon(ctx!, u * 2.1); ctx!.fill();
-      ctx!.fillStyle = "#e8c15a";
+      ctx!.fillStyle = "#e8433a";
       ctx!.beginPath();
       ctx!.moveTo(-u * 1.0, -u * 0.95); ctx!.lineTo(-u * 0.45, -u * 0.95); ctx!.lineTo(u * 0.35, 0);
       ctx!.lineTo(-u * 0.45, u * 0.95); ctx!.lineTo(-u * 1.0, u * 0.95); ctx!.lineTo(-u * 0.2, 0);

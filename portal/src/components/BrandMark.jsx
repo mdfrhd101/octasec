@@ -1,26 +1,26 @@
-// OctaSec "Facet Seal" mark (brand/octasec-logos/concept-1-facet-seal) — inline, no background.
+// OctaSec mark (brand/octasec-logo/mark.svg) — red-team red octagon seal with a
+// red command chevron and a live-green cursor. Inline, no background; sized by CSS.
 export default function BrandMark() {
   return (
-    <svg viewBox="18 18 220 220" aria-hidden="true" focusable="false">
+    <svg viewBox="30 30 196 196" aria-hidden="true" focusable="false">
       <defs>
-        <linearGradient id="octasecFacet" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#f6dd8d" />
-          <stop offset=".5" stopColor="#e8c15a" />
-          <stop offset="1" stopColor="#c9a038" />
+        <linearGradient id="octasecMark" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ff9a86" />
+          <stop offset=".5" stopColor="#e8433a" />
+          <stop offset="1" stopColor="#9a1f18" />
         </linearGradient>
       </defs>
-      <path fill="#f6dd8d" d="M24 85 85 24 99 58 58 99Z" />
-      <path fill="#efcf74" d="M85 24h86l-14 34H99Z" />
-      <path fill="#e8c15a" d="M24 171V85l34 14v58Z" />
-      <path fill="#d9b045" d="M171 24l61 61-34 14-41-41Z" />
-      <path fill="#cfa63d" d="M85 232l-61-61 34-14 41 41Z" />
-      <path fill="#b78e22" d="M232 85v86l-34-14V99Z" />
-      <path fill="#a98320" d="M171 232H85l14-34h58Z" />
-      <path fill="#8f6d18" d="M232 171l-61 61-14-34 41-41Z" />
-      <path fill="url(#octasecFacet)" d="M99 58h58l41 41v58l-41 41H99l-41-41V99Z" />
-      <path fill="#04080b" d="M109 82h38l27 27v38l-27 27h-38l-27-27v-38Z" />
-      <path fill="#e8c15a" d="M110 104l30 24-30 24H96l30-24-30-24Z" />
-      <rect x="148" y="115" width="12" height="26" fill="#45e0a8" />
+      <path
+        d="M91.3 39.3 L164.7 39.3 L216.7 91.3 L216.7 164.7 L164.7 216.7 L91.3 216.7 L39.3 164.7 L39.3 91.3 Z"
+        fill="none" stroke="url(#octasecMark)" strokeWidth="11" strokeLinejoin="round"
+      />
+      <path d="M173.2 47.8 L208.2 82.8" fill="none" stroke="#ffd9cf" strokeWidth="7" strokeLinecap="round" opacity=".85" />
+      <path
+        d="M110.4 85.5 L145.6 85.5 L170.5 110.4 L170.5 145.6 L145.6 170.5 L110.4 170.5 L85.5 145.6 L85.5 110.4 Z"
+        fill="#05090d" stroke="#e8433a" strokeWidth="2" strokeOpacity=".4"
+      />
+      <path d="M109 110 L129 128 L109 146" fill="none" stroke="#e8433a" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="139" y="111" width="9" height="34" rx="3.5" fill="#15a06b" />
     </svg>
   );
 }

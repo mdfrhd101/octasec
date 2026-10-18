@@ -9,7 +9,7 @@ import { AUTH_CHIP } from "../profileOptions.js";
 
 // Every block answers a question the role actually asks — docs/PORTAL_DATA_AND_DASHBOARDS.md §4.
 const SEV_CLASS = { critical: "c", high: "h", medium: "m", low: "l" };
-const SCORE_COLOR = { Strong: "var(--green)", Good: "var(--gold)", Fair: "var(--warn)", "At risk": "var(--red)" };
+const SCORE_COLOR = { Strong: "var(--green)", Good: "#9ed15a", Fair: "var(--warn)", "At risk": "var(--red)" };
 const ACTION_LABEL = {
   "auth.login_fail": "Failed sign-in", "auth.rate_limited": "Rate-limited", "auth.reset_fail": "Bad reset link",
   "auth.verify_fail": "Bad confirm link", "auth.password_change_fail": "Wrong current password",

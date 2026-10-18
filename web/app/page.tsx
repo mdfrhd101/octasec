@@ -4,6 +4,8 @@ import HeroTerminal from "./components/HeroTerminal";
 import MethodChapters from "./components/MethodChapters";
 import DifferentiatorTable from "./components/DifferentiatorTable";
 import FinalCTA from "./components/FinalCTA";
+import JsonLd from "./components/JsonLd";
+import { serviceLd } from "./lib/seo";
 
 // landing page v2 — docs/LANDING_DESIGN_V2.md
 const STATS: [number, string, string][] = [
@@ -22,6 +24,7 @@ const PILLARS = [
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={serviceLd} />
       <Hero />
 
       <section className="wrap proof-strip rv" id="proof" aria-label="OctaSec in numbers">

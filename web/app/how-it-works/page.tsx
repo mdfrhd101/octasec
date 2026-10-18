@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import JsonLd from "../components/JsonLd";
+import { pageMeta, howItWorksLd, breadcrumbLd } from "../lib/seo";
 import PageHero from "../components/PageHero";
 import ScopeCTA from "../components/ScopeCTA";
 import SectionHead from "../components/SectionHead";
@@ -6,16 +7,18 @@ import Card from "../components/Card";
 import DifferentiatorTable from "../components/DifferentiatorTable";
 import FinalCTA from "../components/FinalCTA";
 
-export const metadata: Metadata = {
-  title: "OctaSec — How it works",
+export const metadata = pageMeta({
+  title: "How Our AI Pentesting Works",
   description:
-    "Scope, map, hunt, prove — how OctaSec's AI pentest service runs an engagement, end to end.",
-  alternates: { canonical: "/how-it-works" },
-};
+    "Scope, map, hunt, prove — how OctaSec's AI-orchestrated, human-verified penetration testing runs an engagement end to end, with deterministic proof and a human gate.",
+  keywords: ["how AI penetration testing works", "verification-first pentest", "human-gated pentest", "deterministic proof security testing"],
+  path: "/how-it-works",
+});
 
 export default function HowItWorksPage() {
   return (
     <>
+      <JsonLd data={[howItWorksLd, breadcrumbLd([{ name: "Home", path: "/" }, { name: "How it works", path: "/how-it-works/" }])]} />
       <PageHero
         eyebrow="How it works"
         title={

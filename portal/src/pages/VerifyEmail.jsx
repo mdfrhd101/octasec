@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { auth } from "../services/index.js";
 import { useAuth } from "../auth.jsx";
-import BrandMark from "../components/BrandMark.jsx";
+import BrandLockup from "../components/BrandLockup.jsx";
 
 // Opened from the emailed confirmation link: /portal/verify-email#token=…
 export default function VerifyEmail() {
@@ -30,7 +30,7 @@ export default function VerifyEmail() {
   return (
     <div className="login">
       <div className="login-card card">
-        <div className="brand"><BrandMark /> OCTASEC <span>PORTAL</span></div>
+        <div className="brand"><BrandLockup height={26} /> <span>PORTAL</span></div>
         {state === "working" && <p className="login-sub">Confirming your email…</p>}
         {state === "done" && <p className="login-sub" style={{ color: "var(--green)" }}>Email confirmed — your account is active. Taking you to the portal…</p>}
         {state === "failed" && (
