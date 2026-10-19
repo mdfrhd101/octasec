@@ -9,7 +9,7 @@ import FinalCTA from "../components/FinalCTA";
 export const metadata = pageMeta({
   title: "About — An Octagram Company",
   description:
-    "OctaSec is the offensive-security product of Octagram Limited, a Dhaka-based cybersecurity firm trusted by CID, DMP, RAB & CTTC. Human-gated AI penetration testing.",
+    "OctaSec is the offensive-security product of Octagram Limited, a Dhaka-based cybersecurity firm trusted by CID, DMP, SRB & CTTC. Human-gated AI penetration testing.",
   keywords: ["about OctaSec", "Octagram Limited", "cybersecurity company Bangladesh", "Dhaka penetration testing company"],
   path: "/about",
 });
@@ -34,7 +34,7 @@ export default function AboutPage() {
           <p className="lead" style={{ textAlign: "left" }}>
             OctaSec is the autonomous offensive-security engine of Octagram Ltd
             &mdash; the Dhaka-based security firm trusted by CID, Dhaka
-            Metropolitan Police, RAB and CTTC. Octagram&apos;s red team built
+            Metropolitan Police, SRB and CTTC. Octagram&apos;s red team built
             OctaSec to answer one question: why should deep security testing be a
             luxury?
           </p>
@@ -52,7 +52,7 @@ export default function AboutPage() {
           <span className="cb-lbl">The team behind OctaSec serves</span>
           <span className="cb-item">CID</span>
           <span className="cb-item">Dhaka Metropolitan Police</span>
-          <span className="cb-item">RAB</span>
+          <span className="cb-item">SRB</span>
           <span className="cb-item">CTTC</span>
         </div>
       </section>

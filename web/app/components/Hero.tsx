@@ -9,7 +9,6 @@ export default function Hero() {
       <div className="glow" aria-hidden="true" />
       <div className="in wrap hero2-grid">
         <div className="hero2-copy">
-          <span className="eyebrow">From the team trusted by CID, DMP, RAB &amp; CTTC</span>
           <h1>
             <span className="l1" id="l1">Enterprise-grade pentesting.</span>
             <span className="l2">Startup-grade pricing.</span>
