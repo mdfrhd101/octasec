@@ -40,6 +40,7 @@ const SUITES = [
   "engine.test.mjs",
   "engine-http.test.mjs",
   "security-fixes.test.mjs",
+  "website-check.test.mjs",
   "lockout.test.mjs",
   "leads.test.mjs",
   "findings.test.mjs",
@@ -48,6 +49,7 @@ const SUITES = [
 const env = {
   ...process.env,
   NODE_ENV: "test",
+  ALLOW_SEED: "true", // seed.js requires explicit opt-in; the runner seeds an isolated test DB
   PORT,
   HOST: "127.0.0.1",
   MONGO_URI,

@@ -7,6 +7,8 @@ import { useState } from "react";
 const NAVITEMS: [string, string][] = [
   ["/how-it-works", "How it works"],
   ["/services", "Services"],
+  ["/website-check", "Free website check"],
+  ["/php2shell", "PHP2Shell patch"],
   ["/benchmarks", "Benchmarks"],
   ["/blog", "Blog"],
   ["/pricing", "Pricing"],
@@ -19,9 +21,9 @@ export default function Nav() {
 
   return (
     <>
-      <a className="annbar" href="/about/">
-        <b>OCTAGRAM</b> OctaSec is Octagram&apos;s AI-orchestrated offensive engine
-        &mdash; every finding human-verified <span className="ar">&rarr;</span>
+      <a className="annbar" href="/php2shell/">
+        <b>ACTIVE EXPLOITATION</b> PHP2Shell pre-auth RCE in PHP core &mdash;
+        emergency patching from $10/site, EOL PHP covered <span className="ar">&rarr;</span>
       </a>
       <header className="nav">
         <div className="wrap">

@@ -1,0 +1,100 @@
+# OctaSec production stack (VPS). Build context is the repo root:
+#   sudo docker compose --env-file /home/hassan/octasec/.env \
+#     -f /home/hassan/octasec/repo/deploy/docker/docker-compose.yml up -d --build
+# Secrets come ONLY from the env file (chmod 600, VPS-local, never committed).
+name: octasec
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: octasec-mongo
+    restart: unless-stopped
+    networks:
+      - octasec-internal
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: octasec
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?set in .env}
+      MONGO_INITDB_DATABASE: octasec
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "-u", "octasec", "-p", "${MONGO_ROOT_PASSWORD}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.api
+    image: octasec-api:local
+    container_name: octasec-api
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - octasec-internal
+      - octasec-web
+    ports:
+      - "127.0.0.1:8610:8610"
+    environment:
+      NODE_ENV: production
+      PORT: "8610"
+      HOST: 0.0.0.0   # container interface; published to host loopback only
+      MONGO_URI: mongodb://octasec:${MONGO_ROOT_PASSWORD}@mongo:27017/octasec?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:?set in .env}
+      JWT_EXPIRES: 7d
+      CLIENT_ORIGIN: https://octasec.ai,https://www.octasec.ai
+      APP_URL: https://octasec.ai
+      # SMTP/engine flip later = edit /home/hassan/octasec/.env + `up -d`, no
+      # compose edits. Empty strings keep the app's unset-semantics (mailer
+      # refuses+log; engine webhook 404s until a secret is set).
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-OctaSec <no-reply@octasec.ai>}
+      ENGINE_DRIVER: ${ENGINE_DRIVER:-mock}
+      ENGINE_URL: ${ENGINE_URL:-}
+      ENGINE_API_KEY: ${ENGINE_API_KEY:-}
+      ENGINE_WEBHOOK_SECRET: ${ENGINE_WEBHOOK_SECRET:-}
+      ENGINE_ALLOW_HTTP: ${ENGINE_ALLOW_HTTP:-}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8610/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  web:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.web
+    image: octasec-web:local
+    container_name: octasec-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - octasec-web
+    ports:
+      - "127.0.0.1:8611:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+networks:
+  octasec-internal:
+    internal: true      # api <-> mongo only, no egress
+  octasec-web:          # edge-facing side (web -> api)
+
+volumes:
+  mongo-data:
+    name: octasec-mongo-data

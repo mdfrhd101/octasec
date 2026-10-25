@@ -14,6 +14,8 @@ const PAGES: [string, number, Freq][] = [
   ["benchmarks", 0.8, "weekly"],
   ["blog", 0.8, "weekly"],
   ["pricing", 0.8, "monthly"],
+  ["php2shell", 0.9, "weekly"],
+  ["website-check", 0.9, "weekly"],
   ["contact", 0.7, "monthly"],
   ["faq", 0.6, "monthly"],
   ["about", 0.6, "monthly"],

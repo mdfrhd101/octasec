@@ -1,0 +1,14 @@
+.git
+node_modules
+**/node_modules
+web/out
+web/.next
+portal/dist
+.env
+.env.*
+!.env.example
+tests
+tasks
+docs
+# never ship the demo-account seeder in an image (weak seeded credentials)
+server/src/seed.js

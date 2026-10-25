@@ -55,6 +55,16 @@ export const domains = {
   remove: (id) => http.del(`/domains/${seg(id)}`),
 };
 
+/* ---------------- verified-domain SSL expiry alerts ---------------- */
+export const sslAlerts = {
+  /** GET /website-check/alerts → { alerts } */
+  list: () => http.get("/website-check/alerts"),
+  /** POST /website-check/alerts {domainId,enabled:true} → 201 */
+  enable: (domainId) => http.post("/website-check/alerts", { domainId, enabled: true }),
+  /** POST /website-check/alerts {domainId,enabled:false} → { enabled:false } */
+  disable: (domainId) => http.post("/website-check/alerts", { domainId, enabled: false }),
+};
+
 /* ---------------- assets ---------------- */
 export const assets = {
   /** GET /assets?domainId= → { assets } */

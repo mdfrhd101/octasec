@@ -19,6 +19,9 @@ import engagementRoutes from "./routes/engagements.js";
 import engineCallbackRoutes from "./routes/engineCallback.js";
 import PasswordReset from "./models/PasswordReset.js";
 import User from "./models/User.js";
+import php2shellRoutes from "./routes/php2shell.js";
+import websiteCheckRoutes from "./routes/websiteCheck.js";
+import { startSslAlertScheduler } from "./services/sslAlerts.js";
 
 /* ---- fail fast on missing / weak config ---- */
 function requireEnv() {
@@ -79,6 +82,8 @@ app.use("/api/company", companyRoutes);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/php2shell", php2shellRoutes);
+app.use("/api/website-check", websiteCheckRoutes);
 app.use("/api/engagements", engagementRoutes);
 
 app.use((req, res) => res.status(404).json({ error: "Not found" }));
@@ -106,5 +111,8 @@ connectDB(process.env.MONGO_URI)
   .then(() => PasswordReset.syncIndexes()) // keeps the token TTL index in step with the schema
   // accounts created before the status field existed are active (one-time backfill, idempotent)
   .then(() => User.updateMany({ status: { $exists: false } }, { $set: { status: "active" } }))
-  .then(() => app.listen(PORT, HOST, () => console.log(`[api] http://${HOST}:${PORT}`)))
+  .then(() => {
+    if (process.env.NODE_ENV !== "test") startSslAlertScheduler();
+    app.listen(PORT, HOST, () => console.log(`[api] http://${HOST}:${PORT}`));
+  })
   .catch((e) => { console.error("[db] connection failed:", e.message); process.exit(1); });

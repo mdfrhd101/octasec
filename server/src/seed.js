@@ -1,5 +1,7 @@
-// Seed demo accounts for LOCAL DEVELOPMENT ONLY: `npm run seed`
-// Refuses to run in production so it can never create weak accounts on a live DB.
+// Seed demo accounts for LOCAL DEVELOPMENT ONLY: `ALLOW_SEED=true npm run seed`
+// Refuses to run unless explicitly opted in, so it can never create weak
+// accounts on a live DB — the file is also excluded from the prod image
+// via the repo-root .dockerignore (belt and braces).
 import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { connectDB } from "./config/db.js";
@@ -7,8 +9,8 @@ import User from "./models/User.js";
 import Company from "./models/Company.js";
 import mongoose from "mongoose";
 
-if (process.env.NODE_ENV === "production" || process.env.ALLOW_SEED === "false") {
-  console.error("[seed] refusing to run in production. This script creates weak demo accounts for local dev only.");
+if (process.env.NODE_ENV === "production" || process.env.ALLOW_SEED !== "true") {
+  console.error("[seed] refusing to run: requires ALLOW_SEED=true and NODE_ENV!=production. This script creates weak demo accounts for local dev only.");
   process.exit(1);
 }
 

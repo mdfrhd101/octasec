@@ -14,6 +14,7 @@ const DIR = path.join(process.cwd(), "content", "blog");
 
 // Reading order for the /blog index (README suggests post-01 first).
 const ORDER = [
+  "php2shell-expectation-vs-reality",
   "why-autonomous-pentesting-needed-a-reset",
   "benchmark-journey-xben",
   "how-we-verify",

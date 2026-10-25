@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { domains as domainsApi, clients as clientsApi, assets as assetsApi } from "../services/index.js";
+import { domains as domainsApi, clients as clientsApi, assets as assetsApi, sslAlerts as sslAlertsApi } from "../services/index.js";
 import { useAuth } from "../auth.jsx";
 import Shell from "../components/Shell.jsx";
 import { Modal, CopyBox, Spinner, Empty, LoadError, TableWrap, useUI } from "../ui.jsx";
@@ -17,6 +17,7 @@ export default function Domains() {
   const corp = user.role === "company_admin" || user.role === "employee";
   const [domains, setDomains] = useState(null);
   const [clients, setClients] = useState([]);
+  const [alerts, setAlerts] = useState({});
   const [filter, setFilter] = useState("all");
   const [modal, setModal] = useState(null); // {type, domain}
   const [err, setErr] = useState("");
@@ -24,14 +25,20 @@ export default function Domains() {
   const load = useCallback(async () => {
     setErr("");
     try {
-      const [d, c] = await Promise.all([domainsApi.list(corp ? filter : "all"), corp ? clientsApi.list() : null]);
+      const [d, c, a] = await Promise.all([domainsApi.list(corp ? filter : "all"), corp ? clientsApi.list() : null, sslAlertsApi.list()]);
       setDomains(d.domains);
+      setAlerts(Object.fromEntries((a.alerts || []).filter((x) => x.enabled).map((x) => [String(x.domainId), x])));
       if (c) setClients(c.clients);
     } catch (e) { setErr(e.message); }
   }, [corp, filter]);
   useEffect(() => { load(); }, [load]);
 
   const ownerLabel = (d) => (d.ownerType === "self" ? "My organisation" : clients.find((c) => c._id === d.clientId)?.name || "—");
+  const toggleSsl = async (d) => {
+    const enabled = !alerts[d._id];
+    const ok = await ui.run(() => enabled ? sslAlertsApi.enable(d._id) : sslAlertsApi.disable(d._id), `SSL alerts ${enabled ? "enabled" : "disabled"} for ${d.name}`);
+    if (ok) load();
+  };
 
   const remove = async (d) => {
     const yes = await ui.confirm({
@@ -79,6 +86,7 @@ export default function Domains() {
                         {d.verified
                           ? <button className="btn sm ghost" onClick={() => setModal({ type: "discover", domain: d })}>Look for assets</button>
                           : <button className="btn sm gold" onClick={() => setModal({ type: "verify", domain: d })}>Verify</button>}
+                        {d.verified && <button className={"btn sm " + (alerts[d._id] ? "gold" : "ghost")} title={alerts[d._id]?.daysRemaining != null ? `${alerts[d._id].daysRemaining} days remaining` : "Daily certificate expiry and trust alerts"} onClick={() => toggleSsl(d)}>SSL alerts {alerts[d._id] ? "on" : "off"}</button>}
                         <button className="btn sm ghost" onClick={() => setModal({ type: "edit", domain: d })}>Edit</button>
                         {corp && <button className="btn sm ghost" onClick={() => setModal({ type: "assign", domain: d })}>Assign</button>}
                         <button className="btn sm danger" aria-label={`Remove ${d.name}`} title="Remove" onClick={() => remove(d)}>✕</button>

@@ -49,6 +49,12 @@ export function ipv6IsPublic(ip) {
   if (/^64:ff9b:/.test(a)) return false;                // NAT64 → could embed private v4
   const mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/.exec(a); // IPv4-mapped
   if (mapped) return ipv4IsPublic(mapped[1]);
+  // WHATWG URL normalizes mapped literals to hex ("::ffff:a9fe:a9fe") — decode too
+  const mappedHex = /^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/.exec(a);
+  if (mappedHex) {
+    const hi = parseInt(mappedHex[1], 16), lo = parseInt(mappedHex[2], 16);
+    return ipv4IsPublic(`${hi >> 8}.${hi & 255}.${lo >> 8}.${lo & 255}`);
+  }
   return true;
 }
 

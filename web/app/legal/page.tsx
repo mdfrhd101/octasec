@@ -48,6 +48,11 @@ export default function LegalPage() {
             support the service, and keep an audit trail of security-relevant
             actions. We do not sell your data. Test findings are visible only to
             your organisation and to OctaSec operators working on your engagement.
+            Our free website checker additionally records the target hostname,
+            visitor IP address, user agent and sanitized findings for security,
+            abuse investigation and report delivery. Reports expire after 90 days;
+            sensitive response bodies, secret values and full URL query strings
+            are not retained. Automated bulk use may be rate-limited or blocked.
             To access, correct or delete your data, email{" "}
             <a href="mailto:support@octasec.ai" style={{ color: "var(--gold)" }}>support@octasec.ai</a>.
           </p>

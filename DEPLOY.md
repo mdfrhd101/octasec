@@ -123,6 +123,27 @@ change: redeploy `server/` and `pm2 reload octasec-api`.
 - **Tests**: `cd server && npm test` runs all API suites against an isolated
   `octasec_test` database (needs a local MongoDB). Run before every release.
 
+## Free website checker + SSL alerts (2026-10-24)
+- Public UI: `/website-check/`; API: `POST /api/website-check/check` and
+  `GET /api/website-check/:reportId/report.pdf`. PDFKit is an API production
+  dependency; rebuild the API image instead of copying files into the container.
+- Reports contain only sanitized findings, target, IP/UA and request metadata;
+  the Mongo TTL index deletes them after 90 days. No raw response bodies or
+  secret values are stored. Free checks are rate-limited and globally bounded.
+- Curated vulnerability checks also include the shared PHP2Shell oracle,
+  no-memory-output Heartbleed + legacy protocol/cipher checks, and a no-cookie
+  CORS probe. The API image installs `sslyze==6.3.1`; its JSON is parsed in
+  memory and discarded. SSLyze connects only to the SSRF-validated IP with the
+  original SNI hostname. Scanner failure is inconclusive, never a safe verdict.
+- Authenticated alerts: `GET/POST /api/website-check/alerts`. A Domain must be
+  verified and in the caller's tenant. The daily scheduler checks certificates
+  and notifies at 30/14/7/1 days and on trust/expiry failures through SMTP.
+  Disable alerts from Portal → Domains. The scheduler is disabled in tests.
+- Verify with a real public target, then download the report and check `%PDF`.
+  Also verify private-IP targets return 422 and `/api/website-check/alerts`
+  returns 401 without a token. Do not use production customer domains as test
+  fixtures; use the isolated API suite for alert lifecycle tests.
+
 ## Accounts & email (since 2026-10-17)
 - Self-signup accounts stay **pending** until the emailed confirmation link is used.
 - New company admins / employees get an **emailed invite** to set their own password; admin "Reset password" emails a set-password link. Nobody ever sees another user's password — so **SMTP must be configured before onboarding customers** (`npm run mail:test -- you@domain`).

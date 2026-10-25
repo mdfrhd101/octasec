@@ -3,6 +3,7 @@ import { EMAIL_RE } from "../utils/profile.js";
 import rateLimit from "express-rate-limit";
 import Lead from "../models/Lead.js";
 import { asyncHandler, asString } from "../utils/http.js";
+import { sendMail, mailConfigured } from "../utils/mailer.js";
 
 const r = Router();
 
@@ -43,6 +44,29 @@ r.post(
     const plan = pick(req.body?.plan, PLANS, "");
     const scope = pick(req.body?.scope, SCOPES, "");
     await Lead.create({ name, email, company, target, message, source, plan, scope });
+
+    // notify the team mailbox; the lead is already durable in the DB, so a
+    // mail failure must never fail the request
+    const notifyTo = (process.env.CONTACT_NOTIFY_TO || "").trim();
+    if (notifyTo && mailConfigured()) {
+      const lines = [
+        `Name: ${name}`,
+        `Email: ${email}`,
+        company && `Company: ${company}`,
+        `Target: ${target}`,
+        plan && `Plan: ${plan}`,
+        scope && `Scope: ${scope}`,
+        `Source: ${source}`,
+        "",
+        message || "(no message)",
+      ].filter((l) => l !== "");
+      sendMail({
+        to: notifyTo,
+        subject: `New ${source} inquiry: ${name}${company ? ` (${company})` : ""}`,
+        text: lines.join("\n"),
+      }).catch((e) => console.error("[contact] notify mail failed:", e.message));
+    }
+
     res.status(201).json({ ok: true });
   })
 );
