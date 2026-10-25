@@ -1,6 +1,6 @@
 # OctaSec — Mobile Responsiveness Plan
 
-**Status:** phases 1–2 implemented on 2026-10-25, plus parts of phases 3–4 (see "Implementation status" below).
+**Status:** implemented on 2026-10-25 — all four phases (see "Implementation status" below); only the real-device pass remains.
 **Date:** 2026-10-25
 
 ### Implementation status (2026-10-25)
@@ -32,16 +32,23 @@ All of it is in `web/app/mobile.css`, loaded last; removing its import in `layou
 - No tap target under 40px outside running text.
 - Desktop at 1280px unchanged.
 
-**Open:**
-- Nav hide-on-scroll.
-- Lenis off on touch, and the anchor offset.
-- Pausing the canvases when off-screen.
-- Section-head parallax off on phones.
-- A lighter hero glow on phones.
-- `background-attachment:fixed` off on phones.
-- Collapsible Benchmarks sections.
-- Edge-fade on blog tables.
-- A 2-column tablet hero.
+**Also done (same day, second pass):**
+- Nav hides on scroll down and returns on scroll up (phones and tablets).
+- Lenis is off on touch-first devices ≤1024px; anchors use `scroll-padding-top`.
+- The hero octagon, final-CTA network and terminal pause when off-screen, with fewer particles on phones.
+- Section-head parallax is off ≤900px.
+- A lighter hero glow and no infinite beam on phones; `background-attachment:fixed` is off ≤900px.
+- Collapsible Benchmarks reference blocks (`MobileCollapse.tsx`).
+- Edge shadows on blog tables that scroll sideways.
+- A 2-column tablet hero (copy left, octagon right).
+
+**Full test (production build):**
+- No console errors on any of the 13 routes, at desktop and phone sizes.
+- The layout audit passes at 320, 375, 768 and 1280px, in light and dark.
+- Functional checks pass: menu, nav hide, stepper tap/swipe, slider, collapse blocks, FAQ, quote modal and theme toggle.
+- `server`: 23/23 suites. The `portal` build passes.
+
+**Open:** a real-device pass (iPhone Safari and Android Chrome) and a Lighthouse mobile run.
 **Scope:** the marketing site (`web/`), all 13 routes. The portal is out of scope.
 
 **How this was produced:**
