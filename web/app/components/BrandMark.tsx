@@ -20,7 +20,7 @@ export default function BrandMark({ size }: { size?: number }) {
         fill="#05090d" stroke="#e8433a" strokeWidth="2" strokeOpacity=".4"
       />
       <path d="M109 110 L129 128 L109 146" fill="none" stroke="#e8433a" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="139" y="111" width="9" height="34" rx="3.5" fill="#15a06b" />
+      <rect x="139" y="111" width="9" height="34" rx="3.5" fill="#006A4E" />
     </svg>
   );
 }

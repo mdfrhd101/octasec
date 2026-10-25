@@ -5,7 +5,7 @@ import FinalCTA from "../components/FinalCTA";
 import WebsiteChecker from "./WebsiteChecker";
 
 export const metadata = pageMeta({
-  title: "Free Website Safety Check with PDF Report | OctaSec",
+  title: "Free Website Safety Check with PDF Report",
   description: "Check PHP2Shell, Heartbleed, legacy TLS, CORS, certificate expiry, security headers, WordPress, Drupal, Joomla, DNS, SPF, DMARC and exposed Git or environment files. Download a free PDF report.",
   keywords: ["free website security check", "SSL expiry check", "WordPress security scanner", "Drupal security check", "Joomla security check", "exposed git checker", "website security report PDF"],
   path: "/website-check",

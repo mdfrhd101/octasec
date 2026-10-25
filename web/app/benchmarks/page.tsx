@@ -4,6 +4,7 @@ import PageHero from "../components/PageHero";
 import SectionHead from "../components/SectionHead";
 import Card from "../components/Card";
 import FinalCTA from "../components/FinalCTA";
+import MobileCollapse from "../components/MobileCollapse";
 
 export const metadata = pageMeta({
   title: "AI Pentest Benchmarks — Wins & Misses",
@@ -40,13 +41,15 @@ export default function BenchmarksPage() {
           text="The conditions matter more than the numbers. These are the ones that change what a score means."
           center
         />
-        <div className="blocks c3 stagger" style={{ textAlign: "left" }}>
-          <Card className="cov"><h4>Black-box</h4><p>HTTP interaction only. No source access, no container inspection.</p></Card>
-          <Card className="cov"><h4>Airlocked</h4><p>Web search and external fetches disabled at the harness level. No writeups, no CVE lookups — solved from target behavior alone.</p></Card>
-          <Card className="cov"><h4>No hints</h4><p>Agents are told the flag format, not the vulnerability class.</p></Card>
-          <Card className="cov"><h4>Verified</h4><p>Every flag recomputed byte-identical from ground truth, independently of agent output. &ldquo;The agent said so&rdquo; is never the evidence.</p></Card>
-          <Card className="cov"><h4>Self-reported &amp; dated</h4><p>These numbers are produced by us, like every result on every public leaderboard in this space. Raw result files and per-target evidence kept for every solve.</p></Card>
-        </div>
+        <MobileCollapse more="Show all 5 conditions">
+          <div className="blocks c3 stagger" style={{ textAlign: "left" }}>
+            <Card className="cov"><h4>Black-box</h4><p>HTTP interaction only. No source access, no container inspection.</p></Card>
+            <Card className="cov"><h4>Airlocked</h4><p>Web search and external fetches disabled at the harness level. No writeups, no CVE lookups — solved from target behavior alone.</p></Card>
+            <Card className="cov"><h4>No hints</h4><p>Agents are told the flag format, not the vulnerability class.</p></Card>
+            <Card className="cov"><h4>Verified</h4><p>Every flag recomputed byte-identical from ground truth, independently of agent output. &ldquo;The agent said so&rdquo; is never the evidence.</p></Card>
+            <Card className="cov"><h4>Self-reported &amp; dated</h4><p>These numbers are produced by us, like every result on every public leaderboard in this space. Raw result files and per-target evidence kept for every solve.</p></Card>
+          </div>
+        </MobileCollapse>
       </section>
 
       {/* Suite 1 — XBEN-104 */}
@@ -158,12 +161,14 @@ export default function BenchmarksPage() {
       {/* Disclaimer */}
       <section className="wrap center rv">
         <SectionHead eyebrow="The disclaimer block" title="We mean it." center />
-        <div className="lim" style={{ textAlign: "left" }}>
-          <Card className="cov"><h4>Self-reported</h4><p>Independent replication is welcome; methodology and per-target evidence available on request.</p></Card>
-          <Card className="cov"><h4>Benchmarks are not your application</h4><p>Public suites are saturated and contamination-prone; private suites are harder but still synthetic. The honest claim is narrower and stronger: the operating model — enumerate everything, retry fresh with history, verify deterministically, gate with humans — is what transfers, and it&rsquo;s the same model we run on your scope.</p></Card>
-          <Card className="cov"><h4>We never round up</h4><p>Where a figure includes assisted runs, it is labeled. Where a number is pass@k rather than pass@1, it is labeled. Where a challenge shipped broken, we say so.</p></Card>
-          <Card className="cov"><h4>Dated and versioned</h4><p>Numbers are updated as new runs complete; old entries are kept, not overwritten.</p></Card>
-        </div>
+        <MobileCollapse more="Show all 4 points">
+          <div className="lim" style={{ textAlign: "left" }}>
+            <Card className="cov"><h4>Self-reported</h4><p>Independent replication is welcome; methodology and per-target evidence available on request.</p></Card>
+            <Card className="cov"><h4>Benchmarks are not your application</h4><p>Public suites are saturated and contamination-prone; private suites are harder but still synthetic. The honest claim is narrower and stronger: the operating model — enumerate everything, retry fresh with history, verify deterministically, gate with humans — is what transfers, and it&rsquo;s the same model we run on your scope.</p></Card>
+            <Card className="cov"><h4>We never round up</h4><p>Where a figure includes assisted runs, it is labeled. Where a number is pass@k rather than pass@1, it is labeled. Where a challenge shipped broken, we say so.</p></Card>
+            <Card className="cov"><h4>Dated and versioned</h4><p>Numbers are updated as new runs complete; old entries are kept, not overwritten.</p></Card>
+          </div>
+        </MobileCollapse>
         <p className="stats-foot" style={{ marginTop: 22 }}>Last updated: 2026-10-18.</p>
       </section>
 

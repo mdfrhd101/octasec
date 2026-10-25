@@ -1,7 +1,7 @@
 
   /* Studied XBOW directly: cool blue-black, tight-tracked MONO display (Geist Mono),
      Geist for accent/body, a findings-dashboard product mockup, center stat cards w/ glow.
-     Accent = OctaSec red-team red (#e8433a) + live-green (#15a06b). Original copy. Canvas + typed + scroll motion throughout. */
+     Accent = OctaSec red-team red (#e8433a) + live-green (#006A4E). Original copy. Canvas + typed + scroll motion throughout. */
   :root{
     --bg:#00080b; --bg-2:#030b10; --card:#07131b; --card-2:#0a1822; --navbg:#f1f4f3;
     --text:#f0f6fa; --muted:#8a97a1; --faint:#56626b;
@@ -76,6 +76,7 @@
   section{padding-block:clamp(26px,3.3vw,46px)}
   .center{text-align:center}
   .section-head{max-width:42rem} .center .section-head{margin-inline:auto}
+  .section-head.center{margin-inline:auto;text-align:center} /* was an inline style in SectionHead.tsx (phones override it in mobile.css) */
   .section-head .eyebrow{display:block;margin-bottom:18px}
   .section-head h2{font-size:clamp(1.9rem,4.4vw,3rem)}
   .section-head p{margin-top:18px;color:var(--muted)}
@@ -313,9 +314,9 @@
 .heroTerm .c{color:var(--text)}
 .heroTerm .m{color:var(--muted)}
 .heroTerm .w{color:var(--gold)}
-.heroTerm .g{color:#15a06b}
-.heroTerm .ok{color:#15a06b;font-weight:600;letter-spacing:.08em;margin-top:4px}
-.heroTerm .cur{display:inline-block;width:7px;height:12px;background:#15a06b;vertical-align:-1px;animation:hbl 1s steps(1) infinite}
+.heroTerm .g{color:#006A4E}
+.heroTerm .ok{color:#006A4E;font-weight:600;letter-spacing:.08em;margin-top:4px}
+.heroTerm .cur{display:inline-block;width:7px;height:12px;background:#006A4E;vertical-align:-1px;animation:hbl 1s steps(1) infinite}
 @keyframes hbl{50%{opacity:0}}
 /* footer RoE line */
 .foot-roe{margin:30px 0 0;text-align:center;font-family:var(--m);font-size:11.5px;letter-spacing:.1em;color:var(--faint);text-transform:uppercase}

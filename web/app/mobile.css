@@ -1,0 +1,278 @@
+/* ============================================================================
+   mobile.css — the phone & tablet layer. Loaded LAST (after polish.css).
+   Remove the import in layout.tsx to revert every rule in this file.
+   Tiers: phone ≤600 · tablet 601–900 · small phone ≤360 (desktop = above 900).
+   Plan + reasoning: docs/MOBILE_RESPONSIVE_PLAN.md
+   ============================================================================ */
+
+/* ---------- 0. tokens + guards (all widths) ---------- */
+:root{--gutter:24px}
+.wrap{padding-inline:var(--gutter)}
+.ann-short,.slider-dots,.mp-backdrop{display:none}
+.nw{white-space:nowrap}
+a,button,summary,[role=button],input,select,textarea{touch-action:manipulation}
+html{-webkit-tap-highlight-color:rgba(0,106,78,.12)}
+/* footer: same crop, but `clip` isn't a scroll box — with `hidden`, focusing/scrolling to a
+   footer link shifted the whole footer sideways (its cropped wordmark is wider than it) */
+footer{overflow:clip;display:flow-root}   /* flow-root keeps the wordmark's negative margin inside, so it stays half-cropped */
+/* Reduce Motion: globals' unconditional .rv{translateY(32px)} was never reset there */
+@media (prefers-reduced-motion:reduce){.rv{transform:none}}
+
+/* ---------- 1. announcement bar: one short line ---------- */
+@media (max-width:900px){
+  .annbar{flex-wrap:nowrap;white-space:nowrap;justify-content:center;gap:8px;padding:8px var(--gutter);
+    font-size:13px;line-height:1.35;text-align:left}
+  .annbar .ann-tag,.annbar .ann-long{display:none}
+  .annbar .ann-short{display:inline;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .annbar .ann-short b{letter-spacing:0;font-weight:600}
+  .annbar::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--gold);
+    animation:annpulse 1.8s ease-out infinite}
+}
+@keyframes annpulse{0%{box-shadow:0 0 0 0 rgba(232,67,58,.5)}70%,100%{box-shadow:0 0 0 7px rgba(232,67,58,0)}}
+@media (prefers-reduced-motion:reduce){.annbar::before{animation:none}}
+
+/* ---------- 2. nav bar + menu sheet ---------- */
+@media (max-width:900px){
+  .navbar .brand{min-height:44px;display:inline-flex;align-items:center}
+  .menu-btn,.nav-right .theme-toggle{width:44px;height:44px;justify-content:center;align-items:center}
+  /* dims the page behind the open menu; tap it to close */
+  .mp-backdrop{display:block;position:fixed;inset:0;z-index:59;background:rgba(4,10,14,.42);
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;visibility:hidden;
+    transition:opacity .3s var(--ease),visibility 0s .3s}
+  .mp-backdrop.open{opacity:1;visibility:visible;transition:opacity .3s var(--ease)}
+  .mobile-panel.open{max-height:calc(100dvh - 130px);box-shadow:0 24px 60px -20px rgba(0,0,0,.45)}
+  .mobile-panel:focus{outline:none}        /* focus lands on the panel itself when it opens */
+  .mobile-panel a,.mp-group{min-height:50px;font-size:17px}
+  /* menu CTA: `.mobile-panel a` (+ its light-theme rule) beat .btn, leaving dark,
+     left-aligned text on the red button */
+  :root .mobile-panel .mp-cta a.btn{display:flex;justify-content:center;align-items:center;min-height:52px;
+    font-size:16px;color:#fff;border-bottom:0;text-align:center}
+  body.menu-open .floatcheck{opacity:0;pointer-events:none;transform:scale(.85)}
+}
+@media (max-width:600px){
+  .nav-right .portal-link{display:none}   /* "Sign in" lives in the menu on phones */
+}
+
+/* ---------- 3. home hero: title → octagon → text → buttons ---------- */
+@media (max-width:900px){
+  .hero2-copy{display:contents}            /* lets the octagon slot between title and text */
+  .hero2-grid{gap:0}
+  .hero2 h1{order:1}
+  .hero2 .seal{order:2;width:min(260px,62vw);margin:22px auto 4px}
+  .hero2 .hero-sub{order:3;margin-top:18px}
+  .hero2 .hero-cta{order:4;margin-top:26px}
+}
+@media (max-width:600px){
+  .hero2{padding-top:28px;padding-bottom:40px}
+  .hero2 h1 .l1{font-size:clamp(28px,8.6vw,36px)}
+  .hero2 h1 .l2{font-size:clamp(30px,9.6vw,38px)}
+  .hero2 .seal{width:min(200px,54vw);margin:16px auto 0}
+  .seal-legend{display:none}
+  .hero2 .hero-sub{font-size:16.5px;line-height:1.6}
+}
+
+/* ---------- 4. buttons: stacked, full width, thumb-sized ---------- */
+@media (max-width:600px){
+  .hero-cta{flex-direction:column;align-items:stretch;gap:10px}
+  .hero-cta .btn{width:100%;justify-content:center;min-height:52px}
+  .hero-cta .link{align-self:center}
+  .anchor2-cta{flex-direction:column;align-items:stretch}
+  .anchor2-cta .btn{width:100%;justify-content:center;min-height:52px}
+}
+
+/* ---------- 5. proof strip: compact 2×2 ---------- */
+@media (max-width:600px){
+  .pstat{padding:16px 8px;gap:4px}
+  .pstat b{font-size:31px}
+  .pstat>span{font-size:12px;letter-spacing:.06em;line-height:1.35;text-wrap:balance}
+}
+
+/* ---------- 6. problem section + terminal: a fixed 5-row log window ---------- */
+@media (max-width:600px){
+  #problem{overflow-x:clip}                /* its "PROOF" watermark pushed the page sideways at 320px */
+  .heroTerm{margin-top:24px}
+  .heroTerm .term-bar{padding:9px 12px;gap:6px}
+  .heroTerm .term-bar i{width:8px;height:8px}
+  .heroTerm .term-body{min-height:0;height:129px;padding:12px 14px;font-size:12px;line-height:21px;
+    overflow:hidden;scroll-behavior:smooth}
+  .heroTerm .ln{white-space:pre;overflow:hidden;text-overflow:ellipsis}
+  .heroTerm .ok{margin-top:0}
+}
+
+/* ---------- 7. pillars: auto-sliding, swipeable cards ---------- */
+@media (max-width:900px){
+  .pillar-grid{display:flex;gap:12px;margin-top:28px;overflow-x:auto;overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory;scrollbar-width:none;
+    margin-inline:calc(var(--gutter) * -1);padding:4px var(--gutter) 6px;scroll-padding-inline:var(--gutter)}
+  .pillar-grid::-webkit-scrollbar{display:none}
+  .pillar-grid>.pillar{flex:0 0 86%;scroll-snap-align:start;padding:22px 20px 20px}
+  .slider-dots{display:flex;justify-content:center;gap:6px;margin-top:14px}
+  .slider-dots i{width:6px;height:6px;border-radius:999px;background:var(--line-2);
+    transition:width .3s var(--ease),background-color .3s}
+  .slider-dots i.on{width:22px;background:var(--green)}
+}
+@media (min-width:601px) and (max-width:900px){ .pillar-grid>.pillar{flex-basis:62%} }
+
+/* ---------- 8. how it works: stories-style stepper (not a long serial list) ---------- */
+@media (max-width:899.98px){
+  .chap-head{flex-direction:column;align-items:stretch;gap:16px}
+  .chap-head .eyebrow{align-self:flex-start}
+  .chap-rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .chap-rail span{position:relative;display:flex;align-items:flex-start;min-height:44px;padding-top:12px;
+    font-family:var(--m);font-size:12.5px;letter-spacing:.06em;color:var(--faint);cursor:pointer;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chap-rail span::before,.chap-rail span::after{content:"";position:absolute;left:0;right:0;top:0;height:3px;border-radius:3px}
+  .chap-rail span::before{background:var(--line-2)}
+  .chap-rail span::after{background:var(--green);transform:scaleX(0);transform-origin:left center}
+  .chap-rail span.done::after{transform:scaleX(1)}
+  .chap-rail span.on{color:var(--gold)}
+  .chap-rail .chap-bar{display:none}
+  .chapters.playing .chap-rail span.on::after{animation:chapfill 5.5s linear forwards}
+  .chapters.paused .chap-rail span.on::after{animation-play-state:paused}
+  /* every chapter shares one grid cell: the box is as tall as the tallest one, so nothing jumps */
+  /* overflow-x:clip — the chapters waiting off to the side (±36px) mustn't widen the page */
+  .chap-stage{display:grid;grid-template-columns:minmax(0,1fr);touch-action:pan-y;overflow-x:clip}
+  /* margin-inline:0 — .wrap's auto margins would shrink this grid item to its content */
+  .chap-stage>.chap-head{grid-row:1;margin-inline:0}
+  .chap-stage>.chap{grid-row:2;grid-column:1;border-top:0;margin-top:0;padding-block:20px 0;
+    opacity:0;transform:translate3d(36px,0,0);pointer-events:none;
+    transition:opacity .45s var(--ease),transform .6s var(--ease)}
+  .chap-stage>.chap.past{transform:translate3d(-36px,0,0)}
+  .chap-stage>.chap.on{opacity:1;transform:none;pointer-events:auto}
+  .chap-stage .chap-step{display:none}     /* the rail already names the step */
+  .chap-stage .hatch{font-size:clamp(52px,15vw,72px)}
+}
+@keyframes chapfill{to{transform:scaleX(1)}}
+@media (max-width:899.98px) and (prefers-reduced-motion:reduce){
+  .chapters .chap-rail span.on::after{animation:none;transform:scaleX(1)}
+  .chap-stage>.chap{transition:none}
+}
+
+/* ---------- 9. comparison table → two-line rows ---------- */
+@media (max-width:720px){
+  .cmp-row.head{display:flex;justify-content:flex-end;padding:12px 18px}
+  .cmp-row.head span:not(.oc){display:none}
+  .cmp-row.head .c.oc{padding:5px 12px;border-radius:999px;border:0}
+  .cmp-row:not(.head){display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:14px 18px}
+  .cmp-row:not(.head) .ft{order:1;flex:1 1 auto;font-size:16px;font-weight:500}
+  .cmp-row:not(.head) .c.oc{order:2;flex:none;padding:5px 12px;border-radius:999px;border:0;font-size:14px}
+  .cmp-row:not(.head)::after{content:"";order:3;flex-basis:100%;height:0}
+  .cmp-row:not(.head) .c:not(.oc){order:4;text-align:left;font-size:13.5px}
+  .cmp-row:not(.head) .c:not(.oc)::before{content:attr(data-label);margin-right:7px;color:var(--faint);
+    font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
+}
+
+/* ---------- 10. footer: two columns, not one long list ---------- */
+@media (max-width:900px){
+  .foot-grid{grid-template-columns:1fr 1fr;grid-template-areas:"brand brand" "prod comp" "prod portal";gap:28px 20px}
+  .foot-grid>div:nth-child(1){grid-area:brand}
+  .foot-grid>div:nth-child(2){grid-area:prod}
+  .foot-grid>div:nth-child(3){grid-area:comp}
+  .foot-grid>div:nth-child(4){grid-area:portal}
+  .foot-grid h5{margin-bottom:6px}
+  .foot-grid a{margin:0;padding-block:9px;line-height:1.5}
+  .foot-contact a{display:inline-flex;align-items:center;min-height:44px}
+  .foot-copy a{display:inline-block;padding-block:12px}
+}
+
+/* ---------- 11. floating "Free website check": icon only, clear of content ---------- */
+@media (max-width:900px){
+  .floatcheck{right:calc(14px + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));
+    padding:15px;transition:opacity .25s var(--ease),transform .25s var(--ease)}
+  .floatcheck .fc-txt{display:none}
+  .floatcheck.is-end{opacity:0;pointer-events:none;transform:translateY(12px) scale(.9)}   /* footer on screen */
+}
+
+/* ---------- 12. inner pages (same patterns) ---------- */
+@media (max-width:600px){
+  :root{--gutter:20px}
+  .wrap .wrap{padding-inline:0}           /* nested wraps doubled the gutter (php2shell, FAQ) */
+  /* page hero: left-aligned and compact */
+  .phero{text-align:left;padding-top:32px;padding-bottom:8px}
+  .phero .eyebrow{margin-bottom:16px}
+  .phero h1{margin:0;max-width:none;font-size:clamp(28px,8.4vw,34px);text-wrap:balance}
+  .phero p{margin:14px 0 0;max-width:none;font-size:16.5px}
+  .phero .hero-cta{margin-top:22px}
+  /* long centred blocks read poorly on a phone: left-align them */
+  .section-head,.center .section-head{text-align:left;margin-inline:0}
+  .section-head h2{font-size:28px;text-wrap:balance}
+  .wrap.center,.stats-foot,.cnote,.card.cov{text-align:left}
+  .section-head.center,.section-head.center p,.center .lead{text-align:left;margin-inline:0}
+  /* benchmark tables: fixed number columns (each row is its own grid, so they must be
+     fixed to stay aligned row-to-row); the config name gets the rest */
+  .brow.r3{grid-template-columns:minmax(0,1fr) 76px 62px}
+  .brow.r2{grid-template-columns:minmax(0,1fr) 74px}
+  .eyebrow{letter-spacing:.12em;text-wrap:balance}
+  /* 16px inputs stop iOS zooming in on focus */
+  .wsc-inputrow input,.p2s input{font-size:16px}
+  .qcard{max-height:calc(100dvh - 32px)}
+}
+/* 44px touch targets — phones AND tablets (both are touch screens) */
+@media (max-width:900px){
+  .link,.backlink,.card.cov a{display:inline-flex;align-items:center;min-height:44px}
+  .share-btn{min-height:44px}
+  .qx{width:44px;height:44px}
+}
+/* tablets only: on phones "Sign in" is hidden from the bar (it lives in the menu) */
+@media (min-width:601px) and (max-width:900px){
+  .nav-right .portal-link{display:inline-flex;align-items:center;min-height:44px}
+}
+@media (max-width:360px){
+  :root{--gutter:16px}
+  .brow.r3{grid-template-columns:minmax(0,1fr) 70px 56px}
+  .brow.head{font-size:12px;letter-spacing:.04em}   /* "CONFIGURATION" fits its column */
+}
+@media (min-width:601px) and (max-width:900px){
+  .svcgrid,.pricing,.postlist.c3{grid-template-columns:1fr 1fr}   /* tablets: 2 columns, not 710px-wide cards */
+}
+
+/* ---------- 13. nav hides on scroll down, returns on scroll up (Nav.tsx sets .is-hidden) ---------- */
+@media (max-width:900px){
+  header.nav{transition:transform .35s var(--ease)}
+  header.nav.is-hidden{transform:translateY(calc(-100% - 16px))}
+  html{scroll-padding-top:84px}           /* native anchor jumps clear the sticky bar (no Lenis on phones) */
+}
+@media (max-width:900px) and (prefers-reduced-motion:reduce){ header.nav{transition:none} }
+
+/* ---------- 14. tablet hero: copy left, octagon right ---------- */
+@media (min-width:601px) and (max-width:900px){
+  .hero2{text-align:left}
+  .hero2-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
+    grid-template-areas:"h1 seal" "sub seal" "cta seal";column-gap:28px;align-items:center}
+  .hero2 h1{grid-area:h1;align-self:end}
+  .hero2 .seal{grid-area:seal;width:100%;max-width:300px;margin:0;justify-self:center}
+  .hero2 .hero-sub{grid-area:sub;margin:16px 0 0;align-self:start}
+  .hero2 .hero-cta{grid-area:cta;justify-content:flex-start;margin-top:22px;align-self:start}
+  .hero2 h1 .l1{font-size:clamp(28px,4.6vw,40px)}
+  .hero2 h1 .l2{font-size:clamp(30px,5vw,44px)}
+}
+
+/* ---------- 15. phone performance: lighter hero glow, no fixed page background ---------- */
+@media (max-width:600px){
+  .hero::before{filter:none;height:320px}  /* a 440px blur(28px) layer is costly on phones */
+  .hero::after{animation:none}             /* the infinite beam */
+}
+@media (max-width:900px){
+  :root[data-theme="light"] body{background-attachment:scroll}   /* fixed bg repaints on every scroll (iOS ignores it anyway) */
+}
+
+/* ---------- 16. blog tables: edge shadows say "this scrolls sideways" ---------- */
+:root{--scroll-shadow:rgba(255,255,255,.16)}
+:root[data-theme="light"]{--scroll-shadow:rgba(18,26,32,.18)}
+@media (max-width:600px){
+  .prose table{background:
+    linear-gradient(90deg,var(--bg) 30%,transparent) left center/28px 100% no-repeat local,
+    linear-gradient(270deg,var(--bg) 30%,transparent) right center/28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%,var(--scroll-shadow),transparent) left center/12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%,var(--scroll-shadow),transparent) right center/12px 100% no-repeat scroll}
+}
+
+/* ---------- 17. MobileCollapse: long reference blocks peek + "show all" on phones ---------- */
+.mcol-btn{display:none}
+@media (max-width:600px){
+  .mcol:not(.open) .mcol-body{max-height:340px;overflow:hidden;
+    -webkit-mask-image:linear-gradient(180deg,#000 60%,transparent);mask-image:linear-gradient(180deg,#000 60%,transparent)}
+  .mcol-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-top:12px;padding:0 18px;
+    border:1px solid var(--line-2);border-radius:999px;background:transparent;color:var(--text);
+    font-family:var(--m);font-size:13.5px;letter-spacing:.02em;cursor:pointer}
+}

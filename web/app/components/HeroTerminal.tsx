@@ -19,6 +19,22 @@ const LINES: [string, string][] = [
   ["VERIFIED FINDING - case file ready", "ok"],
 ];
 
+// Phones: the same story without dot leaders, so each line fits one row of a narrow
+// screen; the terminal is a fixed 5-row window that scrolls like a real one (mobile.css).
+const LINES_COMPACT: [string, string][] = [
+  ["$ octasec engage -t app.yourco.com", "c"],
+  ["[recon] 68 endpoints, 3 subdomains", "m"],
+  ["[recon] node/express + postgres", "m"],
+  ["[hunt] auth flows: 4 roles diffed", "m"],
+  ["[hunt] /api/orders: IDOR candidate", "w"],
+  ["[exploit] IDOR -> token -> takeover", "w"],
+  ["[proof] reproduced, non-destructive", "g"],
+  ["[verify] operator confirmed, signed", "g"],
+  ["VERIFIED FINDING - case file ready", "ok"],
+];
+const pickLines = () =>
+  window.matchMedia && window.matchMedia("(max-width: 600px)").matches ? LINES_COMPACT : LINES;
+
 export default function HeroTerminal() {
   const bodyRef = useRef<HTMLDivElement | null>(null);
 
@@ -31,14 +47,20 @@ export default function HeroTerminal() {
       window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 
     body.innerHTML = "";
+    let lines = pickLines();
+    // keep the newest line in view (only matters in the fixed-height phone window)
+    const follow = () => {
+      body.scrollTop = body.scrollHeight;
+    };
 
     if (reduce) {
-      LINES.forEach((L) => {
+      lines.forEach((L) => {
         const s = document.createElement("span");
         s.className = "ln " + L[1];
         s.textContent = L[0];
         body.appendChild(s);
       });
+      follow();
       return;
     }
 
@@ -48,24 +70,42 @@ export default function HeroTerminal() {
     const timers: ReturnType<typeof setTimeout>[] = [];
     let stopped = false;
 
+    // the typing loop pauses while the terminal is off-screen and resumes where it left off
+    let onScreen = true;
+    let pending: (() => void) | null = null;
+    const later = (fn: () => void, ms: number) => {
+      timers.push(setTimeout(() => (onScreen ? fn() : (pending = fn)), ms));
+    };
+    const io = new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      if (onScreen && pending) {
+        const f = pending;
+        pending = null;
+        f();
+      }
+    });
+    io.observe(body);
+
     function reset() {
       if (stopped) return;
       body!.innerHTML = "";
+      lines = pickLines();
       li = 0;
       addLine();
     }
 
     function addLine() {
       if (stopped) return;
-      if (li >= LINES.length) {
-        timers.push(setTimeout(reset, 3400));
+      if (li >= lines.length) {
+        later(reset, 3400);
         return;
       }
-      const L = LINES[li];
+      const L = lines[li];
       const span = document.createElement("span");
       span.className = "ln " + L[1];
       body!.appendChild(span);
       span.appendChild(caret);
+      follow();
       const txt = L[0];
       let ci = 0;
       (function t() {
@@ -74,10 +114,10 @@ export default function HeroTerminal() {
         span.textContent = txt.slice(0, ci);
         span.appendChild(caret);
         if (ci < txt.length) {
-          timers.push(setTimeout(t, 11 + Math.random() * 13));
+          later(t, 11 + Math.random() * 13);
         } else {
           li++;
-          timers.push(setTimeout(addLine, li === LINES.length ? 60 : 150));
+          later(addLine, li === lines.length ? 60 : 150);
         }
       })();
     }
@@ -87,6 +127,7 @@ export default function HeroTerminal() {
     return () => {
       stopped = true;
       timers.forEach(clearTimeout);
+      io.disconnect();
     };
   }, []);
 

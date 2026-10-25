@@ -14,6 +14,16 @@ export const metadata = pageMeta({
   path: "/about",
 });
 
+// Agencies the Octagram team behind OctaSec has served. To use real emblems, drop the
+// files in web/public/agencies/ and add `logo: "/agencies/<file>"` — the card then renders
+// the image instead of the monogram mark.
+const AGENCIES: { acr: string; name: string; logo?: string }[] = [
+  { acr: "CID", name: "Criminal Investigation Department", logo: "/agencies/cid.png" },
+  { acr: "DMP", name: "Dhaka Metropolitan Police", logo: "/agencies/dmp.png" },
+  { acr: "SRB", name: "Special Response Battalion", logo: "/agencies/srb.png" },
+  { acr: "CTTC", name: "Counter Terrorism & Transnational Crime", logo: "/agencies/cttc.webp" },
+];
+
 export default function AboutPage() {
   return (
     <>
@@ -34,7 +44,8 @@ export default function AboutPage() {
           <p className="lead" style={{ textAlign: "left" }}>
             OctaSec is the autonomous offensive-security engine of Octagram Ltd
             &mdash; the Dhaka-based security firm trusted by CID, Dhaka
-            Metropolitan Police, SRB and CTTC. Octagram&apos;s red team built
+            Metropolitan Police, Special Response Battalion and CTTC.
+            Octagram&apos;s red team built
             OctaSec to answer one question: why should deep security testing be a
             luxury?
           </p>
@@ -47,13 +58,21 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="wrap rv" style={{ paddingBlock: "clamp(26px,4vw,44px)" }}>
-        <div className="complybar stagger">
-          <span className="cb-lbl">The team behind OctaSec serves</span>
-          <span className="cb-item">CID</span>
-          <span className="cb-item">Dhaka Metropolitan Police</span>
-          <span className="cb-item">SRB</span>
-          <span className="cb-item">CTTC</span>
+      <section className="wrap center rv" style={{ paddingBlock: "clamp(28px,4vw,48px)" }}>
+        <span className="eyebrow">Organizations served</span>
+        <p className="lead" style={{ margin: "18px auto 0", maxWidth: "54ch" }}>
+          The Octagram red team behind OctaSec has delivered security work for
+          Bangladesh&apos;s leading law-enforcement agencies.
+        </p>
+        <div className="agencies stagger">
+          {AGENCIES.map((a) => (
+            <div className="agency" key={a.acr} title={a.name}>
+              <div className="agency-mark">
+                {a.logo ? <img src={a.logo} alt={`${a.name} logo`} /> : a.acr}
+              </div>
+              <div className="agency-name">{a.name}</div>
+            </div>
+          ))}
         </div>
       </section>
 

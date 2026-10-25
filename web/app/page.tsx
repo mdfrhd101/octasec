@@ -4,6 +4,7 @@ import HeroTerminal from "./components/HeroTerminal";
 import MethodChapters from "./components/MethodChapters";
 import DifferentiatorTable from "./components/DifferentiatorTable";
 import FinalCTA from "./components/FinalCTA";
+import AutoSlider from "./components/AutoSlider";
 import JsonLd from "./components/JsonLd";
 import { serviceLd } from "./lib/seo";
 
@@ -11,8 +12,9 @@ import { serviceLd } from "./lib/seo";
 const STATS: [number, string, string][] = [
   [104, "", "public benchmark apps"],
   [90, "+", "offensive technique modules"],
-  [100, "%", "findings human-verified"],
-  [0, "", "findings auto-submitted"],
+  // ‑ = non-breaking hyphen, so the label never splits as "HUMAN- / VERIFIED"
+  [100, "%", "findings human‑verified"],
+  [0, "", "findings auto‑submitted"],
 ];
 
 const PILLARS = [
@@ -60,7 +62,8 @@ export default function HomePage() {
             <span className="eyebrow">The difference</span>
             <h2 className="mh">Depth of a red team. Discipline of an audit.</h2>
           </div>
-          <div className="pillar-grid stagger">
+          {/* desktop: 3-column grid · phones/tablets: auto-sliding cards (AutoSlider) */}
+          <AutoSlider className="pillar-grid stagger">
             {PILLARS.map((p) => (
               <article key={p.k} className={"card glass pillar" + (p.v ? " verified" : "")}>
                 <span className="pk">{p.k}</span>
@@ -69,7 +72,7 @@ export default function HomePage() {
                 <div className="pchips">{p.c.map((x) => <span key={x}>{x}</span>)}</div>
               </article>
             ))}
-          </div>
+          </AutoSlider>
         </div>
       </section>
 

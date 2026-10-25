@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Prose from "../../components/Prose";
+import ShareButtons from "../../components/ShareButtons";
 import FinalCTA from "../../components/FinalCTA";
 import JsonLd from "../../components/JsonLd";
 import { getAllPosts, getPost, formatDate } from "../../lib/blog";
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) return {};
-  const url = `/blog/${post.slug}`;
+  const url = `/blog/${post.slug}/`;
   return {
     title: post.title,
     description: post.description,
@@ -78,6 +79,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         <h1 className="article-title">{post.title}</h1>
         <p className="article-sub">{post.description}</p>
         <Prose body={post.body} />
+        <ShareButtons />
       </article>
 
       <section className="wrap rv">

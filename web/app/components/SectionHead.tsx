@@ -13,10 +13,8 @@ export default function SectionHead({
   center?: boolean;
 }) {
   return (
-    <div
-      className={"section-head" + (center ? " center" : "")}
-      style={center ? { marginInline: "auto", textAlign: "center" } : undefined}
-    >
+    // centring lives in CSS (.section-head.center, globals.css) so phones can left-align it
+    <div className={"section-head" + (center ? " center" : "")}>
       <span className="eyebrow">{eyebrow}</span>
       <h2 className="mh">{title}</h2>
       {text ? <p>{text}</p> : null}

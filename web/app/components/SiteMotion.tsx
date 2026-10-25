@@ -89,6 +89,7 @@ export default function SiteMotion() {
     /* 3D tilt vars on cards */
     if (!reduce) {
       const onTilt = (e: PointerEvent) => {
+        if (e.pointerType !== "mouse") return; // a finger swiping cards shouldn't tilt them
         const t = e.target as HTMLElement | null;
         const c = t && t.closest ? (t.closest(".card") as HTMLElement | null) : null;
         if (!c) return;
@@ -106,6 +107,7 @@ export default function SiteMotion() {
     if (!reduce) {
       document.querySelectorAll<HTMLElement>(".btn-white").forEach((b) => {
         const move = (e: PointerEvent) => {
+          if (e.pointerType !== "mouse") return;
           const r = b.getBoundingClientRect();
           b.style.transform =
             "translate(" +
@@ -189,12 +191,18 @@ export default function SiteMotion() {
     document.querySelectorAll<HTMLElement>(".section-head").forEach((el) => {
       pars.push({ el, sp: -18 });
     });
+    // phones/tablets: no parallax — it reads layout on every scroll for a barely visible shift
+    const small = window.matchMedia("(max-width: 900px)");
     let vh = window.innerHeight,
       sy = 0,
       ticking = false;
     function update() {
       ticking = false;
       if (reduce) return;
+      if (small.matches) {
+        for (let i = 0; i < pars.length; i++) pars[i].el.style.transform = "";
+        return;
+      }
       for (let i = 0; i < pars.length; i++) {
         const p = pars[i],
           r = p.el.getBoundingClientRect(),
@@ -203,6 +211,7 @@ export default function SiteMotion() {
       }
     }
     function onScroll() {
+      if (small.matches) return;
       sy = window.scrollY || window.pageYOffset || 0;
       if (!ticking) {
         requestAnimationFrame(update);
@@ -211,7 +220,8 @@ export default function SiteMotion() {
     }
     function onResize() {
       vh = window.innerHeight;
-      onScroll();
+      if (small.matches) update(); // clears any leftover offsets
+      else onScroll();
     }
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });

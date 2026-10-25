@@ -1,9 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 import "./landing-v2.css";
+import "./hover-interactive.css";
+import "./polish.css";
+import "./mobile.css";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
+import FloatingCheck from "./components/FloatingCheck";
+import CursorFX from "./components/CursorFX";
 import SiteMotion from "./components/SiteMotion";
 import SmoothScroll from "./components/SmoothScroll";
 import JsonLd from "./components/JsonLd";
@@ -66,20 +71,34 @@ export const metadata: Metadata = {
   },
 };
 
+// One viewport tag (a hand-written <meta> here duplicated Next's default one).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="js" suppressHydrationWarning>
+    <html lang="en" className="js" data-theme="light" suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#f4f7fb" />
+        {/* No-FOUC theme: default LIGHT (day) mode; honour a saved choice before first paint. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('octasec-theme');if(t!=='dark'&&t!=='light')t='light';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='light'?'#f4f7fb':'#00080b');}catch(e){}})();",
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
         />
         {/* Plausible analytics (privacy-friendly, cookieless) — only when configured at build time */}
         {PLAUSIBLE_DOMAIN ? (
@@ -91,6 +110,8 @@ export default function RootLayout({
         <Nav />
         <main>{children}</main>
         <Footer />
+        <FloatingCheck />
+        <CursorFX />
         <SiteMotion />
         <SmoothScroll />
       </body>

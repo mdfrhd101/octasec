@@ -1,0 +1,117 @@
+/* ============================================================================
+   Hover Interactivity & Cursor FX — SELF-CONTAINED, REVERTIBLE LAYER
+   Loaded LAST (after globals.css + landing-v2.css). To fully revert this feature,
+   remove: this import in layout.tsx + the <CursorFX/> render. Nothing else changes.
+   Works in both Light (Day) and Dark (Night) via the --hv-* token layer below.
+   ============================================================================ */
+
+/* ---- 1. theme-aware hover tokens (one source of truth for both modes) ---- */
+:root{
+  --hv-accent:#e8433a; --hv-green:#006A4E;
+  --hv-bd:rgba(232,67,58,.5); --hv-glow:rgba(232,67,58,.3);
+  --hv-surface:rgba(255,255,255,.05);
+  --hv-dur:.24s; --hv-ease:cubic-bezier(.16,1,.3,1);
+}
+:root[data-theme="light"]{
+  --hv-accent:#c23228;
+  --hv-bd:rgba(194,50,40,.42); --hv-glow:rgba(194,50,40,.16);
+  --hv-surface:rgba(18,26,32,.04);
+}
+
+/* ---- 2. hover matrix (applies everywhere; on touch it simply triggers on tap) ---- */
+@media all{
+
+  /* nav links + dropdown triggers: animated red→green underline grows from the left */
+  .nav-links a,.nav-dd-btn{position:relative}
+  .nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:2px;border-radius:2px;
+    background:linear-gradient(90deg,var(--hv-accent),var(--hv-green));transform:scaleX(0);transform-origin:left;
+    transition:transform .3s var(--hv-ease)}
+  .nav-links a:hover::after{transform:scaleX(1)}
+
+  /* dropdown menu items: gentle indent on hover */
+  .dd-item{transition:background .2s,padding-left .2s var(--hv-ease)}
+  .dd-item:hover{padding-left:18px}
+
+  /* ghost / dark buttons: subtle lift */
+  .btn-ghost,.btn-dark{transition:transform .18s var(--hv-ease),background .25s,border-color .25s,box-shadow .25s,color .25s}
+  .btn-ghost:hover,.btn-dark:hover{transform:translateY(-2px)}
+
+  /* comparison / benchmark / dashboard rows: surface tint + accent bar slides in from the left */
+  .cmp-row:not(.head),.brow:not(.head),.drow:not(.head){position:relative;transition:background .2s}
+  .cmp-row:not(.head)::before,.brow:not(.head)::before,.drow:not(.head)::before{content:"";position:absolute;left:0;top:0;bottom:0;
+    width:2px;background:var(--hv-accent);transform:scaleY(0);transform-origin:center;transition:transform .25s var(--hv-ease)}
+  .cmp-row:not(.head):hover,.brow:not(.head):hover,.drow:not(.head):hover{background:var(--hv-surface)}
+  .cmp-row:not(.head):hover::before,.brow:not(.head):hover::before,.drow:not(.head):hover::before{transform:scaleY(1)}
+
+  /* list items: slide + marker lift */
+  .svc li,.pr li{transition:transform .2s var(--hv-ease)}
+  .svc li:hover,.pr li:hover{transform:translateX(5px)}
+
+  /* footer links: nudge + accent */
+  .foot-grid a,.foot-contact a{transition:color .2s,transform .2s var(--hv-ease)}
+  .foot-grid a:hover,.foot-contact a:hover{transform:translateX(3px)}
+  .foot-grid a:hover{color:var(--hv-accent)}
+
+  /* form inputs: accent border on hover (focus ring already exists) */
+  .cform input:hover,.cform textarea:hover,.cform select:hover{border-color:var(--hv-bd)}
+
+  /* agency logo plates: lift + green ring (logos never recolour) */
+  .agency-mark{transition:transform .25s var(--hv-ease),box-shadow .25s}
+  .agency:hover .agency-mark{transform:translateY(-3px) scale(1.03);box-shadow:0 12px 26px -10px rgba(0,106,78,.4)}
+
+  /* pillar cards: hover fills the whole card GREEN; text → white, accents → red
+     (!important so the light-mode .glass white bg / dark text can't win in day mode).
+     html:not(.touch-input) = mouse only: on phones the "hover" stuck after a tap/swipe
+     (CursorFX sets the class from the last pointer type). */
+  .pillar{transition:background .3s var(--hv-ease),border-color .3s,transform .3s var(--hv-ease),box-shadow .35s}
+  html:not(.touch-input) .pillar:hover{background:linear-gradient(155deg,#00563f,#006A4E 55%,#00744f)!important;border-color:#006A4E!important;
+    transform:translateY(-6px);box-shadow:0 24px 50px -18px rgba(0,106,78,.55)!important}
+  html:not(.touch-input) .pillar:hover h3{color:#fff!important}
+  html:not(.touch-input) .pillar:hover p{color:rgba(255,255,255,.88)!important}
+  html:not(.touch-input) .pillar:hover .pk{color:#ff9a86!important}                                   /* number → red */
+  html:not(.touch-input) .pillar:hover .pchips span{color:#fff!important;border-color:rgba(255,255,255,.4)!important;background:rgba(255,255,255,.1)!important}
+  html:not(.touch-input) .pillar:hover .pchips span::before{background:#ff9a86!important}             /* chip marker → red */
+
+  /* content cards (service / pricing / coverage / blog) → same green-fill + white/red text.
+     Dark mockups (.heroTerm/.dash/.trace) and data tables (.cmp/.btable) are intentionally left out. */
+  html:not(.touch-input) .card.svc:hover,html:not(.touch-input) .card.pr:hover,
+  html:not(.touch-input) .card.cov:hover,html:not(.touch-input) .card.postcard:hover{
+    background:linear-gradient(155deg,#00563f,#006A4E 55%,#00744f)!important;border-color:#006A4E!important;
+    box-shadow:0 24px 50px -18px rgba(0,106,78,.55)!important}
+  html:not(.touch-input) .card.svc:hover :is(h3,h4,p,.cv,li,.amt,.pd),
+  html:not(.touch-input) .card.pr:hover :is(h3,h4,p,.cv,li,.amt,.pd),
+  html:not(.touch-input) .card.cov:hover :is(h3,h4,p),
+  html:not(.touch-input) .card.postcard:hover :is(h3,h4,p){color:#fff!important}
+  html:not(.touch-input) .card.svc:hover .tag,html:not(.touch-input) .card.pr:hover .tag,
+  html:not(.touch-input) .card.postcard:hover .ilink,html:not(.touch-input) .card.svc:hover .more .link{color:#ff9a86!important}
+  html:not(.touch-input) .card.svc:hover li::before{background:#ff9a86!important}
+  html:not(.touch-input) .card.pr:hover li::before{color:#ff9a86!important}
+  html:not(.touch-input) .card.svc:hover .tl,html:not(.touch-input) .card.pr:hover .amt small{color:rgba(255,255,255,.72)!important}
+
+  /* icon micro-nudge on any link with an arrow */
+  .link .ar,.ilink .ar,.annbar .ar{transition:transform .2s var(--hv-ease)}
+  .link:hover .ar,.ilink:hover .ar,.annbar:hover .ar{transform:translateX(3px)}
+
+  /* ---- custom cursor: a ring that smoothly trails the pointer, grows on interactive
+         elements. mix-blend-mode makes it read correctly on BOTH white and near-black.
+         Only transform is driven per frame (GPU); size/opacity transition via CSS. ---- */
+  .cursor-ring{position:fixed;top:0;left:0;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;
+    border:1.6px solid #fff;z-index:9999;pointer-events:none;opacity:0;mix-blend-mode:difference;
+    will-change:transform;backface-visibility:hidden;contain:layout style paint;
+    transition:width .22s var(--hv-ease),height .22s var(--hv-ease),margin .22s var(--hv-ease),background .22s,opacity .3s}
+  .cursor-ready .cursor-ring{opacity:1}
+  .cursor-ring.is-hot{width:56px;height:56px;margin:-28px 0 0 -28px;background:rgba(255,255,255,.14)}
+  .cursor-ring.is-press{width:26px;height:26px;margin:-13px 0 0 -13px}
+}
+
+/* ---- 3. keyboard parity: focus-visible mirrors the hover affordance ---- */
+a:focus-visible,button:focus-visible,summary:focus-visible,.card:focus-visible,
+.cform input:focus-visible,.cform textarea:focus-visible,.cform select:focus-visible{
+  outline:none;box-shadow:0 0 0 3px var(--hv-bd)}
+
+/* ---- 4. reduced motion: drop the motion-heavy FX, keep instant states ---- */
+@media (prefers-reduced-motion:reduce){
+  .cursor-ring{display:none!important}
+  .nav-links a::after,.cmp-row::before,.brow::before,.drow::before,
+  .svc li,.pr li,.foot-grid a,.foot-contact a,.agency-mark,.dd-item{transition:none!important}
+}

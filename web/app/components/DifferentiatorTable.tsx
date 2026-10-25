@@ -29,9 +29,10 @@ export default function DifferentiatorTable() {
         {ROWS.map((r) => (
           <div className="cmp-row" key={r.ft}>
             <span className="ft">{r.ft}</span>
-            <span className={"c " + r.scanner[1]}>{r.scanner[0]}</span>
-            <span className={"c " + r.trad[1]}>{r.trad[0]}</span>
-            <span className="c oc">{r.oc}</span>
+            {/* data-label: phones show "Scanner · Low" under the row (mobile.css) */}
+            <span className={"c " + r.scanner[1]} data-label="Scanner">{r.scanner[0]}</span>
+            <span className={"c " + r.trad[1]} data-label="Traditional">{r.trad[0]}</span>
+            <span className="c oc" data-label="OctaSec">{r.oc}</span>
           </div>
         ))}
       </div>

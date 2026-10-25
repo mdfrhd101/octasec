@@ -15,6 +15,8 @@ const nextConfig = {
   images: { unoptimized: true },
   // We rely on tsc types; skip eslint during build to keep the port lean.
   eslint: { ignoreDuringBuilds: true },
+  // Hide the Next.js dev-mode indicator badge (the little "N" overlay).
+  devIndicators: false,
 };
 
 export default nextConfig;

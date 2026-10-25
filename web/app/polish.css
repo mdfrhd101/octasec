@@ -1,0 +1,109 @@
+/* ============================================================================
+   polish.css — loaded LAST. Two things, each clearly sectioned so either can go:
+   (1) crisper, higher-contrast typography in BOTH Light & Dark modes
+   (2) octasec.ai EXACT text + component sizing (full-site match)
+   Remove the import in layout.tsx to revert everything in this file.
+   ============================================================================ */
+
+/* ===== 1. Typography: crisp + high contrast ===== */
+html{-webkit-text-size-adjust:100%}
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+/* stronger muted/faint so secondary text is clearly legible, not washed out */
+:root{--muted:#a6b2bb; --faint:#7d8a93;}                      /* DARK — brighter */
+:root[data-theme="light"]{--muted:#3f4c56; --faint:#57646e;} /* DAY — darker */
+/* dark product-mockup "screenshots" keep their own brighter muted text */
+:root[data-theme="light"] .heroTerm,:root[data-theme="light"] .dash,:root[data-theme="light"] .trace,
+:root[data-theme="light"] .term-body,:root[data-theme="light"] .mininode,:root[data-theme="light"] .poc,
+:root[data-theme="light"] .dashwrap{--muted:#aab6bf;--faint:#7e8b94}
+.heroTerm .m,.term-body .m,.poc .m{color:#aeb9c2}            /* terminal muted lines → legible */
+/* the dark "screenshot" mockups must stay DARK in day mode (the RADAR .card{#fff} rule
+   was overriding the terminal's dark bg, leaving its light text on white). Re-assert + brighten. */
+:root[data-theme="light"] .heroTerm{background:linear-gradient(180deg,#0a1620,#070f16)!important;border-color:rgba(255,255,255,.1)!important}
+.heroTerm .c{color:#f4f9fc}                                  /* command line — brightest */
+
+/* ===== 2. sizing — octasec.ai base + a site-wide size bump (user asked bigger) ===== */
+:root{--maxw:1200px}
+.wrap{width:auto;max-width:var(--maxw);margin-inline:auto;padding-inline:24px}
+body{font-size:17px;line-height:1.6}   /* base up 16 -> 17 (lifts all rem-based text) */
+
+/* reading paragraphs */
+.hero-sub,.phero p,.lead{font-size:clamp(1.1rem,1rem + .5vw,1.28rem);line-height:1.6}
+.legal p{font-size:16px;line-height:1.65}
+
+/* detail copy (cards, rows, callouts) — 16px reading floor */
+.stat p,.dep p,.arch p,.blocks .st p,.st p,.svc .cv,.cmp-row,.brow,.callout,.chain li,.limc p{font-size:16px;line-height:1.6}
+.trace-head .t{font-size:15px}
+.steps p,.cov p{font-size:16px}
+.svc li{font-size:15.5px}
+.trio p,.pillar p{font-size:16px;line-height:1.65}
+.pr ul,.pr li,.pr .pd,.fix{font-size:15.5px}
+.chap-copy p{font-size:17px;line-height:1.6}
+.prose{font-size:17.5px;line-height:1.75}
+.incl{font-size:16px}
+/* comparison / benchmark / dashboard value cells (were 12px mono) + their header labels */
+.cmp-row .c,.brow .c,.drow .c{font-size:15px}
+.cmp-row.head,.brow.head,.drow.head{font-size:13.5px}
+
+/* small mono labels (chips/eyebrows/rail) — bumped but still label-sized */
+.eyebrow{font-size:14px;padding:8px 14px;letter-spacing:.2em}
+.chap-step{font-size:15px}
+.pstat>span{font-size:14px}
+.cb-lbl,.complybar .cb-lbl,.foot-grid h5,.dash-k,.trace-col h4{font-size:12.5px}
+.svc .tag,.pr .tag,.badge,.chip,.pchips span,.chap-chips span{font-size:13.5px}
+
+/* nav + buttons + footer + faq */
+.nav-links a,.nav-dd-btn,.portal-link{font-size:15px}
+.btn{font-size:15px}.btn-sm{font-size:14px}.btn-white,.btn-ghost{font-size:15.5px}
+footer{font-size:15px}.foot-grid a,.foot-grid p{font-size:15px}.foot-copy,.foot-contact a{font-size:15px}
+.faq summary{font-size:16.5px}.faq .a{font-size:16.5px}
+.faq summary,.faq .a{overflow-wrap:anywhere}   /* long code tokens (session.upload_progress.enabled=0) wrap on phones */
+.agency-name{font-size:15px}
+.complybar .cb-item,.intgrid span{font-size:14.5px}
+.svc .tl{font-size:13.5px}            /* service-card "typical timeline" meta (beats landing-v2 .svc .tl) */
+.foot-roe{font-size:13.5px}           /* footer legal strip (a sentence, not a label) */
+
+/* ===== 3. inner pages — small text up (audit of all 13 routes at 1280px) ===== */
+/* card titles (cov h4 was 12.5px) */
+.card.cov h4,.cov h4{font-size:18px;line-height:1.3}
+.card.postcard h3{font-size:20px;line-height:1.3}
+.postlist.c3 .postcard h3{font-size:18.5px}          /* 3-col related posts (was 1.05rem) */
+.card.st h3{font-size:19px}
+.card.svc h3,.card.pr h3,.legal h3{font-size:20.5px}
+/* card copy + tables */
+.card.cov p,.card.postcard p{font-size:16px;line-height:1.6}
+.card.cov a{font-size:15px}
+.prose table{font-size:15.5px}
+.prose thead th{font-size:12.5px}
+.prose tbody td:not(:first-child){font-size:15px}    /* mono value cells (were 13px) */
+/* small mono meta, notes, form labels (were 11.5–13px) */
+.stats-foot,.postdate,.amt small,.pr .amt small,.cnote,.annbar,.pk,.pillar .pk{font-size:13.5px}
+.hero-cta>span{font-size:14px!important}   /* about "Careers — coming soon": beats an inline fontSize:12 */
+.share-lbl{font-size:13px}
+.related-h,.legal code,.cform label,.wsc-form label,.wsc-terms,.share-btn,.share-btn span{font-size:14px}
+.card.st .sn,.steps .sn,.st .sn{font-size:13.5px}
+.seal-legend{font-size:12.5px}
+.brow .rate.muted{font-size:14px}
+.link{font-size:15px}
+.to-top{font-size:14.5px}
+.floatcheck .fc-txt{font-size:14.5px}
+.dd-item .dd-n,.mp-sub a .dd-n{font-size:13.5px}   /* nav dropdown + mobile-drawer sub-labels (were 11.5–12px) */
+@media (max-width:900px){
+  .brow.r3,.brow.r3b,.brow.r2{font-size:13.5px}    /* benchmark rows were forced to 12px on phones/tablets */
+}
+
+/* method chapters → big word + layout (now inside the 1200 wrap) */
+@media (min-width:900px) and (prefers-reduced-motion:no-preference){
+  /* align the method ("How it works") container to the SAME 1200 centred wrap as
+     the pillars ("The difference") so both sections' content share a left edge */
+  .js .chap-head,.js .chap-in{max-width:var(--maxw);margin-inline:auto}
+  .js .chap-in{grid-template-columns:1.15fr .85fr;gap:56px;padding-top:60px}
+  .js .hatch{font-size:clamp(6rem,13vw,12rem)}
+  /* chapter number sits ABOVE the hatched word (stacked, left-aligned) instead of
+     behind it — inside the 1200 column the giant watermark crossed through the
+     word's hatched letters. In flow, so the column centres number + word together. */
+  .js .chap-num{position:static;display:block;transform:none;z-index:auto;
+    font-size:clamp(4.5rem,8vw,7.5rem);line-height:1;margin:0 0 .06em -.02em}
+  .js .chap-copy{max-width:none}
+  .js .chap-rail{font-size:14px;gap:24px}
+}
+@media(max-width:600px){body{font-size:16.5px}.prose{font-size:17px}}

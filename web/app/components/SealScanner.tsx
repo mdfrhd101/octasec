@@ -37,14 +37,14 @@ export default function SealScanner() {
     const ctx = cv.getContext("2d");
     if (!ctx) return;
     const reduce = !!window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const phone = window.innerWidth < 760;
+    let phone = window.innerWidth < 760; // re-checked on resize/rotate
 
     let W = 0, R = 0, dpr = 1, raf = 0, running = false, visible = true;
     let ring: HTMLCanvasElement | null = null;
     let mx = 0, my = 0, tx = 0, ty = 0;
 
-    // dust particles in polar coords around the seal
-    const N = phone ? 70 : 140;
+    // dust particles in polar coords around the seal (fewer on phones: the seal is ~200px there)
+    const N = phone ? 36 : 140;
     const dust = Array.from({ length: N }, () => ({
       a: Math.random() * TAU, d: 0.35 + Math.random() * 0.75, s: 0.4 + Math.random() * 1.4,
       v: (Math.random() - 0.5) * 0.0016, tw: Math.random() * TAU,
@@ -84,7 +84,12 @@ export default function SealScanner() {
     }
 
     function resize() {
-      W = wrap!.clientWidth;
+      const w = wrap!.clientWidth;
+      // mid-layout (breakpoint switch, style reload) the box can measure 0 — keep the last
+      // frame; a 0×0 ring canvas makes drawImage throw InvalidStateError
+      if (w < 2) return;
+      W = w;
+      phone = window.innerWidth < 760;
       dpr = Math.min(window.devicePixelRatio || 1, phone ? 1.5 : 2);
       cv!.width = Math.round(W * dpr);
       cv!.height = Math.round(W * dpr);
@@ -97,6 +102,7 @@ export default function SealScanner() {
     let last = performance.now();
 
     function draw(now: number) {
+      if (W < 2) return; // not measured yet
       const dt = Math.min(48, now - last);
       last = now;
       if (!reduce) sweep += dt * 0.0011;
@@ -193,7 +199,7 @@ export default function SealScanner() {
       ctx!.fillRect(u * 0.6, -u * 0.6, u * 0.36, u * 1.2);
 
       // the glowing ring on top (pre-rendered), with a breathing scale
-      if (ring) {
+      if (ring && ring.width > 0 && ring.height > 0) {
         const s = reduce ? 1 : 1 + 0.012 * Math.sin(now * 0.0012);
         ctx!.save();
         ctx!.translate(tx * -4, ty * -4);
@@ -224,6 +230,7 @@ export default function SealScanner() {
     const onVis = () => (document.hidden ? stop() : start());
     document.addEventListener("visibilitychange", onVis);
     const onMove = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return; // parallax follows a mouse, not a finger scrolling
       mx = (e.clientX / window.innerWidth - 0.5) * 2;
       my = (e.clientY / window.innerHeight - 0.5) * 2;
     };

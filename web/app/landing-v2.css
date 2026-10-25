@@ -1,7 +1,7 @@
 /* ===================== Landing v2 (docs/LANDING_DESIGN_V2.md) =====================
    Imported after globals.css in app/layout.tsx. Overrides nav/buttons site-wide,
    everything else is scoped to the home page sections. */
-:root{--d:"Space Grotesk",system-ui,-apple-system,sans-serif;--green:#15a06b;--ease:cubic-bezier(.16,1,.3,1)}
+:root{--d:"Space Grotesk",system-ui,-apple-system,sans-serif;--green:#006A4E;--ease:cubic-bezier(.16,1,.3,1)}
 
 /* nav: dark glass instead of the white pill */
 .navbar{background:rgba(6,16,22,.62);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);border:1px solid rgba(255,255,255,.08);box-shadow:0 18px 50px rgba(0,0,0,.45);border-radius:999px;padding:10px 12px 10px 22px}
@@ -154,3 +154,402 @@
   .pstat{padding:24px 14px}
   .seal-legend{font-size:9.5px;gap:12px}
 }
+
+/* ===================== v3 — navbar, mobile & readability ===================== */
+/* Loads last, so it is the authoritative layer for nav structure, responsive
+   behaviour and detail-text sizing. */
+
+/* ---- navbar: 5 primary links + a Tools ▾ dropdown ---- */
+.nav-links{gap:22px}
+.nav-links a{font-size:15px}
+.portal-link{font-size:15px}
+.nav-dd{position:relative;display:flex;align-items:center}
+.nav-dd-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:0;cursor:pointer;
+  font-family:var(--d);font-size:15px;color:var(--muted);padding:0;transition:color .18s}
+.nav-dd-btn:hover,.nav-dd.open .nav-dd-btn{color:var(--text)}
+.nav-dd-btn .cr{font-size:10px;transition:transform .22s var(--ease)}
+.nav-dd.open .nav-dd-btn .cr{transform:rotate(180deg)}
+.nav-dd-menu{position:absolute;top:calc(100% + 16px);right:0;min-width:280px;
+  background:rgba(8,18,24,.97);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);
+  border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:8px;
+  box-shadow:0 26px 64px rgba(0,0,0,.55);
+  opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .2s var(--ease),transform .2s var(--ease),visibility .2s;z-index:70}
+.nav-dd.open .nav-dd-menu{opacity:1;visibility:visible;transform:none}
+.dd-item{display:flex;flex-direction:column;gap:2px;padding:11px 14px;border-radius:11px;transition:background .18s}
+.dd-item:hover{background:rgba(255,255,255,.055)}
+.dd-item .dd-t{font-family:var(--d);font-size:15px;color:var(--text);font-weight:500}
+.dd-item .dd-n{font-family:var(--m);font-size:11.5px;color:var(--faint);letter-spacing:.02em}
+.dd-lead{background:rgba(232,67,58,.07)}
+.dd-lead .dd-t{color:var(--gold-hi)}
+/* divider between the two lead tools and Blog/FAQ */
+.nav-dd-menu .dd-item:nth-child(3){margin-top:7px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+
+/* ---- mobile drawer: animated, scroll-locked (body lock is set in Nav.tsx) ---- */
+@media (max-width:900px){
+  .nav-links{display:none}
+  .menu-btn{display:inline-flex}
+  .nav-right .btn-dark{display:none}
+  /* height/opacity transition instead of display toggle, so it slides open */
+  .mobile-panel{display:block;max-height:0;opacity:0;overflow:hidden;margin-top:0;
+    transition:max-height .4s var(--ease),opacity .3s var(--ease),margin-top .4s var(--ease)}
+  .mobile-panel.open{max-height:min(82vh,620px);opacity:1;margin-top:10px;overflow-y:auto;
+    background:rgba(6,16,22,.96);border:1px solid rgba(255,255,255,.09);
+    -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-radius:18px;padding:10px 16px 18px}
+  .mobile-panel a{display:block;font-family:var(--d);font-size:16px;color:var(--text);
+    padding:14px 4px;min-height:44px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .mobile-panel a:active{color:var(--gold-hi)}
+  .mp-group{display:flex;align-items:center;gap:8px;width:100%;background:none;border:0;
+    border-bottom:1px solid rgba(255,255,255,.07);cursor:pointer;
+    font-family:var(--d);font-size:16px;color:var(--text);padding:14px 4px;min-height:44px}
+  .mp-group .cr{font-size:11px;transition:transform .22s var(--ease)}
+  .mp-group.open .cr{transform:rotate(180deg)}
+  .mp-sub{max-height:0;overflow:hidden;transition:max-height .35s var(--ease);padding-left:12px}
+  .mp-sub.open{max-height:360px}
+  .mp-sub a{font-size:15px;color:var(--muted);padding:12px 4px}
+  .mp-sub a.dd-lead{color:var(--gold-hi)}
+  .mp-sub a .dd-n{color:var(--faint);font-family:var(--m);font-size:12px}
+  .mp-cta{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+  .mp-cta a:not(.btn){border:0;text-align:center;color:var(--muted)}
+  .mp-cta .btn{justify-content:center;padding:15px 22px}
+  /* announcement bar wraps and shrinks instead of overflowing */
+  .annbar{flex-wrap:wrap;font-size:11.5px;padding:9px 14px;text-align:center;line-height:1.5}
+}
+/* smoother intermediate behaviour: tablet keeps the pill tidy, phones tighten gutters */
+@media (max-width:1024px){ .nav-links{gap:18px} }
+@media (max-width:600px){
+  .wrap{padding-inline:16px}
+  header.nav{padding-top:10px}
+  .navbar{padding:9px 10px 9px 16px}
+}
+
+/* ---- readability: lift the small detail text site-wide ---- */
+/* base reading size up a touch; most paragraphs inherit this */
+body{font-size:16.5px;line-height:1.65}
+/* lead / intro paragraphs */
+.hero-sub,.phero p,.lead{font-size:clamp(1.05rem,1rem + .5vw,1.2rem);line-height:1.6}
+.legal p{font-size:16px;line-height:1.7}
+/* card & section detail copy → comfortable 15px */
+.stat p,.trio p,.steps p,.cov p,.dep p,.arch p,.svc .cv,.blocks .st p,
+.callout,.fix,.chain li,.pr .pd,.cmp-row,.brow,.limc p,.trace-head .t{font-size:15px;line-height:1.6}
+.pillar p{font-size:15.5px;line-height:1.65}
+.chap-copy p{font-size:16px}
+/* lists */
+.svc li,.pr ul,.pr li{font-size:14.5px;line-height:1.5}
+.incl{font-size:15px}
+/* table header rows stay as compact caps, just a hair larger */
+.cmp-row.head,.brow.head,.drow.head{font-size:11.5px}
+.drow{font-size:13.5px}
+/* nav, links, buttons */
+.link{font-size:14px}
+.btn{font-size:14.5px}
+.btn-sm{font-size:13.5px}
+.btn-white,.btn-ghost{font-size:15px}
+/* faq */
+.faq summary{font-size:16px}
+.faq .a{font-size:15.5px;line-height:1.7}
+/* footer */
+footer{font-size:15px}
+.foot-grid a{font-size:14.5px}
+.foot-copy,.foot-contact a{font-size:14px}
+/* forms — 16px inputs also stop iOS from zooming on focus */
+.cform label{font-size:13px}
+.cform input,.cform textarea,.cform select{font-size:16px}
+/* trust / integrations / home micro-copy */
+.complybar .cb-item{font-size:14px}
+.intgrid span{font-size:14.5px}
+.pstat>span{font-size:12.5px}
+.pchips span,.chap-chips span{font-size:12px}
+.chap-step{font-size:12px}
+.pillar .pk{font-size:12.5px}
+/* keep eyebrows/labels as small caps, just nudged for legibility */
+.eyebrow{font-size:12px}
+.badge{font-size:12px}
+/* terminals keep their compact mono look, only slightly larger */
+.term-body,.heroTerm .term-body{font-size:13px}
+@media (max-width:600px){
+  .svc li,.pr ul,.pr li,.steps p,.cov p,.dep p,.arch p{font-size:15px}
+}
+
+/* ===================== v4 — light default, wide layout, badges, type ===================== */
+
+/* ---- (5) near full-width container: content fills the screen, small balanced gutters ---- */
+:root{--maxw:1920px}
+.wrap{width:min(var(--maxw), 100% - clamp(28px, 4vw, 64px));max-width:none;margin-inline:auto;padding-inline:0}
+
+/* ---- (7) bigger base reading size + proportional leading, site-wide ---- */
+body{font-size:17px;line-height:1.7}
+.hero-sub,.phero p,.lead{font-size:clamp(1.08rem,1rem + .6vw,1.28rem);line-height:1.65}
+.stat p,.trio p,.steps p,.cov p,.dep p,.arch p,.svc .cv,.blocks .st p,
+.callout,.fix,.chain li,.pr .pd,.cmp-row,.brow,.limc p,.trace-head .t{font-size:15.5px;line-height:1.65}
+.svc li,.pr ul,.pr li{font-size:15px}
+.pillar p{font-size:16px;line-height:1.7}
+.chap-copy p{font-size:16.5px;line-height:1.7}
+.faq summary{font-size:16.5px}
+.faq .a{font-size:16px;line-height:1.75}
+footer{font-size:15.5px}
+.legal p{font-size:16.5px;line-height:1.8}
+
+/* ---- (6) section badges redesigned: squared "spec" pill + diamond tick, no AI-template pulse ---- */
+.hero .eyebrow,.phero .eyebrow,.section-head .eyebrow,.hero2 .eyebrow,.sec-left .eyebrow{display:inline-flex;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;padding:7px 13px;border-radius:7px;
+  border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 10%,transparent),transparent);
+  font-family:var(--m);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--text);font-weight:500}
+.eyebrow::before{content:"";width:7px;height:7px;border-radius:1.5px;transform:rotate(45deg);flex:none;
+  background:var(--gold);box-shadow:0 0 10px color-mix(in srgb,var(--gold) 55%,transparent);animation:none}
+
+/* ---- (4) day/night toggle button ---- */
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:999px;
+  border:1px solid var(--line-2);background:transparent;color:var(--muted);cursor:pointer;flex:none;
+  transition:color .2s,border-color .2s,background .2s,transform .12s}
+.theme-toggle:hover{color:var(--gold);border-color:var(--gold)}
+.theme-toggle:active{transform:scale(.94)}
+.theme-toggle svg{display:block}
+
+/* ---- (3) floating "Free website check" widget — fixed right, always visible ---- */
+.floatcheck{position:fixed;right:clamp(14px,2vw,26px);bottom:clamp(16px,3vh,30px);z-index:85;
+  display:inline-flex;align-items:center;gap:10px;padding:13px 19px 13px 15px;border-radius:999px;
+  font-family:var(--m);font-size:13.5px;font-weight:600;letter-spacing:.01em;color:#fff;
+  background:linear-gradient(120deg,#006A4E,#006A4E 48%,#2fb784);
+  box-shadow:0 14px 38px -10px rgba(21,160,107,.6),0 4px 14px -4px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.floatcheck:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 22px 52px -12px rgba(21,160,107,.72),0 6px 18px -4px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.4)}
+.floatcheck .fc-ico{display:inline-flex;flex:none}
+.floatcheck .fc-ico svg{display:block}
+@media (max-width:600px){ .floatcheck{padding:14px;right:14px;bottom:16px} .floatcheck .fc-txt{display:none} }
+
+/* ============================ LIGHT (DAY) MODE ============================ */
+:root[data-theme="light"]{
+  --bg:#f4f7fb; --bg-2:#e9eef4; --card:#ffffff; --card-2:#f2f6fa; --navbg:rgba(255,255,255,.82);
+  --text:#121a20; --muted:#505e68; --faint:#6b7883;
+  --line:rgba(18,26,32,.1); --line-2:rgba(18,26,32,.16);
+  --gold:#c23228; --gold-hi:#d9564a; --gold-lo:#7a160e;
+  --green:#006A4E; --red:#d33440; --crit:#d33440; --high:#c07a16; --med:#55636d;
+  color-scheme:light; --lk-octa:#131a1e;
+}
+:root[data-theme="light"] body{background:
+  radial-gradient(1200px 720px at 92% -14%,rgba(194,50,40,.05),transparent 60%),
+  radial-gradient(1000px 640px at -8% 18%,rgba(0,106,78,.04),transparent 60%),
+  linear-gradient(180deg,#ffffff 0%,#f4f7fb 100%);background-attachment:fixed}
+:root[data-theme="light"] body::after{opacity:.025}
+/* navbar → light pill, light dropdown, light drawer */
+:root[data-theme="light"] .navbar{background:rgba(255,255,255,.86);border:1px solid rgba(18,26,32,.08);box-shadow:0 12px 36px rgba(18,26,32,.12),inset 0 1px 0 #fff}
+:root[data-theme="light"] .brand{color:var(--text)}
+:root[data-theme="light"] .nav-links a,:root[data-theme="light"] .nav-dd-btn,:root[data-theme="light"] .portal-link{color:var(--muted)}
+:root[data-theme="light"] .nav-links a:hover,:root[data-theme="light"] .nav-dd-btn:hover,:root[data-theme="light"] .nav-dd.open .nav-dd-btn{color:var(--text)}
+:root[data-theme="light"] .menu-btn{border-color:rgba(18,26,32,.2)}
+:root[data-theme="light"] .menu-btn svg{stroke:var(--text)}
+:root[data-theme="light"] .nav-dd-menu{background:rgba(255,255,255,.98);border-color:rgba(18,26,32,.1);box-shadow:0 26px 64px rgba(18,26,32,.18)}
+:root[data-theme="light"] .dd-item:hover{background:rgba(18,26,32,.045)}
+:root[data-theme="light"] .dd-item .dd-t{color:var(--text)}
+:root[data-theme="light"] .dd-lead{background:rgba(194,50,40,.08)}
+:root[data-theme="light"] .nav-dd-menu .dd-item:nth-child(3){border-top-color:rgba(18,26,32,.1)}
+:root[data-theme="light"] .mobile-panel.open{background:rgba(255,255,255,.97);border-color:rgba(18,26,32,.1)}
+:root[data-theme="light"] .mobile-panel a,:root[data-theme="light"] .mp-group{color:var(--text);border-bottom-color:rgba(18,26,32,.08)}
+:root[data-theme="light"] .mp-sub a{color:var(--muted)}
+:root[data-theme="light"] .nav-right .btn-dark{background:linear-gradient(120deg,#9a1f18,#c23228 45%,#d9564a);color:#fff;border-color:rgba(122,22,14,.4)}
+/* cards + glass */
+:root[data-theme="light"] .card{background:radial-gradient(130% 90% at 50% -12%,rgba(194,50,40,.05),transparent 52%),linear-gradient(180deg,#fff,#fbfcff);border-color:rgba(18,26,32,.08);box-shadow:0 1px 2px rgba(18,26,32,.04),0 14px 34px -16px rgba(18,26,32,.18),inset 0 1px 0 #fff}
+:root[data-theme="light"] .card:hover{border-color:rgba(194,50,40,.22);box-shadow:0 2px 4px rgba(18,26,32,.05),0 28px 60px -22px rgba(18,26,32,.22),0 0 34px -10px rgba(194,50,40,.12),inset 0 1px 0 #fff}
+:root[data-theme="light"] .glass{background:linear-gradient(180deg,#fff,#f6f9fd);border-color:rgba(18,26,32,.08)}
+/* headline ink → steel on light */
+:root[data-theme="light"] .mh{color:var(--text)}
+:root[data-theme="light"] .mh .w{background:linear-gradient(180deg,#121a20,#5a6872);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+:root[data-theme="light"] .hero2 h1 .l1{color:#434f59}
+:root[data-theme="light"] .l2,:root[data-theme="light"] .hero2 h1 .l2{background:linear-gradient(100deg,#7a160e 0%,#c23228 38%,#d9564a 62%,#7a160e 100%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+/* buttons */
+:root[data-theme="light"] .btn-white{box-shadow:0 10px 26px -10px rgba(194,50,40,.45),0 2px 8px -3px rgba(194,50,40,.3)}
+:root[data-theme="light"] .btn-ghost{border-color:rgba(18,26,32,.18);background:rgba(18,26,32,.014);color:var(--text)}
+:root[data-theme="light"] .btn-ghost:hover{border-color:rgba(18,26,32,.4);color:var(--gold)}
+/* inputs + scrollbar */
+:root[data-theme="light"] .cform input,:root[data-theme="light"] .cform textarea,:root[data-theme="light"] .cform select{background:#fff;color:var(--text);border-color:var(--line)}
+:root[data-theme="light"] ::-webkit-scrollbar-track{background:#e9eef4}
+:root[data-theme="light"] ::-webkit-scrollbar-thumb{background:#c4ccd4;border-color:#e9eef4}
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+/* keep intrinsically-dark product mockups dark (light text inside) */
+:root[data-theme="light"] .heroTerm,:root[data-theme="light"] .dashwrap,:root[data-theme="light"] .dash,
+:root[data-theme="light"] .trace,:root[data-theme="light"] .poc,:root[data-theme="light"] .term-body,
+:root[data-theme="light"] .mininode{--text:#f0f6fa;--muted:#8a97a1;--faint:#56626b;--line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.14);--card:#07131b;color:#f0f6fa}
+:root[data-theme="light"] .heroTerm{background:linear-gradient(180deg,#0a1620,#070f16);border-color:rgba(255,255,255,.08);box-shadow:0 30px 80px -24px rgba(0,0,0,.4),0 0 60px -22px rgba(232,67,58,.14)}
+/* accents that wash out on white → deepen */
+:root[data-theme="light"] .pstat b{background:linear-gradient(180deg,#d9564a,#7a160e);-webkit-background-clip:text;background-clip:text}
+:root[data-theme="light"] .pstat:nth-child(3) b{background:linear-gradient(180deg,#139364,#006a4e);-webkit-background-clip:text;background-clip:text}
+:root[data-theme="light"] .hatch{background:repeating-linear-gradient(-52deg,#c23228 0 2.5px,rgba(194,50,40,.1) 2.5px 8px);-webkit-background-clip:text;background-clip:text;-webkit-text-stroke:1.3px rgba(169,38,30,.9)}
+:root[data-theme="light"] .chap.verified .hatch{background:repeating-linear-gradient(-52deg,#006A4E 0 2.5px,rgba(11,125,82,.1) 2.5px 8px);-webkit-background-clip:text;background-clip:text;-webkit-text-stroke-color:rgba(8,105,78,.95)}
+:root[data-theme="light"] .pillars-mark{-webkit-text-stroke-color:rgba(194,50,40,.14)}
+:root[data-theme="light"] .chap-num{-webkit-text-stroke-color:rgba(18,26,32,.24)}
+:root[data-theme="light"] #problem::before{color:#121a20;opacity:.045}
+:root[data-theme="light"] .annbar{background:linear-gradient(90deg,transparent,rgba(194,50,40,.07),transparent)}
+:root[data-theme="light"] .annbar b,:root[data-theme="light"] .annbar .ar{color:var(--gold)}
+/* content borders/overlays that used white → dark on light */
+:root[data-theme="light"] .pchips span,:root[data-theme="light"] .chap-chips span{border-color:rgba(18,26,32,.14);background:rgba(18,26,32,.022)}
+:root[data-theme="light"] .cb-item{border-color:rgba(18,26,32,.14);background:rgba(18,26,32,.022)}
+:root[data-theme="light"] .badge{border-color:rgba(18,26,32,.12);background:rgba(18,26,32,.022)}
+:root[data-theme="light"] .intgrid span{border-color:rgba(18,26,32,.14)}
+:root[data-theme="light"] .scroll-cue{border-color:rgba(18,26,32,.28)}
+:root[data-theme="light"] .pillar.verified{border-color:rgba(11,125,82,.22)}
+:root[data-theme="light"] footer{border-top-color:rgba(194,50,40,.16);background:linear-gradient(180deg,rgba(194,50,40,.02),transparent 40%)}
+:root[data-theme="light"] .hero-stars{opacity:.4;background-image:radial-gradient(1px 1px at 12% 22%,rgba(18,26,32,.28),transparent 60%),radial-gradient(1px 1px at 32% 68%,rgba(194,50,40,.42),transparent 60%),radial-gradient(1.5px 1.5px at 58% 14%,rgba(18,26,32,.2),transparent 60%),radial-gradient(1px 1px at 82% 78%,rgba(18,26,32,.18),transparent 60%),radial-gradient(1px 1px at 46% 42%,rgba(194,50,40,.38),transparent 60%),radial-gradient(1px 1px at 92% 30%,rgba(18,26,32,.16),transparent 60%),radial-gradient(1px 1px at 22% 88%,rgba(18,26,32,.16),transparent 60%)}
+
+/* ---- method chapters: keep the ORIGINAL pinned scroll animation, just constrained to a
+   max-width so the content stays centred (no edge-drift) on the now-wider container ---- */
+@media (min-width:900px) and (prefers-reduced-motion:no-preference){
+  .js .chap-head,.js .chap-in{width:100%;max-width:1200px;margin-inline:auto}
+  .js .chap-in{grid-template-columns:1fr 1fr;gap:clamp(32px,4vw,72px);align-items:center;padding-top:0}
+  .js .hatch{font-size:clamp(4.5rem,8vw,8rem)}
+  .js .chap-num{font-size:clamp(8rem,13vw,13rem);right:0}
+  .js .chap-copy{max-width:520px}
+}
+
+/* ===================== v5 — RADAR-inspired (radar.octagramltd.com) ===================== */
+/* Fonts: Sora headings · IBM Plex Sans body · IBM Plex Mono labels. Flat crisp-cornered
+   cards (no glow/HUD/blur). Squared geometry. Clean outlined mono tags. */
+:root{
+  --d:"Sora",system-ui,-apple-system,sans-serif;
+  --m:"IBM Plex Mono",ui-monospace,monospace;
+  --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+}
+body{font-family:var(--body)}
+h1,h2,h3,h4,.mh,.na-title,.big-statement,.lead-note{font-family:var(--d)}
+
+/* ---- cards: flat, thin border, crisp corners, no shadow/HUD/blur (RADAR look) ---- */
+.card{background:rgba(255,255,255,.016);border:1px solid var(--line-2);border-radius:5px;
+  box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.card::before,.card::after{display:none !important}
+/* restore the 3D cursor tilt on hover (JS sets --rx/--ry); resting state stays flat */
+.card:hover{transform:perspective(900px) translateY(-5px) rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg));border-color:rgba(232,67,58,.42);box-shadow:0 16px 36px -22px rgba(0,0,0,.5)}
+.glass{background:rgba(255,255,255,.02);backdrop-filter:none;-webkit-backdrop-filter:none}
+.pillar,.glass{border-radius:6px}
+:root[data-theme="light"] .card{background:#ffffff;border-color:rgba(18,26,32,.1);box-shadow:none}
+:root[data-theme="light"] .card:hover{border-color:rgba(194,50,40,.35);box-shadow:0 16px 36px -20px rgba(18,26,32,.14)}
+:root[data-theme="light"] .glass{background:#ffffff;border-color:rgba(18,26,32,.1)}
+
+/* ---- squared geometry (RADAR is crisp 2–4px; we use 4–8px) ---- */
+.navbar{border-radius:9px}
+.btn,.btn-white,.btn-ghost,.btn-dark,.btn-sm,.nav-right .btn-dark{border-radius:5px}
+.theme-toggle,.menu-btn{border-radius:5px}
+.nav-dd-menu,.mobile-panel.open,.qcard{border-radius:8px}
+.dd-item{border-radius:4px}
+.floatcheck{border-radius:7px}
+.chip,.badge,.cb-item,.pchips span,.chap-chips span,.intgrid span,.sevb,.sev,
+.pr .tag,.svc .tag,.sevb,.dash,.media,.trace,.cmp,.btable,.heroTerm,.term-bar,.poc,
+.cform input,.cform textarea,.cform select,.qx,.callout{border-radius:5px}
+.dash,.heroTerm,.trace,.cmp,.btable,.media{border-radius:8px}
+
+/* ---- eyebrow / tags → clean outlined mono tag (accent text, no pulsing marker) ---- */
+.eyebrow{color:var(--gold);background:transparent;border:1px solid color-mix(in srgb,var(--gold) 34%,transparent);
+  border-radius:4px;padding:6px 11px;gap:0;font-family:var(--m);letter-spacing:.18em}
+.eyebrow::before{display:none}
+
+/* ---- headings: Sora, tight tracking (match RADAR's bold grotesk) ---- */
+.section-head h2,.sec-left h2,.svc h3,.pillar h3,.chap-copy h3,.vp h3,.trio h3,.dep h3,.arch h3,
+.steps h3,.cov h4,.final h2,.phero h1,.pr h3{font-family:var(--d);letter-spacing:-.02em}
+.chap-copy h3,.svc h3,.pillar h3,.vp h3{font-weight:700}
+
+/* ---- hero headline: Sora's descenders (g, p, y) need more room than the old tight
+   line-height gave — loosen it (+ a little padding) so they aren't clipped ---- */
+.hero2 h1 .l1{line-height:1.16;padding-bottom:.04em}
+.hero2 h1 .l2{line-height:1.1;padding-bottom:.12em}
+.hero h1 .l1{line-height:1.18}
+.hero h1 .l2{line-height:1.14;padding-bottom:.1em}
+.phero h1{line-height:1.12;padding-bottom:.04em}
+
+/* ---- blog/article body legibility: .prose colour was tuned for dark; fix it for light ---- */
+:root[data-theme="light"] .prose{color:#2a3640}
+:root[data-theme="light"] .prose em{color:#1b2730}
+:root[data-theme="light"] .prose code{color:#b23026;background:rgba(18,26,32,.05);border-color:rgba(18,26,32,.12)}
+:root[data-theme="light"] .prose tbody td{color:var(--muted)}
+:root[data-theme="light"] .prose tbody td:first-child{color:var(--text)}
+:root[data-theme="light"] .prose blockquote{color:#3a4650}
+
+/* ---- About page: "organizations served" logo cards (drop real emblems into .agency-mark img) ---- */
+.agencies{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:38px}
+.agency{display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px 18px;
+  border:1px solid var(--line-2);border-radius:6px;text-align:center;
+  transition:border-color .25s var(--ease),transform .25s var(--ease)}
+.agency:hover{border-color:rgba(232,67,58,.35);transform:translateY(-3px)}
+.agency-mark{width:86px;height:86px;display:grid;place-items:center;border-radius:10px;flex:none;overflow:hidden;
+  border:1px solid var(--line-2);background:#fff;
+  box-shadow:0 2px 10px -4px rgba(18,26,32,.18);
+  font-family:var(--d);font-weight:800;font-size:19px;letter-spacing:.01em;color:var(--gold)}
+.agency-mark img{width:100%;height:100%;object-fit:contain;padding:11px}
+.agency-name{font-family:var(--body);font-size:13.5px;color:var(--muted);line-height:1.45;max-width:20ch}
+@media(max-width:760px){.agencies{grid-template-columns:repeat(2,1fr);gap:12px}}
+
+/* ===================== v6 — larger body / inner text site-wide ===================== */
+body{font-size:18px;line-height:1.7}
+.hero-sub,.phero p,.lead{font-size:clamp(1.15rem,1.05rem + .55vw,1.35rem);line-height:1.62}
+.big-statement ~ .lead,.problem2 .lead,.anchor2 .lead{line-height:1.6}
+.stat p,.trio p,.steps p,.cov p,.dep p,.arch p,.svc .cv,.blocks .st p,
+.callout,.fix,.chain li,.pr .pd,.cmp-row,.brow,.limc p,.trace-head .t,.ilink,.foot-contact a{font-size:16.5px;line-height:1.6}
+.pillar p{font-size:17px;line-height:1.65}
+.chap-copy p{font-size:17px}
+.svc li,.pr ul,.pr li,.incl{font-size:16px;line-height:1.55}
+.faq summary{font-size:17.5px}
+.faq .a{font-size:16.5px;line-height:1.72}
+footer{font-size:16px}
+.foot-grid a{font-size:15px}
+.legal p{font-size:17px;line-height:1.8}
+.complybar .cb-item,.intgrid span,.agency-name{font-size:14.5px}
+/* blog/article body noticeably larger + readable */
+.prose{font-size:17.5px;line-height:1.78}
+.prose h2{font-size:1.7rem}
+.prose h3{font-size:1.3rem}
+@media(max-width:600px){body{font-size:17px}.prose{font-size:16.5px}}
+/* blog paragraphs justified (hyphenate so lines don't get big word-gaps/rivers) */
+.prose p{text-align:justify;-webkit-hyphens:auto;hyphens:auto}
+
+/* ---- blog post share row (Facebook · LinkedIn · copy link) ---- */
+.share{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:44px;padding-top:26px;border-top:1px solid var(--line)}
+.share-lbl{font-family:var(--m);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-right:2px}
+.share-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:5px;
+  border:1px solid var(--line-2);background:transparent;color:var(--muted);cursor:pointer;
+  font-family:var(--m);font-size:13px;line-height:1;transition:color .2s,border-color .2s,background .2s}
+.share-btn svg{flex:none}
+.share-btn:hover{color:var(--text);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 6%,transparent)}
+.share-btn.fb:hover{color:#1877f2;border-color:#1877f2;background:rgba(24,119,242,.07)}
+.share-btn.li:hover{color:#0a66c2;border-color:#0a66c2;background:rgba(10,102,194,.07)}
+
+/* proof-strip stat cells: centre the number + label in every cell */
+.pstat{text-align:center;justify-items:center}
+
+/* larger section-label badges (eyebrows) + the whole small mono-label family */
+.eyebrow{font-size:13.5px;padding:7px 14px;letter-spacing:.16em}
+.chap-step{font-size:16.5px;letter-spacing:.16em}
+.pstat>span{font-size:13.5px}
+.cb-lbl,.complybar .cb-lbl{font-size:13px}
+.svc .tag,.pr .tag{font-size:13px}
+.dash-k,.trace-col h4,.foot-grid h5,.cb-lbl{font-size:12px}
+.steps .sn,.svc .tl,.pr .tag,.cov h4{font-size:12.5px}
+/* method-chapter progress rail (01 SCOPE · 02 MAP · …) — only shown in the pinned desktop view */
+@media (min-width:900px) and (prefers-reduced-motion:no-preference){
+  .js .chap-rail{font-size:14px;gap:22px}
+  /* progress bar: green → red (middle) → green */
+  .js .chap-rail .chap-bar::after{background:linear-gradient(90deg,var(--green),var(--gold) 50%,var(--green))}
+  /* big chapter numbers (01–04): more prominent outline so they read as a watermark */
+  .js .chap-num{-webkit-text-stroke:1.6px rgba(255,255,255,.24)}
+}
+
+/* method words: first (SCOPE) green like the last (PROVE); MAP + HUNT stay red */
+.chap:first-of-type .hatch{
+  background:repeating-linear-gradient(-52deg,#9df3cf 0 2px,rgba(21,160,107,.15) 2px 7px);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-stroke-color:rgba(21,160,107,.6)}
+:root[data-theme="light"] .chap:first-of-type .hatch{
+  background:repeating-linear-gradient(-52deg,#006A4E 0 2.5px,rgba(11,125,82,.1) 2.5px 8px);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-stroke-color:rgba(8,105,78,.95)}
+
+/* ---- box hovers → Bangladesh-green accent (was reddish) ---- */
+.eyebrow{transition:color .22s,border-color .22s,background .22s}
+/* hover: only the border changes colour (green) + font turns white */
+.eyebrow:hover{color:#fff;border-color:var(--green);background:transparent}
+/* light mode: white text needs a fill to stay legible */
+:root[data-theme="light"] .eyebrow:hover{background:var(--green);border-color:var(--green)}
+.card:hover{border-color:rgba(0,106,78,.5);box-shadow:0 16px 36px -22px rgba(0,0,0,.5),0 0 30px -14px rgba(0,106,78,.34)}
+:root[data-theme="light"] .card:hover{border-color:rgba(0,106,78,.42);box-shadow:0 16px 36px -20px rgba(18,26,32,.14),0 0 28px -14px rgba(0,106,78,.16)}
+.agency:hover{border-color:rgba(0,106,78,.45)}
+.cb-item:hover{border-color:rgba(0,106,78,.5);color:var(--green)}
+.intgrid span:hover{border-color:var(--green);color:var(--text)}
+a.linkcard:hover{border-color:rgba(0,106,78,.42)}
+/* primary CTA: on hover the whole button turns green, text stays white (sheen still slides) */
+.btn-white:hover{background:linear-gradient(120deg,#00543d,#006A4E 48%,#0a8a63);color:#fff;border-color:rgba(0,106,78,.55);
+  box-shadow:0 18px 46px -12px rgba(0,106,78,.6),inset 0 1px 0 rgba(255,255,255,.4)}

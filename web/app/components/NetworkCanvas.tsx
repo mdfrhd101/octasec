@@ -8,7 +8,8 @@ type Variant = "hero" | "final";
  * Gold particle-network canvas, ported 1:1 from site/app.js.
  *  - "hero"  -> #heroBg: drifting threat-network, connecting lines + glow nodes
  *  - "final" -> #finalBg: lighter particle field for the final CTA band
- * Respects prefers-reduced-motion (renders a single static frame).
+ * Respects prefers-reduced-motion (renders a single static frame). Animates only while
+ * on screen and the tab is visible; fewer particles on phones.
  */
 export default function NetworkCanvas({ variant }: { variant: Variant }) {
   const ref = useRef<HTMLCanvasElement | null>(null);
@@ -21,13 +22,15 @@ export default function NetworkCanvas({ variant }: { variant: Variant }) {
       !!window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion:reduce)").matches;
     const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const phone = window.innerWidth < 760;
 
     type Pt = { x: number; y: number; vx: number; vy: number; r: number; big?: boolean };
     let W = 0,
       H = 0,
       ctx: CanvasRenderingContext2D,
       pts: Pt[] = [],
-      raf = 0;
+      raf = 0,
+      lastW = 0;
 
     function fit() {
       const r = cv!.getBoundingClientRect();
@@ -100,7 +103,7 @@ export default function NetworkCanvas({ variant }: { variant: Variant }) {
     function initFinal() {
       fit();
       pts = [];
-      const n = Math.round(Math.min(46, (W * H) / 20000));
+      const n = Math.round(Math.min(phone ? 24 : 46, (W * H) / 20000)); // the line pass is O(n²)
       for (let i = 0; i < n; i++)
         pts.push({
           x: Math.random() * W,
@@ -140,7 +143,6 @@ export default function NetworkCanvas({ variant }: { variant: Variant }) {
         ctx.arc(p.x, p.y, p.r, 0, 7);
         ctx.fill();
       }
-      raf = requestAnimationFrame(frameFinal);
     }
 
     function finalStatic() {
@@ -153,40 +155,68 @@ export default function NetworkCanvas({ variant }: { variant: Variant }) {
       }
     }
 
+    const init = () => {
+      if (variant === "hero") {
+        initHero();
+        if (reduce) renderHero(false);
+      } else {
+        initFinal();
+        if (reduce) finalStatic();
+      }
+      lastW = W;
+    };
+
     let to: ReturnType<typeof setTimeout>;
     const onResize = () => {
       clearTimeout(to);
       to = setTimeout(() => {
-        if (variant === "hero") {
-          initHero();
-          if (reduce) renderHero(false);
-        } else {
-          initFinal();
-          if (reduce) finalStatic();
+        // height-only change (the mobile URL bar showing/hiding): refit, keep the particles
+        if (Math.abs(cv.getBoundingClientRect().width - lastW) < 1) {
+          fit();
+          if (reduce) {
+            if (variant === "hero") renderHero(false);
+            else finalStatic();
+          }
+          return;
         }
+        init();
       }, 200);
     };
 
-    if (variant === "hero") {
-      initHero();
-      if (reduce) renderHero(false);
-      else {
-        const loop = () => {
-          renderHero(true);
-          raf = requestAnimationFrame(loop);
-        };
-        loop();
-      }
-    } else {
-      initFinal();
-      if (reduce) finalStatic();
-      else frameFinal();
-    }
-
-    window.addEventListener("resize", onResize, { passive: true });
-    return () => {
+    // animate only while on screen and the tab is visible
+    let running = false,
+      visible = true;
+    const step = variant === "hero" ? () => renderHero(true) : frameFinal;
+    const loop = () => {
+      step();
+      raf = requestAnimationFrame(loop);
+    };
+    const start = () => {
+      if (reduce || running || !visible || document.hidden) return;
+      running = true;
+      raf = requestAnimationFrame(loop);
+    };
+    const stop = () => {
+      running = false;
       cancelAnimationFrame(raf);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) start();
+      else stop();
+    });
+    const onVis = () => (document.hidden ? stop() : start());
+
+    init();
+    io.observe(cv);
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("resize", onResize, { passive: true });
+    start();
+    return () => {
+      stop();
+      io.disconnect();
       clearTimeout(to);
+      document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("resize", onResize);
     };
   }, [variant]);

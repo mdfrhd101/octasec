@@ -11,7 +11,7 @@ export default function Hero() {
         <div className="hero2-copy">
           <h1>
             <span className="l1" id="l1">Enterprise-grade pentesting.</span>
-            <span className="l2">Startup-grade pricing.</span>
+            <span className="l2"><span className="nw">Startup-grade</span> pricing.</span>
           </h1>
           <p className="hero-sub">
             OctaSec is Octagram&apos;s AI-orchestrated offensive engine, supervised by
