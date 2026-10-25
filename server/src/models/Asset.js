@@ -21,6 +21,8 @@ const assetSchema = new mongoose.Schema(
     companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company", default: null, index: true },
     domainId: { type: mongoose.Schema.Types.ObjectId, ref: "Domain", required: true, index: true },
     host: { type: String, required: true, trim: true, lowercase: true },
+    // other names that resolve to the same site (e.g. the www form of an apex host)
+    aliases: { type: [String], default: [] },
     tech: { type: [String], default: [] },
     status: { type: String, enum: ["unscanned", "scanning", "clean", "findings"], default: "unscanned" },
     findings: { type: [findingSchema], default: [] },

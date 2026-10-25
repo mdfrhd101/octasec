@@ -9,6 +9,9 @@ import { scopeFor, ownerStamp, isCompanyUser } from "../utils/tenancy.js";
 import { verifyDomainOwnership, isClaimableDomain } from "../utils/verifyDomain.js";
 import Engagement from "../models/Engagement.js";
 import { audit } from "../utils/audit.js";
+import { canonicalHost } from "../utils/canonicalHost.js";
+import { upsertAssets } from "../utils/assetInventory.js";
+import * as engine from "../engine/index.js";
 
 const OPEN_STATES = ["requested", "assigned", "in_progress"];
 
@@ -26,7 +29,8 @@ function pageParams(req) {
   return { limit, skip };
 }
 function cleanName(v) {
-  return asString(v).trim().toLowerCase().replace(/^https?:\/\//, "").replace(/[\/\\].*$/, "");
+  const host = asString(v).trim().toLowerCase().replace(/^https?:\/\//, "").replace(/[\/\\].*$/, "");
+  return canonicalHost(host); // www.example.com and example.com are the same site — store the apex
 }
 function cleanTags(v) {
   if (!Array.isArray(v)) v = asString(v).split(",");
@@ -176,6 +180,17 @@ r.post(
       domain.verifiedAt = new Date();
       await domain.save();
       await audit(req, "domain.verify", { targetType: "Domain", targetId: domain._id.toString(), targetLabel: domain.name, companyId: domain.companyId });
+      // A freshly verified domain should never be empty: seed its own host as an asset
+      // right away (cheap, so awaited — but guarded so a seed hiccup can't un-verify it).
+      await upsertAssets(domain, req.user, [{ host: domain.name, tech: [] }]).catch((e) =>
+        console.error("[domains] self-asset seed failed:", e?.message));
+      // Then enumerate subdomains in the background. Discovery calls the scan engine, so a
+      // failure must NEVER fail verification — fire-and-forget with a logging .catch,
+      // exactly like the contact-form notification.
+      engine
+        .discover(domain.name)
+        .then((found) => upsertAssets(domain, req.user, found))
+        .catch((e) => console.error("[domains] asset discovery failed:", e?.message));
       return res.json({ verified: true, domain });
     }
     res.status(422).json({ verified: false, reason: "Could not find a matching verification file on the domain." });

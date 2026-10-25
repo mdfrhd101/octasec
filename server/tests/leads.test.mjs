@@ -34,4 +34,12 @@ chk("missing name 400", (await J("POST", "/contact", { email: `n${ts}@test.com`,
 chk("company admin cannot read leads 403", (await J("GET", "/admin/leads", null, ca)).status, 403);
 chk("anonymous cannot read leads 401", (await J("GET", "/admin/leads")).status, 401);
 
+console.log("--- contact notification is fire-and-forget ---");
+// CONTACT_NOTIFY_TO is set in the test env but SMTP is absent (SMTP_HOST=""), so the
+// team notification is skipped; it must never change the 201 or the stored lead.
+const nEmail = `notify${ts}@test.com`;
+const nr = await J("POST", "/contact", { name: "Notify Me", email: nEmail, company: "NotifyCo", target: "Web app", source: "contact", message: "please email the team" });
+chk("contact still 201 with CONTACT_NOTIFY_TO set", nr.status, 201);
+chk("lead stored durably regardless of mail", (await leads()).some((l) => l.email === nEmail), true);
+
 await done("LEADS (contact + pricing)");

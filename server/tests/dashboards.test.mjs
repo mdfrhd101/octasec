@@ -1,5 +1,5 @@
 // Phase P5: role dashboards. Spec: tests/specs/profiles.spec.md §Dashboards
-import { J, token, chk, done } from "./lib.mjs";
+import { J, token, chk, done, registerVerified } from "./lib.mjs";
 
 const admin = await token("admin@octasec.ai", "admin12345");
 const ca = await token("corp@demo.com", "corp12345");
@@ -59,5 +59,14 @@ chk("client profile completeness", typeof d.profile?.pct, "number");
 chk("client unverified count", typeof d.unverified, "number");
 chk("client sees no company clients", d.clients, undefined);
 chk("client sees no ops", d.ops, undefined);
+
+console.log("--- fresh tenant: posture is NOT-ASSESSED (no unearned 100/Strong) ---");
+const fresh = await registerVerified(`fresh${Date.now()}@test.com`, "Fresh-Tenant-123");
+const f = (await J("GET", "/dashboard", null, fresh.token)).j;
+chk("fresh tenant: assessed is false", f.assessed, false);
+chk("fresh tenant: score is null", f.score, null);
+chk("fresh tenant: scoreLabel is null", f.scoreLabel, null);
+chk("fresh tenant: zero verified domains", f.tiles.verified, 0);
+chk("fresh tenant: dashboard still returns tiles", typeof f.tiles.openFindings, "number");
 
 await done("DASHBOARDS");

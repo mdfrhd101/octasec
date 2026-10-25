@@ -41,8 +41,10 @@ function scoreFrom(sev) {
 const countBy = (rows) => Object.fromEntries(rows.map((x) => [x._id, x.n]));
 const hours = (ms) => Math.round(ms / 3600000);
 
-// posture block shared by every role (scoped)
-async function posture(match) {
+// posture block shared by every role (scoped). `gate` enforces the tenant-facing
+// "not-assessed" rule; the super_admin platform aggregate is an internal operator
+// metric and opts out so it always reports a numeric score.
+async function posture(match, { gate = true } = {}) {
   const delivered = { ...match, status: "delivered" };
   const [domainCount, verified, assetCount, sevAgg, topFindings, recentAssets, assessedDomains, pipeAgg] = await Promise.all([
     Domain.countDocuments(match),
@@ -60,11 +62,17 @@ async function posture(match) {
   const severity = { critical: 0, high: 0, medium: 0, low: 0 };
   for (const s of sevAgg) if (s._id in severity) severity[s._id] = s.n;
   const openFindings = severity.critical + severity.high + severity.medium + severity.low;
+  const p = countBy(pipeAgg);
+  // A brand-new tenant (no verified domain, or no delivered report) has NOT earned a
+  // posture score — reporting 100/Strong would be an unearned trust claim. Mark it
+  // not-assessed and let the UI render an empty state. scoreFrom() math is unchanged.
+  const assessed = !gate || (verified > 0 && (p.delivered || 0) > 0);
   const { score, label } = scoreFrom(severity);
   const assessedPct = domainCount ? Math.round((assessedDomains.length / domainCount) * 100) : 0;
-  const p = countBy(pipeAgg);
   return {
-    score, scoreLabel: label,
+    assessed,
+    score: assessed ? score : null,
+    scoreLabel: assessed ? label : null,
     tiles: { domains: domainCount, verified, assets: assetCount, assessed: assessedDomains.length, openFindings, critical: severity.critical },
     severity,
     coverage: { scannedPct: assessedPct, scanned: assessedDomains.length, assets: domainCount },
@@ -187,7 +195,7 @@ r.get(
   asyncHandler(async (req, res) => {
     const user = req.user;
     const match = scopeFor(user);
-    const base = await posture(match);
+    const base = await posture(match, { gate: user.role !== "super_admin" });
     const out = { role: user.role, ...base };
 
     if (user.role === "super_admin") {

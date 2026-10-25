@@ -71,7 +71,7 @@ export default function Domains() {
         ) : (
           <TableWrap>
             <table className="tbl">
-              <thead><tr><th>Domain</th>{corp && <th>Client / owner</th>}<th>Environment</th><th>Criticality</th><th>Status</th><th>Assets</th><th></th></tr></thead>
+              <thead><tr><th>Domain</th>{corp && <th>Client / owner</th>}<th>Environment</th><th title="Business impact — set by you, not a scan result">Impact</th><th>Status</th><th>Assets</th><th></th></tr></thead>
               <tbody>
                 {domains.map((d) => (
                   <tr key={d._id}>
@@ -144,12 +144,13 @@ function DomainForm({ domain, corp, clients = [], filter, onClose, onSaved }) {
     <Modal title={editing ? `Edit ${domain.name}` : "Add a domain"} sub={editing ? "Update the context we use to prioritise testing." : "Give us context so we can prioritise — then verify ownership."} onClose={onClose}>
       <form onSubmit={submit}>
         <div className="fgrid">
-          {!editing && <label className="full">Domain<span className="req">*</span><input required value={f.name} onChange={set("name")} placeholder="example.com" autoFocus /></label>}
+          {!editing && <label className="full">Domain<span className="req">*</span><input required value={f.name} onChange={set("name")} placeholder="example.com" autoFocus /><span style={{ color: "var(--faint)", fontSize: "12px" }}>Enter the apex domain — www.example.com and example.com are treated as the same site.</span></label>}
           <label className="full">Label {opt}<input value={f.label} maxLength={80} onChange={set("label")} placeholder="e.g. Customer portal" autoFocus={editing} /></label>
           <label>Environment
             <select value={f.env} onChange={set("env")}>{Object.entries(ENV_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
           </label>
-          <label>Business criticality
+          <label>Business impact{" "}
+            <span style={{ color: "var(--faint)", cursor: "help" }} title="Set by you — how much this asset matters to the business. Not a scan result.">ⓘ</span>
             <select value={f.criticality} onChange={set("criticality")}>{Object.entries(CRIT_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>
           </label>
           {!editing && corp && (

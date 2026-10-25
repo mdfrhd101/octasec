@@ -169,6 +169,10 @@ input:focus,select:focus{outline:none;border-color:rgba(232,67,58,.55);box-shado
 .scorecard .meta .k{font-family:var(--m);font-size:10.5px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase}
 .scorecard .meta .lbl{font-size:1.15rem;font-weight:700;margin-top:3px}
 .scorecard .meta .sub{font-size:12px;color:var(--muted);margin-top:4px;max-width:22ch;line-height:1.45}
+.scorecard-na{padding:4px 2px}
+.scorecard-na .k{font-family:var(--m);font-size:10.5px;letter-spacing:.2em;color:var(--faint);text-transform:uppercase}
+.scorecard-na .na-title{font-family:var(--d);font-size:1.4rem;font-weight:600;color:var(--muted);margin:7px 0 5px}
+.scorecard-na .sub{font-size:12.5px;color:var(--muted);line-height:1.5;max-width:30ch}
 .dash-top .tiles{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
 .dash-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:900px){.dash-top{grid-template-columns:1fr}.dash-cols{grid-template-columns:1fr}}

@@ -126,6 +126,7 @@ cd .. && node deploy/local-serve.mjs              # http://127.0.0.1:3000
 
 - `scopeFor(req.user)` returns the Mongo filter. **Every tenant query must spread it.** It fails closed: a company user without a company matches nothing.
 - `ownerStamp(req.user)` sets ownership on new records.
+- **Operator dogfooding:** `super_admin` only sees the admin side — the portal (`Shell.jsx`) deliberately gives operators no tenant view, since a platform operator has no domains, scans or posture of their own. To exercise the tenant experience (add a domain, request a scan, read a report), an operator signs in with a **separate client account** (e.g. the seeded `dash@demo.com`), never by widening `super_admin`'s scope.
 
 **Input handling:**
 - `asString`, `isId` and `isBadParam` (`utils/http.js`) reject Mongo-operator objects and bad ids.

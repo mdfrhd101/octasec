@@ -44,6 +44,7 @@ const SUITES = [
   "lockout.test.mjs",
   "leads.test.mjs",
   "findings.test.mjs",
+  "assets-inventory.test.mjs",
 ];
 
 const env = {
@@ -60,6 +61,8 @@ const env = {
   // no SMTP in tests: the dev mailer appends each email here so suites can read links
   MAIL_DEV_OUTBOX: path.join(os.tmpdir(), `octasec-test-outbox-${process.pid}.jsonl`),
   SMTP_HOST: "",
+  CONTACT_NOTIFY_TO: "ops@octasec.test", // set, but SMTP absent → notify is skipped; contact still 201
+
   ENGINE_DRIVER: "mock",
   ENGINE_WEBHOOK_SECRET: crypto.randomBytes(32).toString("hex"),
   APP_URL: "http://127.0.0.1:3000",

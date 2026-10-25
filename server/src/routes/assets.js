@@ -3,19 +3,18 @@ import Asset from "../models/Asset.js";
 import Domain from "../models/Domain.js";
 import { auth } from "../middleware/auth.js";
 import { asyncHandler, isId, asString, isHostname, isBadParam } from "../utils/http.js";
-import { scopeFor, ownerStamp } from "../utils/tenancy.js";
+import { scopeFor } from "../utils/tenancy.js";
 import * as engine from "../engine/index.js";
 import Engagement from "../models/Engagement.js";
 import { audit } from "../utils/audit.js";
+import { canonicalHost, hostAlias } from "../utils/canonicalHost.js";
+import { ownerOf, upsertAssets, ASSETS_PER_DOMAIN_MAX } from "../utils/assetInventory.js";
 
 const r = Router();
 r.use(auth);
 
 // Discovery runs in the scan engine (engine/index.js, ENGINE_DRIVER=mock|http).
 const PAGE_MAX = 200;
-// an asset always lands in the tenant that owns the domain
-const ownerOf = (domain, user) => (domain.companyId ? { userId: user.id, companyId: domain.companyId } : { userId: domain.userId, companyId: null });
-const ASSETS_PER_DOMAIN_MAX = 500;
 
 async function ownedDomain(user, domainId) {
   if (!isId(domainId)) return null;
@@ -48,15 +47,7 @@ r.post(
     if (!domain) return res.status(404).json({ error: "Domain not found" });
     if (!domain.verified) return res.status(409).json({ error: "Verify the domain first" });
     const found = await engine.discover(domain.name); // in-scope hosts only
-    const room = Math.max(0, ASSETS_PER_DOMAIN_MAX - (await Asset.countDocuments({ domainId: domain._id })));
-    const created = [];
-    for (const a of found.slice(0, room)) {
-      try {
-        created.push(await Asset.create({ ...ownerOf(domain, req.user), domainId: domain._id, host: a.host, tech: a.tech, status: "unscanned" }));
-      } catch (e) {
-        if (!(e && e.code === 11000)) throw e; // ignore already-known hosts
-      }
-    }
+    const created = await upsertAssets(domain, req.user, found); // canonicalises www/apex, dedupes
     res.json({ discovered: created.length, assets: created, mock: engine.engineName() === "mock" });
   })
 );
@@ -68,8 +59,10 @@ r.post(
     const domain = await ownedDomain(req.user, asString(req.body?.domainId));
     if (!domain) return res.status(404).json({ error: "Domain not found" });
     if (!domain.verified) return res.status(409).json({ error: "Verify the domain first" });
-    const host = asString(req.body?.host).trim().toLowerCase();
-    if (!isHostname(host)) return res.status(400).json({ error: "Enter a valid host" });
+    const input = asString(req.body?.host).trim().toLowerCase();
+    if (!isHostname(input)) return res.status(400).json({ error: "Enter a valid host" });
+    // www.example.com and example.com are the same site — track the apex, keep the www as an alias
+    const host = canonicalHost(input);
     // the host must be the domain itself or a subdomain of it — never an
     // arbitrary/third-party/internal host (this is what the scanner will hit)
     if (host !== domain.name && !host.endsWith("." + domain.name)) {
@@ -78,8 +71,9 @@ r.post(
     if ((await Asset.countDocuments({ domainId: domain._id })) >= ASSETS_PER_DOMAIN_MAX) {
       return res.status(409).json({ error: "Asset limit reached for this domain" });
     }
+    const alias = hostAlias(input);
     try {
-      const asset = await Asset.create({ ...ownerOf(domain, req.user), domainId: domain._id, host, tech: [] });
+      const asset = await Asset.create({ ...ownerOf(domain, req.user), domainId: domain._id, host, aliases: alias ? [alias] : [], tech: [] });
       res.status(201).json({ asset });
     } catch (e) {
       if (e && e.code === 11000) return res.status(409).json({ error: "Host already added" });

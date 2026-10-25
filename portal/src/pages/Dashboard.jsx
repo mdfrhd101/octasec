@@ -161,14 +161,28 @@ function Tenant({ d, role }) {
 
       <div className="dash-top">
         <div className="card scorecard">
-          <div className="ring" style={{ "--v": d.score, "--c": color }}>
-            <div className="in"><div className="n">{d.score}</div><div className="u">/ 100</div></div>
-          </div>
-          <div className="meta">
-            <div className="k">Security posture</div>
-            <div className="lbl" style={{ color }}>{d.scoreLabel}</div>
-            <div className="sub">From signed findings across your verified assets.</div>
-          </div>
+          {d.score == null ? (
+            <div className="scorecard-na">
+              <div className="k">Security posture</div>
+              <div className="na-title">Not assessed yet</div>
+              <div className="sub">Add and verify a domain, then request your first scan.</div>
+            </div>
+          ) : (
+            <>
+              <div className="ring" style={{ "--v": d.score, "--c": color }}>
+                <div className="in"><div className="n">{d.score}</div><div className="u">/ 100</div></div>
+              </div>
+              <div className="meta">
+                <div className="k">Security posture</div>
+                <div className="lbl" style={{ color }}>{d.scoreLabel}</div>
+                <div className="sub">
+                  From signed findings across your verified assets.
+                  {d.tiles.verified > 0 && d.tiles.assessed < d.tiles.verified &&
+                    ` (based on ${d.tiles.assessed} of ${d.tiles.verified} verified domains assessed)`}
+                </div>
+              </div>
+            </>
+          )}
         </div>
         <div className="tiles">
           <Tile k="Open findings" v={d.tiles.openFindings} gold />
