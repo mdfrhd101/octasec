@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+// same-origin by default: nginx (prod) proxies /api to the API; NEXT_PUBLIC_API_URL points elsewhere in dev
+const API = process.env.NEXT_PUBLIC_API_URL || "/api";
+
 type Finding = {
   category: string;
   status: "critical" | "high" | "warning" | "good" | "info";
@@ -35,16 +38,20 @@ export default function WebsiteChecker() {
     setError("");
     setResult(null);
     try {
-      const response = await fetch("/api/website-check/check", {
+      const response = await fetch(API + "/website-check/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "The check failed");
+      // a proxy error page (502/504 HTML) or an empty body isn't JSON: never show the raw parser error
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.overall) {
+        setError(data?.error || "The checker is unavailable right now. Please try again in a few minutes.");
+        return;
+      }
       setResult(data);
-    } catch (ex) {
-      setError(ex instanceof Error ? ex.message : "The check failed");
+    } catch {
+      setError("Couldn't reach the checker. Check your connection and try again.");
     } finally {
       setBusy(false);
     }
@@ -60,7 +67,7 @@ export default function WebsiteChecker() {
       <form className="wsc-form" onSubmit={run}>
         <label htmlFor="website-check-url">Website URL</label>
         <div className="wsc-inputrow">
-          <input id="website-check-url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://your-site.com" required maxLength={300} disabled={busy} />
+          <input id="website-check-url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://your-site.com" inputMode="url" autoComplete="url" spellCheck={false} autoCapitalize="none" required maxLength={300} disabled={busy} />
           <button className="btn btn-white" type="submit" disabled={busy}>{busy ? "Checking…" : "Check my website"}</button>
         </div>
         <p className="wsc-terms">Only check sites you own or are authorized to test. Target, IP and sanitized results are logged for abuse prevention. See <a href="/legal#privacy">privacy</a>.</p>
@@ -76,7 +83,7 @@ export default function WebsiteChecker() {
               <p>{result.overall.summary}</p>
               <small>{result.checkedAtDhaka} · Report {result.reportId.slice(0, 12)} · {result.cached ? "Recent verified result" : "Fresh check"}</small>
             </div>
-            <a className="btn btn-white" href={`/api/website-check/${result.reportId}/report.pdf`} download>Download PDF report</a>
+            <a className="btn btn-white" href={`${API}/website-check/${result.reportId}/report.pdf`} download>Download PDF report</a>
           </div>
           <div className="wsc-counts" aria-label="Finding counts">
             {(["critical", "high", "warning", "good", "info"] as const).map((key) => <div className={`wsc-count s-${key}`} key={key}><strong>{result.counts[key] || 0}</strong><span>{STATUS_LABEL[key]}</span></div>)}

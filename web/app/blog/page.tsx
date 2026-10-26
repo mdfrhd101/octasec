@@ -17,6 +17,12 @@ export const metadata: Metadata = {
     url: "/blog",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "OctaSec Blog" }],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "OctaSec Blog — Autonomous Pentesting Field Notes",
+    description: "The verification doctrine, the benchmark journey, and the agent failure modes we engineered out.",
+    images: ["/og.png"],
+  },
 };
 
 export default function BlogIndex() {
@@ -36,6 +42,7 @@ export default function BlogIndex() {
       />
 
       <section className="wrap rv">
+        <h2 className="sr-only">All posts</h2>
         <div className="postlist">
           {posts.map((p) => (
             <Link key={p.slug} href={`/blog/${p.slug}`} className="card postcard">

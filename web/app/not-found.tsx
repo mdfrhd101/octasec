@@ -3,9 +3,14 @@ import Link from "next/link";
 import PageHero from "./components/PageHero";
 
 export const metadata: Metadata = {
-  title: "OctaSec — Not found",
+  title: "Page not found",
   description: "Page not found.",
-  robots: { index: false, follow: false },
+  // Next adds <meta name="robots" content="noindex"> to the 404 itself (a second tag duplicated it),
+  // and the 404 must not inherit the homepage canonical / social url
+  robots: null, // drops the layout's "index, follow": only Next's own noindex remains
+  alternates: { canonical: null },
+  openGraph: null,
+  twitter: null,
 };
 
 export default function NotFound() {

@@ -115,3 +115,17 @@ a:focus-visible,button:focus-visible,summary:focus-visible,.card:focus-visible,
   .nav-links a::after,.cmp-row::before,.brow::before,.drow::before,
   .svc li,.pr li,.foot-grid a,.foot-contact a,.agency-mark,.dd-item{transition:none!important}
 }
+
+/* ---- 5. cursor cards (homepage Pricing + "How it compares"): green highlighted border; a soft red
+   shadow + glow follow the pointer. Any `.card` wrapped in <CursorCard> gets this.
+   CursorCard.tsx eases --px/--py (pointer offset from the centre, -1..1), --gx/--gy (glow position)
+   and --sa (hover fade 0..1) every animation frame, so the shadow and glow glide with the pointer.
+   No CSS transition on them — the per-frame easing IS the smoothing. The shadow is !important so
+   the theme's `.card` / `.card:hover` shadows (day mode's is (0,4,0)) can't replace it. */
+.cfx-stage > .card{transition:border-color .35s var(--hv-ease),transform .3s var(--hv-ease);
+  box-shadow:0 0 0 1px rgba(0,106,78,var(--sa,0)),0 0 28px -4px rgba(0,106,78,calc(var(--sa,0) * .5)),
+    calc(var(--px,0) * 24px) calc(var(--py,0) * 18px + 22px) 56px -18px rgba(232,67,58,calc(var(--sa,0) * .45))!important}
+html:not(.touch-input) .cfx-stage > .card:hover{border-color:#006A4E}
+/* the red glow inside the card (the flat-card restyle hides .card::before everywhere else) */
+:root .cfx-stage > .card::before{display:block!important;opacity:var(--sa,0);transition:none;
+  background:radial-gradient(380px circle at var(--gx,50%) var(--gy,50%),rgba(232,67,58,.2),transparent 62%)}

@@ -64,6 +64,7 @@ export default function ServicesPage() {
       />
 
       <section className="wrap rv">
+        <h2 className="sr-only">Our services</h2>
         <div className="svcgrid stagger">
           <Svc
             tag="S1"

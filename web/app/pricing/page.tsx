@@ -111,6 +111,7 @@ export default function PricingPage() {
       />
 
       <section className="wrap rv">
+        <h2 className="sr-only">Pricing plans</h2>
         <div className="pricing stagger">
           {PLANS.map((p) => (
             <div key={p.key} className={"card pr" + (p.featured ? " feat" : "")}>
@@ -130,7 +131,7 @@ export default function PricingPage() {
         <div className="blocks c3 stagger" style={{ marginTop: 32, textAlign: "left" }}>
           {DRIVERS.map(([t, d]) => (
             <div key={t} className="card cov">
-              <h4>{t}</h4>
+              <h3>{t}</h3>
               <p>{d}</p>
             </div>
           ))}

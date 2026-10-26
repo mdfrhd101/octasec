@@ -7,7 +7,7 @@ import type { AnchorHTMLAttributes } from "react";
 // Renders a Markdown article body inside a styled .prose wrapper. Internal links
 // (href starting with "/") become client-side Next links; external links open
 // in a new, safe tab.
-function Anchor({ href = "", children, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>) {
+function Anchor({ href = "", children, node: _node, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement> & { node?: unknown }) {
   if (href.startsWith("/")) {
     return <Link href={href}>{children}</Link>;
   }

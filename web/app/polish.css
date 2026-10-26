@@ -21,9 +21,10 @@ body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-r
 :root[data-theme="light"] .heroTerm{background:linear-gradient(180deg,#0a1620,#070f16)!important;border-color:rgba(255,255,255,.1)!important}
 .heroTerm .c{color:#f4f9fc}                                  /* command line — brightest */
 
-/* ===== 2. sizing — octasec.ai base + a site-wide size bump (user asked bigger) ===== */
-:root{--maxw:1200px}
-.wrap{width:auto;max-width:var(--maxw);margin-inline:auto;padding-inline:24px}
+/* ===== 2. sizing — full-width layout measured as a % of the screen (owner's request), bigger text ===== */
+:root{--maxw:none}   /* no pixel cap: content = 100% minus the --gutter on each side (mobile.css) */
+.wrap{width:auto;max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gutter,4vw)}
+.hero2 > .hero2-grid{width:100%}   /* the hero is a flex row: width:auto would shrink it to its content on very wide screens */
 body{font-size:17px;line-height:1.6}   /* base up 16 -> 17 (lifts all rem-based text) */
 
 /* reading paragraphs */
@@ -48,7 +49,7 @@ body{font-size:17px;line-height:1.6}   /* base up 16 -> 17 (lifts all rem-based 
 .eyebrow{font-size:14px;padding:8px 14px;letter-spacing:.2em}
 .chap-step{font-size:15px}
 .pstat>span{font-size:14px}
-.cb-lbl,.complybar .cb-lbl,.foot-grid h5,.dash-k,.trace-col h4{font-size:12.5px}
+.cb-lbl,.complybar .cb-lbl,.foot-grid h2,.dash-k,.trace-col h4{font-size:12.5px}
 .svc .tag,.pr .tag,.badge,.chip,.pchips span,.chap-chips span{font-size:13.5px}
 
 /* nav + buttons + footer + faq */
@@ -64,11 +65,11 @@ footer{font-size:15px}.foot-grid a,.foot-grid p{font-size:15px}.foot-copy,.foot-
 
 /* ===== 3. inner pages — small text up (audit of all 13 routes at 1280px) ===== */
 /* card titles (cov h4 was 12.5px) */
-.card.cov h4,.cov h4{font-size:18px;line-height:1.3}
+.card.cov h3,.cov h3{font-size:18px;line-height:1.3;text-wrap:wrap}
 .card.postcard h3{font-size:20px;line-height:1.3}
 .postlist.c3 .postcard h3{font-size:18.5px}          /* 3-col related posts (was 1.05rem) */
 .card.st h3{font-size:19px}
-.card.svc h3,.card.pr h3,.legal h3{font-size:20.5px}
+.card.svc h3,.card.pr h3,.legal h2{font-size:20.5px}
 /* card copy + tables */
 .card.cov p,.card.postcard p{font-size:16px;line-height:1.6}
 .card.cov a{font-size:15px}
@@ -97,13 +98,56 @@ footer{font-size:15px}.foot-grid a,.foot-grid p{font-size:15px}.foot-copy,.foot-
      the pillars ("The difference") so both sections' content share a left edge */
   .js .chap-head,.js .chap-in{max-width:var(--maxw);margin-inline:auto}
   .js .chap-in{grid-template-columns:1.15fr .85fr;gap:56px;padding-top:60px}
-  .js .hatch{font-size:clamp(6rem,13vw,12rem)}
+  .js .hatch{font-size:clamp(6rem,13vw,15rem)}   /* keeps growing with full-width layouts */
   /* chapter number sits ABOVE the hatched word (stacked, left-aligned) instead of
      behind it — inside the 1200 column the giant watermark crossed through the
      word's hatched letters. In flow, so the column centres number + word together. */
   .js .chap-num{position:static;display:block;transform:none;z-index:auto;
-    font-size:clamp(4.5rem,8vw,7.5rem);line-height:1;margin:0 0 .06em -.02em}
+    font-size:clamp(4.5rem,8vw,9rem);line-height:1;margin:0 0 .06em -.02em}
   .js .chap-copy{max-width:none}
   .js .chap-rail{font-size:14px;gap:24px}
 }
 @media(max-width:600px){body{font-size:16.5px}.prose{font-size:17px}}
+
+/* ===== 4. contrast fixes from the 2026-10-26 QA pass (WCAG AA: 4.5:1 for body-size text) ===== */
+/* day-mode highlight red #d9564a measured 3.3–3.6:1 on light surfaces (comparison table OctaSec
+   column, benchmark highlight rate, blog-table emphasis); #bf3a2f is ≥4.6:1 on all of them */
+:root[data-theme="light"]{--gold-hi:#bf3a2f}
+/* dark mode: flag-green #006A4E on near-black was 2.96–3.05:1 (pillar 03, "How it works" step 04)
+   → a lighter flag-green tint; day mode keeps #006A4E */
+.pillar.verified .pk,.chap.verified .chap-step{color:#2fb784}
+:root[data-theme="light"] .pillar.verified .pk,:root[data-theme="light"] .chap.verified .chap-step{color:var(--green)}
+/* php2shell: its bright green accent was built for dark mode (1.8:1 on day-mode surfaces) */
+:root[data-theme="light"] .p2s{--gold:#13773f;--gold-hi:#0f6e3a;--gold-lo:#0a5c33}
+/* checker URL fields were dark (#0a1822) in day mode with dark day-mode text: typed text was invisible */
+:root[data-theme="light"] .wsc-inputrow input,:root[data-theme="light"] .p2s input{background:#fff;color:var(--text);border-color:var(--line-2)}
+/* checker errors + results: tints hard-coded for dark mode → readable day-mode tones */
+:root[data-theme="light"] .wsc-error{color:#b42318;background:rgba(180,35,24,.06);border-color:rgba(180,35,24,.35)}
+:root[data-theme="light"] .v-urgent .wsc-summary-label,:root[data-theme="light"] .wsc-status.s-critical,
+:root[data-theme="light"] .wsc-status.s-high,:root[data-theme="light"] .wsc-count.s-critical strong,:root[data-theme="light"] .wsc-count.s-high strong{color:#b42318}
+:root[data-theme="light"] .wsc-status.s-warning,:root[data-theme="light"] .wsc-count.s-warning strong{color:#9a5b00}
+:root[data-theme="light"] .wsc-status.s-good,:root[data-theme="light"] .wsc-count.s-good strong{color:#0f6e3a}
+:root[data-theme="light"] .wsc-count.s-info strong,:root[data-theme="light"] .wsc-action{color:var(--muted)}
+:root[data-theme="light"] .wsc-count{background:rgba(18,26,32,.03)}
+:root[data-theme="light"] .p2s-verdict.v-exposed,:root[data-theme="light"] .p2s-verdict.v-likely-exposed{color:#b42318;background:rgba(180,35,24,.07);border-color:rgba(180,35,24,.45);box-shadow:none}
+:root[data-theme="light"] .p2s-verdict.v-patched,:root[data-theme="light"] .p2s-verdict.v-likely-patched,
+:root[data-theme="light"] .p2s-verdict.v-not-php{color:#0f6e3a;background:rgba(15,110,58,.07);border-color:rgba(15,110,58,.4)}
+:root[data-theme="light"] .p2s-verdict.v-unknown{color:#9a5b00;background:rgba(154,91,0,.07);border-color:rgba(154,91,0,.4)}
+/* visually hidden but announced by screen readers: section headings that keep the heading outline
+   sequential where a card grid follows the page h1 directly (blog, services, pricing, how-it-works) */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* keyboard focus on buttons: the day-mode .btn-white shadow (0,3,0) overrode the box-shadow focus ring,
+   so primary buttons showed no focus at all in day mode — an outline can't collide with decorative shadows */
+:root .btn:focus-visible{outline:2px solid var(--hv-accent);outline-offset:3px}
+/* the day-mode checker field colours above also replaced their focus border: restore it */
+:root[data-theme="light"] .wsc-inputrow input:focus,:root[data-theme="light"] .p2s input:focus{border-color:var(--gold)}
+:root[data-theme="light"] .p2s input:focus{box-shadow:0 0 0 3px rgba(19,119,63,.18)}
+/* browser autofill: the dark inset (#0b1118) made autofilled fields dark-on-dark in day mode */
+:root[data-theme="light"] input:-webkit-autofill,:root[data-theme="light"] input:-webkit-autofill:hover,
+:root[data-theme="light"] input:-webkit-autofill:focus,:root[data-theme="light"] input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 1000px #fff inset;box-shadow:0 0 0 1000px #fff inset}
+/* in-page anchors (#privacy, #terms…) landed under the fixed header on desktop (phones/tablets: mobile.css) */
+@media (min-width:901px){html{scroll-padding-top:96px}}
+/* skip link: the first Tab stop on every page, visible only while focused */
+.skip-link{position:fixed;left:16px;top:-80px;z-index:10000;padding:12px 18px;border-radius:10px;background:var(--text);color:var(--bg);font-weight:600;text-decoration:none}
+.skip-link:focus{top:12px}
+main:focus{outline:none}

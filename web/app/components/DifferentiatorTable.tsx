@@ -1,4 +1,5 @@
 import SectionHead from "./SectionHead";
+import CursorCard from "./CursorCard";
 
 /* metric | Scanner | Traditional | OctaSec, with per-cell tone classes */
 const ROWS: { ft: string; scanner: [string, string]; trad: [string, string]; oc: string }[] = [
@@ -19,6 +20,8 @@ export default function DifferentiatorTable() {
         title="Not a scanner. Not a once-a-year pentest."
         center
       />
+      {/* red shadow + glow follow the mouse pointer smoothly (CursorCard), like the Pricing card */}
+      <CursorCard>
       <div className="card cmp stagger" style={{ textAlign: "left" }}>
         <div className="cmp-row head">
           <span>&nbsp;</span>
@@ -36,6 +39,7 @@ export default function DifferentiatorTable() {
           </div>
         ))}
       </div>
+      </CursorCard>
     </section>
   );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import BrandLockup from "./BrandLockup";
 import ThemeToggle from "./ThemeToggle";
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 type DItem = { href: string; title: string; note?: string; lead?: boolean };
 type NavItem = { label: string; href?: string; dropdown?: DItem[] };
@@ -38,6 +39,15 @@ export default function Nav() {
   const menuBtnRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const [tucked, setTucked] = useState(false); // phones/tablets: bar hidden while scrolling down
+  const pathname = usePathname();
+
+  // Back/forward (or any client-side navigation) closes every open menu — link clicks already
+  // did; without this the mobile panel stayed open, scroll-locked, over the previous page.
+  useEffect(() => {
+    setOpen(false);
+    setDd(null);
+    setMdd(null);
+  }, [pathname]);
 
   // Phones/tablets: slide the bar away on scroll down, bring it back on scroll up —
   // frees ~70px of a small screen (most of all in landscape). Small moves are ignored.
@@ -76,6 +86,7 @@ export default function Nav() {
     body.classList.toggle("menu-open", open);
     if (!open) return;
     panelRef.current?.focus({ preventScroll: true });
+    window.__lenis?.stop(); // smooth scroll pauses too, or the wheel scrolls the page behind the panel
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
@@ -104,6 +115,7 @@ export default function Nav() {
       body.classList.remove("menu-open");
       window.removeEventListener("keydown", onKey);
       desktop.removeEventListener("change", onDesktop);
+      window.__lenis?.start();
     };
   }, [open]);
 
@@ -114,7 +126,13 @@ export default function Nav() {
       const t = e.target as Element | null;
       if (!t?.closest?.(".nav-dd")) setDd(null);
     };
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDd(null);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      // focus was on an item of the closing menu: hand it back to that menu's toggle, not to <body>
+      const menu = document.activeElement?.closest(".nav-dd");
+      setDd(null);
+      menu?.querySelector<HTMLElement>(".nav-dd-btn")?.focus();
+    };
     document.addEventListener("pointerdown", onDown);
     window.addEventListener("keydown", onKey);
     return () => {
@@ -160,22 +178,23 @@ export default function Nav() {
                     // mouseenter opened the menu and the click instantly toggled it shut
                     onPointerEnter={(e) => e.pointerType === "mouse" && setDd(item.label)}
                     onPointerLeave={(e) => e.pointerType === "mouse" && setDd(null)}
+                    // keyboard: tabbing out of an open menu closes it
+                    onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node | null) && setDd((v) => (v === item.label ? null : v))}
                   >
                     <button
                       type="button"
                       className="nav-dd-btn"
-                      aria-haspopup="true"
                       aria-expanded={dd === item.label}
+                      aria-controls={"dd-" + item.label.toLowerCase()}
                       onClick={() => setDd((v) => (v === item.label ? null : item.label))}
                     >
                       {item.label} <span className="cr" aria-hidden>&#9662;</span>
                     </button>
-                    <div className="nav-dd-menu" role="menu">
+                    <div className="nav-dd-menu" id={"dd-" + item.label.toLowerCase()}>
                       {item.dropdown.map((it) => (
                         <Link
                           key={it.href}
                           href={it.href}
-                          role="menuitem"
                           className={it.lead ? "dd-item dd-lead" : "dd-item"}
                           onClick={closeAll}
                         >
@@ -224,6 +243,7 @@ export default function Nav() {
             ref={panelRef}
             tabIndex={-1}
             inert={!open}
+            data-lenis-prevent
           >
             {NAV.map((item) =>
               item.dropdown ? (

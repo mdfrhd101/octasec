@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+// same-origin by default: nginx (prod) proxies /api to the API; NEXT_PUBLIC_API_URL points elsewhere in dev
+const API = process.env.NEXT_PUBLIC_API_URL || "/api";
+
 type CheckResult = {
   target: string;
   php: {
@@ -36,16 +39,20 @@ export default function Checker() {
     e.preventDefault();
     setBusy(true); setErr(""); setRes(null);
     try {
-      const r = await fetch("/api/php2shell/check", {
+      const r = await fetch(API + "/php2shell/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
       });
-      const j = await r.json();
-      if (!r.ok) throw new Error(j.error || "check failed");
+      // a proxy error page (502/504 HTML) or an empty body isn't JSON: never show the raw parser error
+      const j = await r.json().catch(() => null);
+      if (!r.ok || !j?.overall) {
+        setErr(j?.error || "The checker is unavailable right now. Please try again in a few minutes.");
+        return;
+      }
       setRes(j);
-    } catch (ex) {
-      setErr(ex instanceof Error ? ex.message : "check failed");
+    } catch {
+      setErr("Couldn't reach the checker. Check your connection and try again.");
     } finally {
       setBusy(false);
     }
@@ -63,6 +70,12 @@ export default function Checker() {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://your-site.com"
+          aria-label="Website URL"
+          inputMode="url"
+          autoComplete="url"
+          spellCheck={false}
+          autoCapitalize="none"
+          maxLength={300}
           required
           style={{ flex: 1, minWidth: 220 }}
         />
@@ -70,7 +83,7 @@ export default function Checker() {
           {busy ? "Checking…" : "Check my site"}
         </button>
       </form>
-      {err ? <p style={{ marginTop: 14, color: "var(--crit)" }}>{err}</p> : null}
+      {err ? <p role="alert" style={{ marginTop: 14, color: "var(--crit)" }}>{err}</p> : null}
       {res ? (
         <div style={{ marginTop: 22 }}>
           <div className={`p2s-verdict v-${res.overall.verdict}`}>

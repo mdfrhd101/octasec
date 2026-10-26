@@ -18,7 +18,7 @@ export default function SmoothScroll() {
     if (!window.matchMedia) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (window.matchMedia("(hover: none) and (pointer: coarse) and (max-width: 1024px)").matches) return;
-    const lenis = new Lenis({ lerp: 0.1, anchors: { offset: -90 }, autoRaf: true });
+    const lenis = new Lenis({ lerp: 0.1, anchors: { offset: -90 }, autoRaf: true, stopInertiaOnNavigate: true });
     window.__lenis = lenis;
     return () => { lenis.destroy(); delete window.__lenis; };
   }, []);

@@ -33,6 +33,7 @@ export default function HowItWorksPage() {
       />
 
       <section className="wrap rv">
+        <h2 className="sr-only">The four stages of an engagement</h2>
         <div className="blocks stagger">
           <Card className="st">
             <div className="sn">01</div>
@@ -84,7 +85,7 @@ export default function HowItWorksPage() {
         />
         <div className="blocks c3 stagger">
           <Card className="cov">
-            <h4>AI-orchestrated hunting</h4>
+            <h3>AI-orchestrated hunting</h3>
             <p>
               Complementary AI models reason about your application in concert
               &mdash; orchestrated to hunt the way a skilled red-teamer would, not
@@ -92,14 +93,14 @@ export default function HowItWorksPage() {
             </p>
           </Card>
           <Card className="cov">
-            <h4>90+ technique modules</h4>
+            <h3>90+ technique modules</h3>
             <p>
               An offensive skill library distilled from thousands of disclosed
               real-world vulnerability reports, selected per feature.
             </p>
           </Card>
           <Card className="cov">
-            <h4>Human-gated verification</h4>
+            <h3>Human-gated verification</h3>
             <p>
               A named operator verifies, writes and signs every report. Nothing is
               auto-submitted &mdash; ever.
@@ -116,21 +117,21 @@ export default function HowItWorksPage() {
         />
         <div className="blocks c3 stagger">
           <Card className="cov">
-            <h4>Every action logged</h4>
+            <h3>Every action logged</h3>
             <p>
               Every action the engine takes is logged and auditable &mdash;
               replayable end to end for your auditors.
             </p>
           </Card>
           <Card className="cov">
-            <h4>Limits enforced mechanically</h4>
+            <h3>Limits enforced mechanically</h3>
             <p>
               Scope, timing and intensity limits are enforced in the harness, not
               left to good intentions.
             </p>
           </Card>
           <Card className="cov">
-            <h4>Signed rules of engagement</h4>
+            <h3>Signed rules of engagement</h3>
             <p>
               Authorized testing only. Both sides sign before a single request is
               sent.

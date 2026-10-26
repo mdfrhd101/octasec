@@ -6,6 +6,7 @@ import "./hover-interactive.css";
 import "./polish.css";
 import "./mobile.css";
 import Nav from "./components/Nav";
+import SkipLink from "./components/SkipLink";
 import Footer from "./components/Footer";
 import FloatingCheck from "./components/FloatingCheck";
 import CursorFX from "./components/CursorFX";
@@ -84,14 +85,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="js" data-theme="light" suppressHydrationWarning>
+    <html lang="en" className="js" data-theme="dark" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#f4f7fb" />
-        {/* No-FOUC theme: default LIGHT (day) mode; honour a saved choice before first paint. */}
+        <meta name="theme-color" content="#00080b" />
+        {/* No-FOUC theme: default DARK (night) mode (owner, 2026-10-26); honour a saved choice before first paint. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{var t=localStorage.getItem('octasec-theme');if(t!=='dark'&&t!=='light')t='light';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='light'?'#f4f7fb':'#00080b');}catch(e){}})();",
+              "(function(){try{var t=localStorage.getItem('octasec-theme');if(t!=='dark'&&t!=='light')t='dark';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='light'?'#f4f7fb':'#00080b');}catch(e){}})();",
           }}
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -107,8 +108,9 @@ export default function RootLayout({
       </head>
       <body>
         <JsonLd data={[organizationLd, websiteLd]} />
+        <SkipLink />
         <Nav />
-        <main>{children}</main>
+        <main id="main" tabIndex={-1}>{children}</main>
         <Footer />
         <FloatingCheck />
         <CursorFX />

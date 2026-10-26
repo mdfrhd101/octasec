@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 
 type Theme = "dark" | "light";
 
-// The site defaults to LIGHT (day) mode; a no-FOUC inline script in layout.tsx
+// The site defaults to DARK (night) mode; a no-FOUC inline script in layout.tsx
 // sets data-theme before paint. This toggle just flips + persists the choice.
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    const t = (document.documentElement.getAttribute("data-theme") as Theme) || "light";
+    const t = (document.documentElement.getAttribute("data-theme") as Theme) || "dark";
     setTheme(t);
   }, []);
 

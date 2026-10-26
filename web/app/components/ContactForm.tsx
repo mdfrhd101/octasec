@@ -30,7 +30,8 @@ export default function ContactForm() {
       form.reset();
     } catch (e2) {
       setState("error");
-      setErr(e2 instanceof Error ? e2.message : "Could not send.");
+      // fetch() throws a TypeError ("Failed to fetch") when the network or the API is down
+      setErr(e2 instanceof TypeError ? "Could not reach our server. Please try again, or email support@octasec.ai." : e2 instanceof Error ? e2.message : "Could not send.");
     }
   }
 
@@ -55,9 +56,9 @@ export default function ContactForm() {
   return (
     <>
       <form className="cform" onSubmit={onSubmit}>
-        <label>Name<input type="text" name="name" required /></label>
-        <label>Work email<input type="email" name="email" required /></label>
-        <label>Company<input type="text" name="company" /></label>
+        <label>Name<input type="text" name="name" required maxLength={120} autoComplete="name" /></label>
+        <label>Work email<input type="email" name="email" required maxLength={160} autoComplete="email" /></label>
+        <label>Company<input type="text" name="company" maxLength={160} autoComplete="organization" /></label>
         {/* honeypot — hidden from humans, bots fill it and get silently dropped */}
         <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
         <label>
@@ -71,12 +72,12 @@ export default function ContactForm() {
             <option>Not sure</option>
           </select>
         </label>
-        <label>Message<textarea name="message" rows={4} /></label>
+        <label>Message<textarea name="message" rows={4} maxLength={4000} /></label>
         <button className="btn btn-white" type="submit" disabled={state === "sending"}>
           {state === "sending" ? "Sending…" : "Request a scoping call"}
         </button>
         {state === "error" && (
-          <p style={{ color: "var(--red, #ff5d6c)", fontFamily: "var(--m)", fontSize: 13 }}>{err}</p>
+          <p role="alert" style={{ color: "var(--red, #ff5d6c)", fontFamily: "var(--m)", fontSize: 13 }}>{err}</p>
         )}
       </form>
       <p className="cnote">

@@ -8,6 +8,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
+      disallow: "/portal/", // the customer portal is a login app: keep it out of search results
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

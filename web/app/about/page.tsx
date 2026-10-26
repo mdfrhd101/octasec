@@ -85,14 +85,14 @@ export default function AboutPage() {
         />
         <div className="blocks stagger">
           <Card className="cov">
-            <h4>OctaSec</h4>
+            <h3>OctaSec</h3>
             <p>
               Octagram&apos;s productized offensive engine &mdash; AI-orchestrated
               hunting, human-gated, fixed-price.
             </p>
           </Card>
           <Card className="cov">
-            <h4>Octagram</h4>
+            <h3>Octagram</h3>
             <p>
               The parent firm behind OctaSec &mdash; full-service security, red
               team, and six service lines.{" "}

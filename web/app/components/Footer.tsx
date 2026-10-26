@@ -37,7 +37,7 @@ export default function Footer() {
         <div className="foot-grid">
           <div>
             <span className="brand foot-brand" style={{ color: "var(--text)" }}>
-              <BrandLockup height={26} />
+              <BrandLockup height={26} gradientId="octasecLockupFoot" />
             </span>
             <p
               className="muted"
@@ -60,7 +60,7 @@ export default function Footer() {
             </div>
           </div>
           <div>
-            <h5>Product</h5>
+            <h2>Product</h2>
             <Link href="/how-it-works">How it works</Link>
             <Link href="/services">Services</Link>
             <Link href="/benchmarks">Benchmarks</Link>
@@ -69,13 +69,13 @@ export default function Footer() {
             <Link href="/faq">FAQ</Link>
           </div>
           <div>
-            <h5>Company</h5>
+            <h2>Company</h2>
             <Link href="/about">About</Link>
             <a href="https://octagramltd.com">Octagram Ltd &#8599;</a>
             <Link href="/contact">Contact</Link>
           </div>
           <div>
-            <h5>Portal</h5>
+            <h2>Portal</h2>
             <a href="/portal/">Sign in</a>
             <a href="/portal/">Client portal</a>
             <a href="/portal/">Corporate portal</a>

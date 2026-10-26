@@ -6,7 +6,7 @@
    ============================================================================ */
 
 /* ---------- 0. tokens + guards (all widths) ---------- */
-:root{--gutter:24px}
+:root{--gutter:4vw}   /* side gutter as a % of the screen: content = 92% wide */
 .wrap{padding-inline:var(--gutter)}
 .ann-short,.slider-dots,.mp-backdrop{display:none}
 .nw{white-space:nowrap}
@@ -89,7 +89,7 @@ footer{overflow:clip;display:flow-root}   /* flow-root keeps the wordmark's nega
 
 /* ---------- 6. problem section + terminal: a fixed 5-row log window ---------- */
 @media (max-width:600px){
-  #problem{overflow-x:clip}                /* its "PROOF" watermark pushed the page sideways at 320px */
+  #problem{overflow-x:clip}                /* its "SECURE" watermark pushed the page sideways at 320px */
   .heroTerm{margin-top:24px}
   .heroTerm .term-bar{padding:9px 12px;gap:6px}
   .heroTerm .term-bar i{width:8px;height:8px}
@@ -169,7 +169,7 @@ footer{overflow:clip;display:flow-root}   /* flow-root keeps the wordmark's nega
   .foot-grid>div:nth-child(2){grid-area:prod}
   .foot-grid>div:nth-child(3){grid-area:comp}
   .foot-grid>div:nth-child(4){grid-area:portal}
-  .foot-grid h5{margin-bottom:6px}
+  .foot-grid h2{margin-bottom:6px}
   .foot-grid a{margin:0;padding-block:9px;line-height:1.5}
   .foot-contact a{display:inline-flex;align-items:center;min-height:44px}
   .foot-copy a{display:inline-block;padding-block:12px}
@@ -185,7 +185,7 @@ footer{overflow:clip;display:flow-root}   /* flow-root keeps the wordmark's nega
 
 /* ---------- 12. inner pages (same patterns) ---------- */
 @media (max-width:600px){
-  :root{--gutter:20px}
+  :root{--gutter:5vw}   /* phones: content = 90% wide */
   .wrap .wrap{padding-inline:0}           /* nested wraps doubled the gutter (php2shell, FAQ) */
   /* page hero: left-aligned and compact */
   .phero{text-align:left;padding-top:32px;padding-bottom:8px}
@@ -218,7 +218,7 @@ footer{overflow:clip;display:flow-root}   /* flow-root keeps the wordmark's nega
   .nav-right .portal-link{display:inline-flex;align-items:center;min-height:44px}
 }
 @media (max-width:360px){
-  :root{--gutter:16px}
+  :root{--gutter:5vw}
   .brow.r3{grid-template-columns:minmax(0,1fr) 70px 56px}
   .brow.head{font-size:12px;letter-spacing:.04em}   /* "CONFIGURATION" fits its column */
 }

@@ -1,10 +1,12 @@
 import Link from "next/link";
 import Hero from "./components/Hero";
+import BreachIntro from "./components/BreachIntro";
 import HeroTerminal from "./components/HeroTerminal";
 import MethodChapters from "./components/MethodChapters";
 import DifferentiatorTable from "./components/DifferentiatorTable";
 import FinalCTA from "./components/FinalCTA";
 import AutoSlider from "./components/AutoSlider";
+import CursorCard from "./components/CursorCard";
 import JsonLd from "./components/JsonLd";
 import { serviceLd } from "./lib/seo";
 
@@ -27,6 +29,11 @@ export default function HomePage() {
   return (
     <>
       <JsonLd data={serviceLd} />
+      {/* autoplay intro film (docs/SCROLL_ANIMATION_PLAN.md): ~6.5 s full screen on every page load
+          (once={false}: a reload plays it again), then the mark lands on the hero's seal and the
+          hero appears; it never comes back on scroll. No Skip button and no caption text (owner), but a
+          click, scroll or Esc still skips it; off with reduced motion */}
+      <BreachIntro once={false} skipButton={false} captions={false} />
       <Hero />
 
       <section className="wrap proof-strip rv" id="proof" aria-label="OctaSec in numbers">
@@ -79,6 +86,8 @@ export default function HomePage() {
       <MethodChapters />
 
       <section className="wrap rv" id="pricing-anchor">
+        {/* red shadow + glow follow the mouse pointer smoothly (CursorCard) */}
+        <CursorCard>
         <div className="anchor2 card glass">
           <div>
             <span className="eyebrow">Pricing</span>
@@ -94,6 +103,7 @@ export default function HomePage() {
             <Link className="btn btn-ghost" href="/contact">Get a scoped quote</Link>
           </div>
         </div>
+        </CursorCard>
       </section>
 
       <DifferentiatorTable />

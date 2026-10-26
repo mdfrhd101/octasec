@@ -5,6 +5,8 @@
   "description": "OctaSec marketing website — Next.js App Router, static export.",
   "scripts": {
     "dev": "next dev",
+    "sitemap": "node scripts/sitemap.mjs",
+    "prebuild": "node scripts/sitemap.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

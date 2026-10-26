@@ -24,9 +24,9 @@ export default function WebsiteCheckPage() {
       </section>
       <section className="wrap rv">
         <div className="blocks c3" style={{ marginTop: 12, textAlign: "left" }}>
-          <div className="card"><h3>Evidence before alarm</h3><p>Confirmed public exposures and expired certificates are marked urgent. Missing hardening and inconclusive evidence remain clearly separated.</p></div>
-          <div className="card"><h3>Safe by construction</h3><p>A handful of bounded requests. No exploitation, port scanning, credential testing, plugin brute-force, or storage of sensitive response values.</p></div>
-          <div className="card"><h3>Need the full picture?</h3><p>This free baseline cannot see business logic, authenticated authorization, internal services, or unknown vulnerabilities. That is where our verified pentest takes over.</p></div>
+          <div className="card cov"><h3>Evidence before alarm</h3><p>Confirmed public exposures and expired certificates are marked urgent. Missing hardening and inconclusive evidence remain clearly separated.</p></div>
+          <div className="card cov"><h3>Safe by construction</h3><p>A handful of bounded requests. No exploitation, port scanning, credential testing, plugin brute-force, or storage of sensitive response values.</p></div>
+          <div className="card cov"><h3>Need the full picture?</h3><p>This free baseline cannot see business logic, authenticated authorization, internal services, or unknown vulnerabilities. That is where our verified pentest takes over.</p></div>
         </div>
         <p className="center" style={{ marginTop: 24 }}>Running PHP? <Link className="link" href="/php2shell">Use our specialist PHP2Shell exposure checker →</Link></p>
       </section>

@@ -39,10 +39,27 @@ function QuoteModal({ plan, onClose }: { plan: Plan; onClose: () => void }) {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [err, setErr] = useState("");
   const first = useRef<HTMLInputElement>(null);
+  const card = useRef<HTMLDivElement>(null);
+
+  // focus returns to whatever opened the dialog (the plan's quote button) when it closes
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    return () => opener?.focus?.();
+  }, []);
 
   useEffect(() => {
     first.current?.focus();
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab" || !card.current) return;
+      // aria-modal: Tab / Shift+Tab cycle inside the dialog instead of reaching the page behind it
+      const items = Array.from(card.current.querySelectorAll<HTMLElement>("a[href],button:not([disabled]),input:not([disabled]):not([tabindex='-1']),select,textarea"));
+      if (!items.length) return;
+      const firstEl = items[0], lastEl = items[items.length - 1];
+      const inside = card.current.contains(document.activeElement);
+      if (e.shiftKey && (document.activeElement === firstEl || !inside)) { e.preventDefault(); lastEl.focus(); }
+      else if (!e.shiftKey && (document.activeElement === lastEl || !inside)) { e.preventDefault(); firstEl.focus(); }
+    };
     window.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden"; // no background scroll while the dialog is open
@@ -64,14 +81,15 @@ function QuoteModal({ plan, onClose }: { plan: Plan; onClose: () => void }) {
       setState("sent");
     } catch (e2) {
       setState("error");
-      setErr(e2 instanceof Error ? e2.message : "Could not send.");
+      // fetch() throws a TypeError ("Failed to fetch") when the network or the API is down
+      setErr(e2 instanceof TypeError ? "Could not reach our server. Please try again, or email support@octasec.ai." : e2 instanceof Error ? e2.message : "Could not send.");
     }
   }
 
   return (
     // a click on the backdrop does NOT close the dialog — typed text is never lost by accident
     <div className="qmodal" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="qmodal-title">
-      <div className="qcard card">
+      <div className="qcard card" ref={card}>
         <button type="button" className="qx" onClick={onClose} aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
         </button>
@@ -86,9 +104,9 @@ function QuoteModal({ plan, onClose }: { plan: Plan; onClose: () => void }) {
             <h3 id="qmodal-title">Get a quote</h3>
             <p className="qsub">Tell us what you need tested. A scoped, fixed quote follows within one business day — no obligation.</p>
             <div className="qgrid">
-              <label>Name<input ref={first} type="text" name="name" required maxLength={120} /></label>
-              <label>Work email<input type="email" name="email" required maxLength={160} /></label>
-              <label>Company<input type="text" name="company" maxLength={160} /></label>
+              <label>Name<input ref={first} type="text" name="name" required maxLength={120} autoComplete="name" /></label>
+              <label>Work email<input type="email" name="email" required maxLength={160} autoComplete="email" /></label>
+              <label>Company<input type="text" name="company" maxLength={160} autoComplete="organization" /></label>
               <label>Plan
                 <select name="plan" defaultValue={plan}>
                   <option value="">Not sure yet</option>
@@ -113,7 +131,7 @@ function QuoteModal({ plan, onClose }: { plan: Plan; onClose: () => void }) {
             <label>Anything else (deadline, compliance, environment)<textarea name="message" rows={3} maxLength={4000} /></label>
             {/* honeypot — hidden from humans, bots fill it and get silently dropped */}
             <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
-            {state === "error" && <p className="qerr">{err}</p>}
+            {state === "error" && <p className="qerr" role="alert">{err}</p>}
             <div className="qrow">
               <button type="button" className="link" onClick={onClose}>Cancel</button>
               <button className="btn btn-white" type="submit" disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Request quote"}</button>

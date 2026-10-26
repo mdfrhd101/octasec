@@ -43,11 +43,11 @@ export default function BenchmarksPage() {
         />
         <MobileCollapse more="Show all 5 conditions">
           <div className="blocks c3 stagger" style={{ textAlign: "left" }}>
-            <Card className="cov"><h4>Black-box</h4><p>HTTP interaction only. No source access, no container inspection.</p></Card>
-            <Card className="cov"><h4>Airlocked</h4><p>Web search and external fetches disabled at the harness level. No writeups, no CVE lookups — solved from target behavior alone.</p></Card>
-            <Card className="cov"><h4>No hints</h4><p>Agents are told the flag format, not the vulnerability class.</p></Card>
-            <Card className="cov"><h4>Verified</h4><p>Every flag recomputed byte-identical from ground truth, independently of agent output. &ldquo;The agent said so&rdquo; is never the evidence.</p></Card>
-            <Card className="cov"><h4>Self-reported &amp; dated</h4><p>These numbers are produced by us, like every result on every public leaderboard in this space. Raw result files and per-target evidence kept for every solve.</p></Card>
+            <Card className="cov"><h3>Black-box</h3><p>HTTP interaction only. No source access, no container inspection.</p></Card>
+            <Card className="cov"><h3>Airlocked</h3><p>Web search and external fetches disabled at the harness level. No writeups, no CVE lookups — solved from target behavior alone.</p></Card>
+            <Card className="cov"><h3>No hints</h3><p>Agents are told the flag format, not the vulnerability class.</p></Card>
+            <Card className="cov"><h3>Verified</h3><p>Every flag recomputed byte-identical from ground truth, independently of agent output. &ldquo;The agent said so&rdquo; is never the evidence.</p></Card>
+            <Card className="cov"><h3>Self-reported &amp; dated</h3><p>These numbers are produced by us, like every result on every public leaderboard in this space. Raw result files and per-target evidence kept for every solve.</p></Card>
           </div>
         </MobileCollapse>
       </section>
@@ -123,8 +123,8 @@ export default function BenchmarksPage() {
           <div className="brow r2"><span className="ft">Frontier worker engine (reference ceiling)</span><span className="rate">20 / 20</span></div>
         </Card>
         <div className="blocks c2 stagger" style={{ textAlign: "left", marginTop: 26 }}>
-          <Card className="cov"><h4>The quantization tax is real</h4><p>Full precision over quantized weights: +4 solves (+50%) and materially better efficiency on shared solves. Infrastructure quality is capability.</p></Card>
-          <Card className="cov"><h4>In-context teaching is a net negative</h4><p>Stuffing a ~2,900-token digest of our technique library into context <b>cost five solves</b> versus a clean context — it displaced working memory and pushed the model into checklist behavior. Expertise belongs in weights, in deterministic machinery, or retrieved just-in-time. Never stuffed.</p></Card>
+          <Card className="cov"><h3>The quantization tax is real</h3><p>Full precision over quantized weights: +4 solves (+50%) and materially better efficiency on shared solves. Infrastructure quality is capability.</p></Card>
+          <Card className="cov"><h3>In-context teaching is a net negative</h3><p>Stuffing a ~2,900-token digest of our technique library into context <b>cost five solves</b> versus a clean context — it displaced working memory and pushed the model into checklist behavior. Expertise belongs in weights, in deterministic machinery, or retrieved just-in-time. Never stuffed.</p></Card>
         </div>
         <p className="stats-foot" style={{ marginTop: 18 }}>
           Results dated 2026-10-15 through 2026-10-17. We deliberately do not name the models in this ladder — the point is the method, not the vendor. Full per-app verdicts are available to customers and researchers under NDA.
@@ -141,17 +141,17 @@ export default function BenchmarksPage() {
         />
         <div className="blocks c3 stagger">
           <Link href="/blog/benchmark-journey-xben" className="cov card linkcard">
-            <h4>The benchmark journey</h4>
+            <h3>The benchmark journey</h3>
             <p>Expectations vs. reality on XBEN-104 — the broken challenge we proved unwinnable, and the two &ldquo;unsolvable&rdquo; targets that were scope bugs in our own briefs.</p>
             <span className="ilink">Read &rarr;</span>
           </Link>
           <Link href="/blog/agent-failure-modes" className="cov card linkcard">
-            <h4>The failure-mode taxonomy</h4>
+            <h3>The failure-mode taxonomy</h3>
             <p>Transcript-level autopsy of eight applications that defeated every local model: decision-point failures, decoy fields, primitive-inventory amnesia, and the repetition-loop disease.</p>
             <span className="ilink">Read &rarr;</span>
           </Link>
           <Link href="/blog/how-we-verify" className="cov card linkcard">
-            <h4>The verification doctrine</h4>
+            <h3>The verification doctrine</h3>
             <p>Why none of it matters unless a deterministic oracle and a human gate stand between the engine and your report.</p>
             <span className="ilink">Read &rarr;</span>
           </Link>
@@ -163,10 +163,10 @@ export default function BenchmarksPage() {
         <SectionHead eyebrow="The disclaimer block" title="We mean it." center />
         <MobileCollapse more="Show all 4 points">
           <div className="lim" style={{ textAlign: "left" }}>
-            <Card className="cov"><h4>Self-reported</h4><p>Independent replication is welcome; methodology and per-target evidence available on request.</p></Card>
-            <Card className="cov"><h4>Benchmarks are not your application</h4><p>Public suites are saturated and contamination-prone; private suites are harder but still synthetic. The honest claim is narrower and stronger: the operating model — enumerate everything, retry fresh with history, verify deterministically, gate with humans — is what transfers, and it&rsquo;s the same model we run on your scope.</p></Card>
-            <Card className="cov"><h4>We never round up</h4><p>Where a figure includes assisted runs, it is labeled. Where a number is pass@k rather than pass@1, it is labeled. Where a challenge shipped broken, we say so.</p></Card>
-            <Card className="cov"><h4>Dated and versioned</h4><p>Numbers are updated as new runs complete; old entries are kept, not overwritten.</p></Card>
+            <Card className="cov"><h3>Self-reported</h3><p>Independent replication is welcome; methodology and per-target evidence available on request.</p></Card>
+            <Card className="cov"><h3>Benchmarks are not your application</h3><p>Public suites are saturated and contamination-prone; private suites are harder but still synthetic. The honest claim is narrower and stronger: the operating model — enumerate everything, retry fresh with history, verify deterministically, gate with humans — is what transfers, and it&rsquo;s the same model we run on your scope.</p></Card>
+            <Card className="cov"><h3>We never round up</h3><p>Where a figure includes assisted runs, it is labeled. Where a number is pass@k rather than pass@1, it is labeled. Where a challenge shipped broken, we say so.</p></Card>
+            <Card className="cov"><h3>Dated and versioned</h3><p>Numbers are updated as new runs complete; old entries are kept, not overwritten.</p></Card>
           </div>
         </MobileCollapse>
         <p className="stats-foot" style={{ marginTop: 22 }}>Last updated: 2026-10-18.</p>
