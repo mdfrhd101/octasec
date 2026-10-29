@@ -1,7 +1,7 @@
+import type { CSSProperties } from "react";
 import { pageMeta } from "../lib/seo";
 import Link from "next/link";
 import PageHero from "../components/PageHero";
-import SectionHead from "../components/SectionHead";
 import FaqAccordion, { type FaqItem } from "../components/FaqAccordion";
 import FinalCTA from "../components/FinalCTA";
 import Checker from "./Checker";
@@ -112,88 +112,136 @@ const FAQ: FaqItem[] = [
   },
 ];
 
+// threat facts (red: attacks/exposure), then the five-step patch procedure on a rail (green:
+// the fix), fixed plans, FAQ. Blocks reveal on scroll (HudMotion); hud-pages-c.css styles them.
+const THREATS = [
+  {
+    tag: "Since 2012",
+    t: "14 years in the core",
+    d: "The vulnerable code path predates your application: any multipart POST to any PHP script reaches it — no upload form, no plugin, no app bug required.",
+  },
+  {
+    tag: "No official fix",
+    t: "EOL means exposed forever",
+    d: (
+      <>
+        PHP 8.1 and older get no official patch. If your app can&rsquo;t survive an upgrade, your choices are mitigation done properly — or
+        hoping the exploit ecosystem stalls. It isn&rsquo;t stalling.
+      </>
+    ),
+  },
+  {
+    tag: "In the wild",
+    t: "Attacks are already firing",
+    d: "In-the-wild exploitation began hours before the patch shipped. The simple chains work today; the harder chains are engineering problems someone is solving right now.",
+    hot: true,
+  },
+];
+
+const v = (vars: Record<string, number>) => vars as CSSProperties;
+
 export default function Php2ShellPage() {
   return (
-    <div className="p2s">
+    <div className="pg-p2s">
       <PageHero
         eyebrow="Emergency service · CVE-2026-109618 / CVE-2026-109619"
         title={<>PHP2Shell patching for servers<br />that can&rsquo;t upgrade.</>}
         sub="Pre-auth RCE in PHP core, present since 2012, actively exploited — and PHP 8.1 and older will never get an official fix. We harden what you run today, verify it with a non-destructive oracle we built during our field research, and hand you proof."
         ctas={
-          <div className="hero-cta">
-            <Link className="btn btn-white" href="/contact">
+          <div className="h-cta">
+            <Link className="h-btn h-btn-red p2-go" href="/contact">
               Get emergency patching
             </Link>
-            <Link className="link" href="/blog/php2shell-expectation-vs-reality">
-              Read our field research <span className="ar">&rarr;</span>
+            <Link className="h-btn h-btn-line" href="/blog/php2shell-expectation-vs-reality">
+              Read our field research <span aria-hidden="true">&rarr;</span>
             </Link>
           </div>
         }
       />
 
-      <section className="wrap rv" id="check">
-        <SectionHead eyebrow="Check your site" title="Is your server exposed?" center />
-        <div style={{ marginTop: 32 }}>
+      <section className="h-sec p2-check" id="check" aria-labelledby="p2-check-t">
+        <div className="h-head p2-head-c" data-rv>
+          <span className="h-lbl">Check your site</span>
+          <h2 id="p2-check-t" className="h-h2 h-split">Is your server exposed?</h2>
+        </div>
+        <div className="p2-check-in" data-rv>
           <Checker />
         </div>
       </section>
 
-      <section className="wrap rv">
-        <SectionHead eyebrow="The situation" title="Why waiting isn't a plan." />
-        <div className="blocks c3 stagger" style={{ marginTop: 32, textAlign: "left" }}>
-          <div className="card">
-            <h3>14 years in the core</h3>
-            <p>The vulnerable code path predates your application: any multipart POST to any PHP script reaches it — no upload form, no plugin, no app bug required.</p>
-          </div>
-          <div className="card">
-            <h3>EOL means exposed forever</h3>
-            <p>PHP 8.1 and older get no official patch. If your app can&rsquo;t survive an upgrade, your choices are mitigation done properly — or hoping the exploit ecosystem stalls. It isn&rsquo;t stalling.</p>
-          </div>
-          <div className="card">
-            <h3>Attacks are already firing</h3>
-            <p>In-the-wild exploitation began hours before the patch shipped. The simple chains work today; the harder chains are engineering problems someone is solving right now.</p>
-          </div>
+      <section className="h-sec p2-sit" aria-labelledby="p2-sit-t">
+        <div className="h-head" data-rv>
+          <span className="h-lbl">The situation</span>
+          <h2 id="p2-sit-t" className="h-h2 h-split">Why waiting isn&rsquo;t a plan.</h2>
         </div>
-      </section>
-
-      <section className="wrap rv">
-        <SectionHead eyebrow="What we do" title="Five steps, fixed scope, measured outcome." />
-        <div className="blocks c3 stagger" style={{ marginTop: 32, textAlign: "left" }}>
-          {STEPS.map((s) => (
-            <div className="card" key={s.n}>
-              <span className="tag">{s.n}</span>
-              <h3 style={{ marginTop: 8 }}>{s.t}</h3>
-              <p>{s.d}</p>
-            </div>
+        <div className="p2-threats" data-rv>
+          {THREATS.map((x, i) => (
+            <article key={x.t} className={"h-panel h-tilt p2-threat" + (x.hot ? " hot" : "")} style={v({ "--sd": i })}>
+              <div className="h-ph">
+                <span className="h-lbl">{String(i + 1).padStart(2, "0")} / 03</span>
+                <span className="h-tag crit">{x.hot ? <i className="h-dot" /> : null}{x.tag}</span>
+              </div>
+              <h3>{x.t}</h3>
+              <p>{x.d}</p>
+            </article>
           ))}
         </div>
       </section>
 
-      <section className="wrap rv">
-        <SectionHead eyebrow="Fixed pricing" title="No quotes, no hourly meter — the price is the price." center />
-        <div className="pricing stagger" style={{ marginTop: 32 }}>
-          {PLANS.map((p) => (
-            <div key={p.name} className={"card pr" + (p.featured ? " feat" : "")}>
-              <span className="tag">{p.tag}</span>
-              <h3 style={{ marginTop: 8 }}>{p.name}</h3>
-              <div className="amt">{p.amt} <small>{p.per}</small></div>
-              <ul>{p.items.map((i) => <li key={i}>{i}</li>)}</ul>
-              <Link className="btn btn-white" href="/contact">
+      <section className="h-sec p2-steps" aria-labelledby="p2-steps-t">
+        <div className="h-head" data-rv>
+          <span className="h-lbl">What we do</span>
+          <h2 id="p2-steps-t" className="h-h2 h-split">Five steps, fixed scope, measured outcome.</h2>
+        </div>
+        <ol className="p2-proc" data-rv>
+          {STEPS.map((s, i) => (
+            <li key={s.n} className={"p2-step" + (i >= 3 ? " ok" : "")} style={v({ "--i": i })}>
+              <span className="h-edge p2-node" aria-hidden="true">{s.n}</span>
+              <div className="h-panel h-tilt p2-step-card">
+                <span className="h-lbl">Step {s.n}</span>
+                <h3>{s.t}</h3>
+                <p>{s.d}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="h-sec p2-price" aria-labelledby="p2-price-t">
+        <div className="h-head p2-head-c" data-rv>
+          <span className="h-lbl">Fixed pricing</span>
+          <h2 id="p2-price-t" className="h-h2 h-split">No quotes, no hourly meter — the price is the price.</h2>
+        </div>
+        <div className="p2-plans">
+          {PLANS.map((p, i) => (
+            <article key={p.name} className={"h-panel h-tilt p2-plan" + (p.featured ? " ok" : "")} data-rv style={v({ "--sd": i })}>
+              <div className="h-ph">
+                <span className="h-lbl">{p.tag}</span>
+                {p.featured ? <i className="h-dot p2-plan-dot" aria-hidden="true" /> : null}
+              </div>
+              <h3>{p.name}</h3>
+              <div className="p2-amt">
+                <b>{p.amt}</b> <small>{p.per}</small>
+              </div>
+              <ul>{p.items.map((it) => <li key={it}>{it}</li>)}</ul>
+              <Link className={"h-btn " + (p.featured ? "h-btn-red p2-go" : "h-btn-line")} href="/contact">
                 Start now
               </Link>
-            </div>
+            </article>
           ))}
         </div>
-        <p className="wrap center" style={{ marginTop: 24, opacity: 0.75 }}>
+        <p className="p2-note" data-rv>
+          <i className="h-dot" aria-hidden="true" />
           Every engagement includes a rollback plan and a signed report. Bangladesh: bKash or bank transfer. International: card or wire.
         </p>
       </section>
 
-      <section className="wrap rv">
-        <SectionHead eyebrow="Questions" title="Straight answers." center />
-        <div style={{ maxWidth: 760, margin: "32px auto 0" }}>
-          <FaqAccordion items={FAQ} />
+      <section className="h-sec p2-faq" aria-labelledby="p2-faq-t">
+        <div className="h-head p2-head-c" data-rv>
+          <span className="h-lbl">Questions</span>
+          <h2 id="p2-faq-t" className="h-h2 h-split">Straight answers.</h2>
         </div>
+        <FaqAccordion items={FAQ} />
       </section>
 
       <FinalCTA />

@@ -169,16 +169,16 @@ export default function SiteMotion() {
       io = new IntersectionObserver(
         (es) => {
           es.forEach((e) => {
-            if (e.isIntersecting) {
+            // 8% shows, or a third of a screen of a block taller than the screen
+            if (e.isIntersecting && (e.intersectionRatio >= 0.08 || e.intersectionRect.height >= window.innerHeight * 0.33)) {
               reveal(e.target as HTMLElement);
               io!.unobserve(e.target);
             }
           });
         },
-        { rootMargin: "0px 0px -12% 0px", threshold: 0.08 }
+        { rootMargin: "0px 0px -12% 0px", threshold: [0, 0.08, 0.33] }
       );
       rvs.forEach((el) => io!.observe(el));
-      fallbackTimer = setTimeout(() => rvs.forEach(reveal), 2600);
     }
     cleanups.push(() => {
       if (io) io.disconnect();

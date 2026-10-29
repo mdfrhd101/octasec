@@ -1,0 +1,376 @@
+/* =============================================================================
+   hud-pages-a.css: the HUD blocks of /services, /how-it-works and /pricing (+ the quote
+   dialog). Loaded after hud-site.css. Scoped: every rule hangs off a page wrapper
+   (.pg-services, .pg-how, .pg-pricing), so nothing here reaches another page.
+   Tokens and building blocks (.h-panel, .h-tag, .h-btn, .hs-rule, .hs-cells, .hs-final…)
+   come from hud.css / hud-site.css. Reveals: [data-rv] blocks get .is-in from HudMotion;
+   every hidden starting state sits under .hud.is-armed + no-preference, so without JS or
+   with reduced motion everything simply shows. Hover-only effects: html:not(.touch-input).
+   ============================================================================= */
+
+/* ---------- keyframes (own copies, so this file never depends on hud.css's names) ---------- */
+@keyframes pa-in{from{opacity:0;transform:translateX(-10px)}}
+@keyframes pa-fade{from{opacity:0}}
+@keyframes pa-stamp{0%{opacity:0;transform:scale(1.35)}60%{opacity:1;transform:scale(.96)}100%{transform:none}}
+@keyframes pa-ping{0%{transform:scale(.7);opacity:1}100%{transform:scale(2.4);opacity:0}}
+@keyframes pa-blink{50%{opacity:.25}}
+@keyframes pa-wipe{from{opacity:0;clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% 0,100% 0,var(--c) 0,0 0)}to{opacity:1;clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)))}}
+
+/* ---------- shared: the section rail (a visible h2 label, a hairline, a counter) ---------- */
+:is(.pg-services,.pg-how,.pg-pricing) .pa-rail{display:flex;align-items:center;gap:14px;margin-bottom:clamp(20px,3vh,30px)}
+:is(.pg-services,.pg-how,.pg-pricing) .pa-rail h2{margin:0;font:500 11px/1.35 var(--h-disp);letter-spacing:.07em;color:var(--h-faint);text-wrap:wrap}
+:is(.pg-services,.pg-how,.pg-pricing) .pa-rail-line{flex:1;min-width:24px;height:1px;background:linear-gradient(90deg,var(--h-line-hi),transparent);transform-origin:0 50%}
+:is(.pg-services,.pg-how,.pg-pricing) .pa-rail-n{font:600 11px/1 var(--h-disp);letter-spacing:.12em;color:var(--h-faint);font-variant-numeric:tabular-nums}
+
+/* ---------- shared: icon plate (services, price drivers) ---------- */
+:is(.pg-services,.pg-pricing) .pa-ic{--c:8px;flex:none;width:42px;height:42px;display:grid;place-items:center;color:var(--h-green-ink);background:var(--h-ok-bg);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--h-green-ink) 40%,transparent);
+  clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)))}
+:is(.pg-services,.pg-pricing) .pa-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- shared: HUD buttons that are <button>s (quote buttons, dialog) ---------- */
+:is(.pg-services,.pg-how,.pg-pricing) button.h-btn{border:0;-webkit-appearance:none;appearance:none}
+:is(.pg-services,.pg-how,.pg-pricing) button.h-btn:disabled{opacity:.65;cursor:progress}
+
+/* ---------- shared: tilt cards reveal with `translate`, so the hover tilt (transform) never
+   inherits the reveal's slow, staggered transition ---------- */
+@media (prefers-reduced-motion:no-preference){
+  .hud.is-armed :is(.pg-services,.pg-how,.pg-pricing) .pa-card[data-rv]{
+    transition:opacity .9s var(--h-ease) calc(var(--d,0) * 110ms),translate .9s var(--h-ease) calc(var(--d,0) * 110ms),transform .35s var(--h-ease),background .3s}
+  .hud.is-armed :is(.pg-services,.pg-how,.pg-pricing) .pa-card[data-rv]:not(.is-in){transform:none;translate:0 34px}
+  .hud.is-armed :is(.pg-services,.pg-how,.pg-pricing) .pa-rail:not(.is-in) .pa-rail-line{transform:scaleX(0)}
+  .hud.is-armed :is(.pg-services,.pg-how,.pg-pricing) .pa-rail.is-in .pa-rail-line{transition:transform 1.3s .25s var(--h-ease)}
+}
+
+/* ---------- shared: 6-card grids (services, price drivers) ----------
+   desktop: a 3-column grid, each card revealed as it scrolls in (stagger per column);
+   ≤900px: an AutoSlider swipe row revealed as one (its looping clone must never sit hidden) */
+:is(.pg-services .sv-grid,.pg-pricing .pr-drv-grid){display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+/* --d is set on every card: the legacy CSS uses --d as its display-font token, so an
+   unset --d would inherit a font name and break every var(--d,0) delay */
+:is(.pg-services .sv-grid,.pg-pricing .pr-drv-grid) > *{--d:0}
+:is(.pg-services .sv-grid,.pg-pricing .pr-drv-grid) > :nth-child(3n+2){--d:1}
+:is(.pg-services .sv-grid,.pg-pricing .pr-drv-grid) > :nth-child(3n+3){--d:2}
+
+/* =============================================================================
+   /services
+   ============================================================================= */
+.pg-services .sv-card{--c:18px;display:flex;flex-direction:column;gap:14px;padding:22px 22px 14px}
+.pg-services .sv-card > :not(.sv-scan){position:relative}
+.pg-services .sv-card .h-ph{margin:0}
+.pg-services .sv-id{display:inline-flex;align-items:center;gap:10px;font:700 13px/1 var(--h-disp);letter-spacing:.16em;color:var(--h-green-ink)}
+.pg-services .sv-id::before{content:"";width:7px;height:7px;background:currentColor;box-shadow:0 0 8px currentColor}
+.pg-services .sv-card h3{font:600 18px/1.3 var(--h-disp);letter-spacing:.02em;color:var(--h-ink);text-wrap:balance}
+.pg-services .sv-cv{font:400 15.5px/1.6 var(--h-body);color:var(--h-dim)}
+.pg-services .sv-list{display:grid;gap:9px;padding-top:14px;border-top:1px dashed var(--h-line-hi)}
+.pg-services .sv-list li{position:relative;padding-left:20px;font:400 15px/1.45 var(--h-body);color:var(--h-ink)}
+.pg-services .sv-list li::before{content:"";position:absolute;left:1px;top:.42em;width:8px;height:8px;background:var(--h-green-ink);
+  clip-path:polygon(0 0,70% 0,100% 30%,100% 100%,30% 100%,0 70%)}
+.pg-services .sv-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 14px;margin-top:auto;padding-top:6px;border-top:1px solid var(--h-line)}
+.pg-services .sv-tl{display:inline-flex;align-items:center;gap:10px;min-height:44px}
+.pg-services .sv-foot .link{margin-left:auto}
+/* S4: a monitor trace that keeps drawing (reduced motion: the whole trace) */
+.pg-services .sv-pulse{stroke-dasharray:1 1;stroke-dashoffset:0}
+/* the scan line that sweeps a card once as it arrives */
+.pg-services .sv-scan{position:absolute;left:0;right:0;top:0;height:42%;pointer-events:none;opacity:0;
+  background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--h-green-ink) 9%,transparent));
+  border-bottom:1px solid color-mix(in srgb,var(--h-green-ink) 60%,transparent)}
+@keyframes pa-scan{0%{opacity:0;transform:translateY(-100%)}18%,70%{opacity:1}100%{opacity:0;transform:translateY(240%)}}
+@keyframes pa-trace{0%{stroke-dashoffset:1}55%{stroke-dashoffset:0}100%{stroke-dashoffset:-1}}
+@media (prefers-reduced-motion:no-preference){
+  .pg-services .sv-card.is-in .sv-pulse{animation:pa-trace 2.6s 1s ease-in-out infinite}
+}
+@media (prefers-reduced-motion:no-preference) and (min-width:901px){
+  .hud.is-armed .pg-services .sv-card:not(.is-in) :is(.sv-list li,.sv-foot,.pa-ic){opacity:0}
+  .hud.is-armed .pg-services .sv-card.is-in .pa-ic{animation:pa-stamp .5s calc(.3s + var(--d,0) * 110ms) both}
+  .hud.is-armed .pg-services .sv-card.is-in .sv-list li{animation:pa-in .45s calc(.4s + var(--d,0) * 110ms + var(--i,0) * 80ms) var(--h-ease) both}
+  .hud.is-armed .pg-services .sv-card.is-in .sv-foot{animation:pa-fade .6s calc(.85s + var(--d,0) * 110ms) both}
+  .hud.is-armed .pg-services .sv-card.is-in .sv-scan{animation:pa-scan 1.5s calc(.15s + var(--d,0) * 110ms) var(--h-ease) both}
+}
+
+/* ---------- "Not sure which?": copy | the threat scope ---------- */
+.pg-services .sv-ask-card{--c:22px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:4vw;align-items:center;padding:clamp(26px,3.4vw,56px)}
+.pg-services .sv-ask-copy{display:grid;gap:20px;justify-items:start}
+.pg-services .sv-ask-copy .h-sub{max-width:48ch}
+.pg-services .sv-radar{position:relative;justify-self:center;width:min(100%,300px);aspect-ratio:1}
+.pg-services .sv-radar svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+/* the sweep: a conic wedge whose bright edge leads, turning clockwise */
+.pg-services .sv-sweep{position:absolute;inset:3.33%;border-radius:50%;
+  background:conic-gradient(from 0deg,transparent 0 262deg,color-mix(in srgb,var(--h-green-ink) 20%,transparent) 350deg,color-mix(in srgb,var(--h-green-ink) 55%,transparent) 360deg)}
+.pg-services .sv-rings circle{fill:none;stroke:var(--h-acc);stroke-opacity:.34}
+.pg-services .sv-rings circle:first-child{fill:var(--h-tint);stroke-opacity:.62}
+.pg-services .sv-cross line{stroke:var(--h-acc);stroke-opacity:.26;stroke-dasharray:2 5}
+.pg-services .sv-ticks line{stroke:var(--h-acc);stroke-opacity:.6}
+.pg-services .sv-blip circle{fill:var(--h-green-ink)}
+.pg-services .sv-blip.crit circle{fill:var(--h-red);filter:drop-shadow(0 0 5px var(--h-red))}
+.pg-services .sv-blip circle.sv-ping{fill:none;stroke:var(--h-red);stroke-width:1.4;filter:none;opacity:0;transform-box:fill-box;transform-origin:center}
+@keyframes pa-spin{to{transform:rotate(1turn)}}
+@keyframes pa-blip{0%,5%{opacity:1}60%,100%{opacity:.26}}
+@media (prefers-reduced-motion:no-preference){
+  .hud.is-armed .pg-services .sv-ask-card:not(.is-in) :is(.sv-sweep,.sv-blip){opacity:0}
+  .pg-services .sv-ask-card.is-in .sv-sweep{animation:pa-fade .8s .4s both,pa-spin 4.8s .4s linear infinite}
+  /* each blip flares as the sweep's leading edge passes its angle */
+  .pg-services .sv-ask-card.is-in .sv-blip{animation:pa-blip 4.8s linear infinite;animation-delay:calc(.4s + var(--a,0) * 4.8s / 360 - 4.8s)}
+  .pg-services .sv-ask-card.is-in .sv-ping{animation:pa-ping 1.8s 1.2s ease-out infinite}
+}
+
+/* =============================================================================
+   /how-it-works
+   ============================================================================= */
+/* ---------- the four stages on one rail: hunt = attack (red), proof = verified (green) ---------- */
+.pg-how .hw-path{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.pg-how .hw-step{--mc:var(--h-acc);--mn:var(--mc);position:relative;display:flex;flex-direction:column;gap:16px;min-width:0}
+.pg-how .hw-step.crit{--mc:var(--h-red)}
+.pg-how .hw-step.ok{--mc:var(--h-green-ink)}
+.pg-how .hw-step:nth-child(2){--mn:var(--h-red)}
+.pg-how .hw-step:nth-child(3){--mn:var(--h-green-ink)}
+.pg-how .hw-mark{position:relative;display:flex;align-items:center;height:26px}
+.pg-how .hw-node{position:relative;z-index:1;flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--mc) 55%,transparent)}
+.pg-how .hw-node i{width:12px;height:12px;border-radius:50%;background:var(--h-void);border:2px solid var(--mc);box-sizing:border-box}
+.pg-how .hw-step.crit .hw-node i{background:var(--mc);box-shadow:0 0 10px var(--mc)}
+.pg-how .hw-step.ok .hw-node i{background:var(--mc)}
+.pg-how .hw-ping{position:absolute;inset:0;border-radius:50%;border:1px solid var(--h-red);opacity:0}
+/* each step draws its own stretch of the rail, to the next stage */
+.pg-how .hw-step:not(:last-child) .hw-mark::after{content:"";position:absolute;left:34px;right:-6px;top:50%;height:2px;margin-top:-1px;
+  background:linear-gradient(90deg,var(--mc),var(--mn));transform-origin:0 50%}
+.pg-how .hw-card{--c:18px;flex:1;display:flex;flex-direction:column;gap:12px;padding:20px 20px 22px}
+.pg-how .hw-step.crit .hw-card{--b:color-mix(in srgb,var(--h-red) 55%,transparent);--fill:var(--h-alert-fill)}
+.pg-how .hw-step.ok .hw-card{--b:color-mix(in srgb,var(--h-green-ink) 55%,transparent);--fill:var(--h-ok-fill)}
+.pg-how .hw-card .h-ph{margin:0}
+.pg-how .hw-sn{font:700 13px/1 var(--h-disp);letter-spacing:.16em;color:var(--h-dim)}
+.pg-how .hw-step.crit .hw-sn{color:var(--h-red-ink)}
+.pg-how .hw-step.ok .hw-sn{color:var(--h-green-ink)}
+.pg-how .hw-prog{display:flex;gap:3px}
+.pg-how .hw-prog i{width:14px;height:4px;background:var(--h-line-hi)}
+.pg-how .hw-prog i.on{background:var(--mc)}
+.pg-how .hw-card h3{font:600 18px/1.3 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
+.pg-how .hw-card p{font:400 15.5px/1.6 var(--h-body);color:var(--h-dim)}
+@media (prefers-reduced-motion:no-preference){
+  .hud.is-armed .pg-how .hw-step:not(.is-in) .hw-mark::after{transform:scaleX(0)}
+  .hud.is-armed .pg-how .hw-step.is-in .hw-mark::after{transition:transform 1s var(--h-ease) calc(.5s + var(--d,0) * 110ms)}
+  .hud.is-armed .pg-how .hw-step:not(.is-in) .hw-node{opacity:0;transform:scale(.4)}
+  .hud.is-armed .pg-how .hw-step.is-in .hw-node{transition:opacity .5s var(--h-ease) calc(.2s + var(--d,0) * 110ms),transform .6s cubic-bezier(.3,1.6,.5,1) calc(.2s + var(--d,0) * 110ms)}
+  .hud.is-armed .pg-how .hw-step:not(.is-in) .hw-prog i.on{opacity:.1}
+  .hud.is-armed .pg-how .hw-step.is-in .hw-prog i.on{transition:opacity .3s calc(.7s + var(--d,0) * 110ms)}
+  .pg-how .hw-step.crit.is-in .hw-ping{animation:pa-ping 1.8s 1.2s ease-out infinite}
+}
+
+/* ---------- the engine: the homepage's rule cards (.hs-rule), each with its own readout ---------- */
+.pg-how .hw-eng .h-ph{margin:0}
+.pg-how .hw-live{display:inline-flex;color:var(--h-green-ink)}
+.pg-how .hw-bars{height:46px;gap:3px;margin-top:auto}
+.pg-how .hw-bars i{transform-origin:50% 100%}
+.pg-how .hw-n{display:block;margin-bottom:10px;font:800 clamp(40px,3.6vw,56px)/1 var(--h-disp);letter-spacing:.01em;color:var(--h-ink);font-variant-numeric:tabular-nums}
+.pg-how .hw-eng .hs-cells{margin-top:auto}
+.pg-how .hw-seal{display:block;width:100%;max-width:250px;height:auto;margin-top:auto;overflow:visible}
+.pg-how .hw-seal-base{stroke:var(--h-line-hi);stroke-dasharray:2 4}
+.pg-how .hw-sig{fill:none;stroke:var(--h-ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 1}
+.pg-how .hw-ring{fill:var(--h-ok-bg);stroke:var(--h-green-ink);stroke-width:1.6;stroke-dasharray:1 1}
+.pg-how .hw-check{fill:none;stroke:var(--h-green-ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 1}
+@keyframes pa-bar{to{scale:1 .55}}
+@media (prefers-reduced-motion:no-preference){
+  .pg-how .hs-rules-wrap.is-in .hw-live .h-dot{animation:pa-blink 1.1s steps(1) infinite}
+  .hud.is-armed .pg-how .hs-rules-wrap:not(.is-in) .hw-bars i{transform:scaleY(.08)}
+  .hud.is-armed .pg-how .hs-rules-wrap.is-in .hw-bars i{transition:transform .8s var(--h-ease) calc(.45s + var(--i,0) * 26ms)}
+  .pg-how .hs-rules-wrap.is-in .hw-bars i{animation:pa-bar 2.3s calc(var(--i,0) * -.37s) ease-in-out infinite alternate}
+  .hud.is-armed .pg-how .hs-rules-wrap:not(.is-in) :is(.hw-sig,.hw-ring,.hw-check){stroke-dashoffset:1}
+  .hud.is-armed .pg-how .hs-rules-wrap:not(.is-in) .hw-ring{fill-opacity:0}
+  .hud.is-armed .pg-how .hs-rules-wrap.is-in .hw-sig{transition:stroke-dashoffset 1.3s ease-in-out 1.1s}
+  .hud.is-armed .pg-how .hs-rules-wrap.is-in .hw-ring{transition:stroke-dashoffset .8s var(--h-ease) 2.3s,fill-opacity .6s 2.7s}
+  .hud.is-armed .pg-how .hs-rules-wrap.is-in .hw-check{transition:stroke-dashoffset .5s var(--h-ease) 2.9s}
+}
+
+/* ---------- governance: head | the three guarantees as an audit log ---------- */
+.pg-how .hw-gov{display:grid;grid-template-columns:minmax(0,29fr) minmax(0,71fr);gap:3vw;align-items:start}
+.pg-how .hw-gov > .h-head{margin-bottom:0}
+.pg-how .hw-log{--c:20px;padding:0 0 18px}
+.pg-how .hw-log-bar{display:flex;align-items:center;gap:6px;padding:12px 18px;border-bottom:1px solid var(--h-line)}
+.pg-how .hw-log-bar > i{width:8px;height:8px;border-radius:50%;background:color-mix(in srgb,var(--h-acc) 50%,transparent)}
+.pg-how .hw-rec{display:inline-flex;margin-left:auto;color:var(--h-green-ink)}
+.pg-how .hw-rows{display:grid}
+.pg-how .hw-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:start;padding:20px 22px;border-bottom:1px dashed var(--h-line-hi)}
+.pg-how .hw-chk{--c:6px;display:grid;place-items:center;width:28px;height:28px;color:var(--h-green-ink);background:var(--h-ok-bg);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--h-green-ink) 50%,transparent);
+  clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)))}
+.pg-how .hw-chk svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 1}
+.pg-how .hw-row h3{font:600 17px/1.35 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
+.pg-how .hw-row p{margin-top:6px;font:400 15.5px/1.6 var(--h-body);color:var(--h-dim)}
+.pg-how .hw-cursor{display:block;width:9px;height:16px;margin:16px 22px 0 66px;background:var(--h-green-ink)}
+@media (prefers-reduced-motion:no-preference){
+  .hud.is-armed .pg-how .hw-log:not(.is-in) .hw-row{opacity:0}
+  .hud.is-armed .pg-how .hw-log.is-in .hw-row{animation:pa-in .55s calc(.35s + var(--i,0) * 220ms) var(--h-ease) both}
+  .hud.is-armed .pg-how .hw-log:not(.is-in) .hw-chk path{stroke-dashoffset:1}
+  .hud.is-armed .pg-how .hw-log.is-in .hw-chk path{transition:stroke-dashoffset .45s var(--h-ease) calc(.75s + var(--i,0) * 220ms)}
+  .pg-how .hw-log.is-in :is(.hw-cursor,.hw-rec .h-dot){animation:pa-blink 1.05s steps(1) infinite}
+}
+
+/* =============================================================================
+   /pricing
+   ============================================================================= */
+/* ---------- plans ---------- */
+.pg-pricing .pr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:stretch}
+.pg-pricing .pr-plan{--c:20px;display:flex;flex-direction:column;gap:14px;padding:24px}
+.pg-pricing .pr-plan > :not(.hs-sweep){position:relative}
+.pg-pricing .pr-plan.feat{--b:color-mix(in srgb,var(--h-green-ink) 60%,transparent);--fill:var(--h-ok-fill);box-shadow:inset 0 2px 0 var(--h-green-ink)}
+.pg-pricing .pr-plan .h-ph{margin:0}
+.pg-pricing .pr-plan h3{font:600 18px/1.3 var(--h-disp);letter-spacing:.03em;color:var(--h-ink)}
+.pg-pricing .pr-amt{font:800 clamp(26px,2.2vw,34px)/1.05 var(--h-disp);letter-spacing:.01em;color:var(--h-ink)}
+.pg-pricing .pr-amt small{display:block;margin-top:8px;font:500 11px/1.3 var(--h-disp);letter-spacing:.08em;text-transform:uppercase;color:var(--h-dim)}
+.pg-pricing .pr-pd{font:400 15.5px/1.6 var(--h-body);color:var(--h-dim)}
+.pg-pricing .pr-items{display:grid;gap:10px;padding-top:16px;border-top:1px dashed var(--h-line-hi)}
+.pg-pricing .pr-items li{position:relative;padding-left:22px;font:400 15px/1.5 var(--h-body);color:var(--h-ink)}
+.pg-pricing .pr-items li::before{content:"";position:absolute;left:1px;top:.42em;width:10px;height:10px;
+  background:linear-gradient(var(--h-green-ink),var(--h-green-ink)) 50% 50%/100% 2px no-repeat,linear-gradient(var(--h-green-ink),var(--h-green-ink)) 50% 50%/2px 100% no-repeat}
+.pg-pricing .pr-plan .h-btn{margin-top:auto;width:100%}
+@media (prefers-reduced-motion:no-preference){
+  .hud.is-armed .pg-pricing .pr-plan:not(.is-in) .pr-items li{opacity:0}
+  .hud.is-armed .pg-pricing .pr-plan.is-in .pr-items li{animation:pa-in .45s calc(.4s + var(--d,0) * 110ms + var(--i,0) * 70ms) var(--h-ease) both}
+}
+
+/* ---------- what decides the price ---------- */
+.pg-pricing .pr-drv{--c:16px;display:flex;flex-direction:column;gap:12px;padding:20px 22px 22px}
+.pg-pricing .pr-drv .h-ph{margin:0 0 4px}
+.pg-pricing .pr-drv-n{font:700 13px/1 var(--h-disp);letter-spacing:.16em;color:var(--h-faint)}
+.pg-pricing .pr-drv h3{font:600 17px/1.35 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
+.pg-pricing .pr-drv p{font:400 15.5px/1.6 var(--h-body);color:var(--h-dim)}
+@media (prefers-reduced-motion:no-preference) and (min-width:901px){
+  .hud.is-armed .pg-pricing .pr-drv:not(.is-in) .pa-ic{opacity:0}
+  .hud.is-armed .pg-pricing .pr-drv.is-in .pa-ic{animation:pa-stamp .5s calc(.35s + var(--d,0) * 110ms) both}
+}
+
+/* ---------- always included: head | a checklist that stamps in ---------- */
+.pg-pricing .pr-inc{display:grid;grid-template-columns:minmax(0,29fr) minmax(0,71fr);gap:3vw;align-items:start}
+.pg-pricing .pr-inc > .h-head{margin-bottom:0}
+.pg-pricing .pr-inc-card{--c:20px;--b:color-mix(in srgb,var(--h-green-ink) 50%,transparent);--fill:var(--h-ok-fill);padding:clamp(22px,2.6vw,34px)}
+.pg-pricing .pr-meter{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin-bottom:24px}
+.pg-pricing .pr-meter i{height:4px;background:var(--h-green-ink);transform-origin:0 50%}
+.pg-pricing .pr-incl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 28px}
+.pg-pricing .pr-incl li{display:flex;gap:12px;align-items:flex-start;font:400 15.5px/1.5 var(--h-body);color:var(--h-ink)}
+.pg-pricing .pr-ck{--c:5px;flex:none;display:grid;place-items:center;width:22px;height:22px;margin-top:1px;color:var(--h-green-ink);background:var(--h-ok-bg);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--h-green-ink) 55%,transparent);
+  clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)))}
+.pg-pricing .pr-ck svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 1}
+@media (prefers-reduced-motion:no-preference){
+  .hud.is-armed .pg-pricing .pr-inc-card:not(.is-in) .pr-meter i{transform:scaleX(0)}
+  .hud.is-armed .pg-pricing .pr-inc-card.is-in .pr-meter i{transition:transform .4s var(--h-ease) calc(.6s + var(--i,0) * 180ms)}
+  .hud.is-armed .pg-pricing .pr-inc-card:not(.is-in) .pr-incl li{opacity:0}
+  .hud.is-armed .pg-pricing .pr-inc-card.is-in .pr-incl li{animation:pa-in .5s calc(.35s + var(--i,0) * 180ms) var(--h-ease) both}
+  .hud.is-armed .pg-pricing .pr-inc-card:not(.is-in) .pr-ck path{stroke-dashoffset:1}
+  .hud.is-armed .pg-pricing .pr-inc-card.is-in .pr-ck path{transition:stroke-dashoffset .4s var(--h-ease) calc(.65s + var(--i,0) * 180ms)}
+}
+
+/* ---------- FAQ: head | the questions (FaqAccordion, skinned by hud-site.css) ---------- */
+.pg-pricing .pr-faq{display:grid;grid-template-columns:minmax(0,29fr) minmax(0,71fr);gap:3vw;align-items:start}
+.pg-pricing .pr-faq > .h-head{margin-bottom:0}
+.pg-pricing .pr-faq > .wrap{width:auto;max-width:none;margin:0;padding:0}
+.pg-pricing .pr-faq .faq{max-width:none}
+
+/* ---------- the quote dialog (QuoteRequest.tsx): a chamfered glass panel that wipes in ---------- */
+/* the backdrop scrolls a tall card (an inner scroller would scroll the panel's edges away) */
+.pg-pricing .qmodal{place-items:normal;padding:16px;background:color-mix(in srgb,var(--h-void) 80%,transparent);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color-scheme:dark}
+:root[data-theme="light"] .pg-pricing .qmodal{color-scheme:light}
+.pg-pricing .qcard{--c:22px;--fill:var(--h-glass-hi);--b:color-mix(in srgb,var(--h-green-ink) 45%,transparent);
+  margin:auto;width:min(640px,100%);max-height:none;overflow:visible;padding:28px 28px 24px;border-radius:0}
+.pg-pricing .qcard h3{margin:0 0 8px;padding-right:52px;font:700 22px/1.25 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
+.pg-pricing .qsub{margin:0 0 18px;font:400 15px/1.6 var(--h-body);color:var(--h-dim)}
+.pg-pricing .qform{gap:14px}
+.pg-pricing .qform label{display:grid;gap:7px;font:500 11.5px/1.3 var(--h-disp);letter-spacing:.06em;color:var(--h-dim)}
+.pg-pricing .qform :is(input,select,textarea){width:100%;padding:11px 13px}
+.pg-pricing .qform textarea{min-height:92px;resize:vertical}
+.pg-pricing .qx{--c:8px;position:absolute;top:14px;right:14px;z-index:3;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:0;
+  background:var(--h-tint);color:var(--h-dim);box-shadow:inset 0 0 0 1px var(--h-line-hi);cursor:pointer;
+  clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)))}
+html:not(.touch-input) .pg-pricing .qx:hover{color:var(--h-red-ink);box-shadow:inset 0 0 0 1px var(--h-hover-b)}
+.pg-pricing .qx:focus-visible{outline:none;color:var(--h-ink);box-shadow:inset 0 0 0 2px var(--h-ink)}
+.pg-pricing .qx svg{width:18px;height:18px}
+.pg-pricing .qrow{flex-wrap:wrap;gap:8px 18px;margin-top:6px}
+.pg-pricing .qrow .link{padding:0 6px;background:none;border:0;cursor:pointer}
+.pg-pricing .qerr{margin:0;font:500 14px/1.5 var(--h-body);color:var(--h-red-ink)}
+.pg-pricing .qsent{display:grid;justify-items:center;gap:12px;padding:14px 4px 6px;text-align:center}
+.pg-pricing .qsent h3{margin:0;padding:0;color:var(--h-green-ink)}
+.pg-pricing .qsent .qsub{margin:0 0 6px}
+.pg-pricing .qsent-ic{--c:10px;display:grid;place-items:center;width:56px;height:56px;color:var(--h-green-ink);background:var(--h-ok-bg);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--h-green-ink) 55%,transparent);
+  clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)))}
+.pg-pricing .qsent-ic svg{width:30px;height:30px;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 1}
+@keyframes pa-draw{from{stroke-dashoffset:1}}
+@media (prefers-reduced-motion:no-preference){
+  .pg-pricing .qmodal{animation:pa-fade .25s ease-out both}
+  .pg-pricing .qcard{animation:pa-wipe .55s .05s var(--h-ease) both}
+  .pg-pricing .qsent-ic{animation:pa-stamp .5s .1s both}
+  .pg-pricing .qsent-ic path{animation:pa-draw .5s .45s var(--h-ease) both}
+}
+
+/* =============================================================================
+   hover (real mouse only)
+   ============================================================================= */
+/* the hunt stays red under the pointer (the shared tilt turns edges green) */
+html:not(.touch-input) .pg-how .hw-step.crit .h-tilt:hover{--b:var(--h-red);
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--h-red) 16%,transparent),transparent 70%),var(--fill,var(--h-glass))}
+html:not(.touch-input) .pg-how .hw-row:hover{background:var(--h-tint)}
+html:not(.touch-input) .pg-pricing .qx:hover{color:var(--h-ink);box-shadow:inset 0 0 0 1px var(--h-green-ink)}
+
+/* =============================================================================
+   responsive
+   ============================================================================= */
+@media (max-width:1180px){
+  .pg-services .sv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pg-services .sv-grid > :nth-child(n){--d:0}
+  .pg-services .sv-grid > :nth-child(even){--d:1}
+  /* the stages become a vertical timeline */
+  .pg-how .hw-path{grid-template-columns:minmax(0,1fr);gap:0;max-width:900px}
+  .pg-how .hw-step{flex-direction:row;gap:18px;padding-bottom:16px}
+  .pg-how .hw-step:last-child{padding-bottom:0}
+  .pg-how .hw-mark{flex:none;flex-direction:column;align-items:center;align-self:stretch;width:26px;height:auto;padding-top:18px}
+  .pg-how .hw-step:not(:last-child) .hw-mark::after{left:50%;right:auto;top:52px;bottom:-26px;width:2px;height:auto;margin:0 0 0 -1px;
+    background:linear-gradient(180deg,var(--mc),var(--mn));transform-origin:50% 0}
+  .pg-how .hw-gov,.pg-pricing .pr-inc,.pg-pricing .pr-faq{grid-template-columns:minmax(0,1fr)}
+  .pg-how .hw-gov > .h-head,.pg-pricing .pr-inc > .h-head,.pg-pricing .pr-faq > .h-head{margin-bottom:clamp(6px,2vh,16px)}
+  .pg-pricing .pr-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:1180px) and (prefers-reduced-motion:no-preference){
+  .hud.is-armed .pg-how .hw-step:not(.is-in) .hw-mark::after{transform:scaleY(0)}
+}
+/* tablets: a plan reads as one wide card, its list beside the price */
+@media (min-width:701px) and (max-width:1180px){
+  .pg-pricing .pr-plan{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:auto auto auto auto 1fr;
+    grid-template-areas:"head items" "name items" "amt items" "pd items" "btn items";column-gap:0;row-gap:12px}
+  .pg-pricing .pr-plan > .pr-head{grid-area:head}
+  .pg-pricing .pr-plan > h3{grid-area:name}
+  .pg-pricing .pr-plan > .pr-amt{grid-area:amt}
+  .pg-pricing .pr-plan > .pr-pd{grid-area:pd;padding-right:3vw}
+  .pg-pricing .pr-plan > .pr-items{grid-area:items;align-self:start;border-top:0;padding:0 0 0 3vw;border-left:1px dashed var(--h-line-hi)}
+  .pg-pricing .pr-plan > .h-btn{grid-area:btn;align-self:start;justify-self:start;width:auto;margin-top:8px}
+}
+@media (max-width:900px){
+  :is(.pg-services .sv-grid,.pg-pricing .pr-drv-grid){display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
+  :is(.pg-services .sv-grid,.pg-pricing .pr-drv-grid)::-webkit-scrollbar{display:none}
+  :is(.pg-services .sv-grid,.pg-pricing .pr-drv-grid) > *{flex:0 0 86%;scroll-snap-align:start}
+  .hud.is-armed :is(.pg-services .sv-grid,.pg-pricing .pr-drv-grid) > [data-rv]:not(.is-in){opacity:1;transform:none;translate:none}
+  .pg-services .sv-ask-card{grid-template-columns:minmax(0,1fr) minmax(0,.62fr)}
+}
+@media (min-width:901px){
+  .hud.is-armed :is(.pg-services .sv-wrap,.pg-pricing .pr-drv-wrap)[data-rv]{opacity:1;transform:none}
+}
+@media (min-width:601px) and (max-width:900px){
+  :is(.pg-services .sv-grid,.pg-pricing .pr-drv-grid) > *{flex-basis:62%}
+}
+@media (max-width:700px){
+  .pg-services .sv-card{padding:20px 18px 12px}
+  .pg-services .sv-ask-card{grid-template-columns:minmax(0,1fr);gap:22px}
+  .pg-services .sv-radar{order:-1;width:min(62%,220px);justify-self:start}
+  .pg-how .hw-step{gap:12px}
+  .pg-how .hw-card{padding:18px 18px 20px}
+  .pg-how .hw-row{gap:14px;padding:18px}
+  .pg-how .hw-cursor{margin:14px 18px 0 60px}
+  .pg-pricing .pr-plan{padding:22px 20px}
+  .pg-pricing .pr-incl{grid-template-columns:minmax(0,1fr)}
+  .pg-pricing .qcard{padding:24px 18px 20px}
+  .pg-pricing .qcard h3{font-size:20px}
+}
+@media (max-width:420px){
+  /* long button labels wrap instead of pushing the page sideways */
+  :is(.pg-services,.pg-how,.pg-pricing) .h-cta .h-btn{white-space:normal;text-align:center;line-height:1.25;padding-block:10px}
+}

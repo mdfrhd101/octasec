@@ -5,6 +5,11 @@ import "./landing-v2.css";
 import "./hover-interactive.css";
 import "./polish.css";
 import "./mobile.css";
+import "./hud.css";
+import "./hud-site.css";
+import "./hud-pages-a.css";
+import "./hud-pages-b.css";
+import "./hud-pages-c.css";
 import Nav from "./components/Nav";
 import SkipLink from "./components/SkipLink";
 import Footer from "./components/Footer";
@@ -12,6 +17,7 @@ import FloatingCheck from "./components/FloatingCheck";
 import CursorFX from "./components/CursorFX";
 import SiteMotion from "./components/SiteMotion";
 import SmoothScroll from "./components/SmoothScroll";
+import HudMotion from "./components/hud/HudMotion";
 import JsonLd from "./components/JsonLd";
 import { SITE_URL, PLAUSIBLE_DOMAIN } from "./site";
 import { organizationLd, websiteLd } from "./lib/seo";
@@ -85,21 +91,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="js" data-theme="dark" suppressHydrationWarning>
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#00080b" />
-        {/* No-FOUC theme: default DARK (night) mode (owner, 2026-10-26); honour a saved choice before first paint. */}
+        {/* No-FOUC theme: default DARK (night) mode (owner, 2026-10-26); honour a saved choice before first paint.
+            Also marks html.js here (not in the markup), so without JS the scroll-reveal blocks stay visible. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{var t=localStorage.getItem('octasec-theme');if(t!=='dark'&&t!=='light')t='dark';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='light'?'#f4f7fb':'#00080b');}catch(e){}})();",
+              "(function(){document.documentElement.classList.add('js');try{var t=localStorage.getItem('octasec-theme');if(t!=='dark'&&t!=='light')t='dark';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='light'?'#f4f7fb':'#00080b');}catch(e){}})();",
           }}
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Exo+2:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
         />
         {/* Plausible analytics (privacy-friendly, cookieless) — only when configured at build time */}
         {PLAUSIBLE_DOMAIN ? (
@@ -110,11 +117,13 @@ export default function RootLayout({
         <JsonLd data={[organizationLd, websiteLd]} />
         <SkipLink />
         <Nav />
-        <main id="main" tabIndex={-1}>{children}</main>
+        {/* the "mission control" design covers every page (hud.css tokens hang off main.hud) */}
+        <main id="main" tabIndex={-1} className="hud">{children}</main>
         <Footer />
         <FloatingCheck />
         <CursorFX />
         <SiteMotion />
+        <HudMotion />
         <SmoothScroll />
       </body>
     </html>

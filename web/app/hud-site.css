@@ -1,0 +1,155 @@
+/* =============================================================================
+   hud-site.css: the HUD skin for every page (loaded after hud.css). hud.css brings the
+   tokens, nav, footer and homepage; this file restyles the shared building blocks the
+   inner pages are made of: page hero, section heads, cards, tags, buttons and links,
+   step/cover blocks, FAQ, forms, article prose and the phone "show all" collapse.
+   Page-specific blocks live in hud-pages-a/b/c.css. Same rules as hud.css: scoped under
+   .hud (main), hover only under html:not(.touch-input), AA contrast in both themes.
+   ============================================================================= */
+
+/* ---------- inner-page hero: tag, title word by word, copy + CTAs | mini globe ---------- */
+.h-phero{position:relative;display:flex;align-items:center;min-height:min(74vh,720px);padding:clamp(24px,5vh,64px) var(--h-gut) clamp(26px,5vh,60px)}
+.h-phero > .h-field{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.7;
+  -webkit-mask-image:radial-gradient(90% 85% at 60% 45%,#000 35%,transparent 100%);mask-image:radial-gradient(90% 85% at 60% 45%,#000 35%,transparent 100%)}
+.h-phero-grid{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:minmax(0,58fr) minmax(0,42fr);gap:3vw;align-items:center}
+.h-phero-copy{display:grid;gap:24px;justify-items:start}
+.h-phero .h-tag{white-space:normal;max-width:100%;line-height:1.35}
+.h-phero .h-title{font-size:clamp(30px,3.4vw,62px);max-width:22ch}
+.h-phero .h-sub{max-width:58ch}
+.h-phero-viz{justify-self:center;width:min(100%,540px)}
+.h-mini .h-orb{width:100%}
+@media (prefers-reduced-motion:no-preference){
+  .hud.is-armed .h-phero[data-rv]{opacity:1;transform:none;transition:none}
+  .hud.is-armed .h-phero:not(.is-in) .h-split .hw > span{opacity:0}
+  .h-phero.is-in .h-split .hw > span{display:inline-block;animation:h-rin .55s calc(var(--w,0) * 35ms) var(--h-ease) both}
+  .hud.is-armed .h-phero .h-phero-copy > :not(h1){opacity:0;transform:translateY(10px);transition:opacity .45s var(--h-ease),transform .45s var(--h-ease)}
+  .hud.is-armed .h-phero.is-in .h-phero-copy > :not(h1){opacity:1;transform:none}
+  .hud.is-armed .h-phero.is-in .h-phero-copy > :nth-child(3){transition-delay:.12s}
+  .hud.is-armed .h-phero.is-in .h-phero-copy > :nth-child(4){transition-delay:.2s}
+  .hud.is-armed .h-phero .h-phero-viz{opacity:0;transform:scale(.96);transition:opacity .6s var(--h-ease),transform .7s var(--h-ease)}
+  .hud.is-armed .h-phero.is-in .h-phero-viz{opacity:1;transform:none}
+}
+
+/* ---------- section heads (SectionHead) and the old type ---------- */
+.hud .section-head.h-head{max-width:46rem;margin-bottom:clamp(26px,4vh,46px)}
+.hud .section-head.center{margin-inline:auto;text-align:center;justify-items:center}
+.hud .section-head .h-sub{margin-inline:inherit}
+.hud .eyebrow{font:500 11px/1.35 var(--h-disp);letter-spacing:.07em;text-transform:none;color:var(--h-faint)}
+.hud .mh{font-family:var(--h-disp);color:var(--h-ink)}
+/* the old word split painted each word with a white/grey gradient: plain HUD ink instead */
+.hud .mh .w,:root[data-theme="light"] .hud .mh .w{background:none;-webkit-background-clip:border-box;background-clip:border-box;-webkit-text-fill-color:currentColor;color:inherit}
+.hud .lead{font:400 clamp(16px,1.2vw,19px)/1.62 var(--h-body);color:var(--h-dim)}
+.hud .muted{color:var(--h-dim)}
+:where(.hud section) :where(h2,h3,h4){font-family:var(--h-disp);letter-spacing:.01em;color:var(--h-ink)}
+:where(.hud section) :where(p,li){font-family:var(--h-body)}
+.hud .wrap{padding-inline:var(--h-gut)}
+
+/* ---------- cards → chamfered glass panels (edges drawn like .h-panel) ---------- */
+.hud .card{--c:16px;--b:var(--h-line-hi);position:relative;color:var(--h-ink);background:var(--fill,var(--h-glass));border:0;border-radius:0;box-shadow:none;
+  clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)));
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:transform .35s var(--h-ease),background .3s}
+.hud .card::before,.hud .card::after{display:block!important;content:"";position:absolute;inset:0;pointer-events:none;border-radius:0;opacity:1;z-index:0;filter:none;transform:none}
+.hud .card::before{padding:1px;background:var(--b)!important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.hud .card::after{background:
+  linear-gradient(to bottom left,transparent calc(50% - .8px),var(--b) 0 calc(50% + .8px),transparent 0) 100% 0/var(--c) var(--c) no-repeat,
+  linear-gradient(to bottom left,transparent calc(50% - .8px),var(--b) 0 calc(50% + .8px),transparent 0) 0 100%/var(--c) var(--c) no-repeat!important}
+.hud .card > *{position:relative;z-index:1}
+.hud .card :where(h3,h4){font:600 17px/1.35 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
+.hud .card :where(p,li){color:var(--h-dim)}
+/* the old card tilt + glow (SiteMotion writes --rx/--ry/--mx/--my), HUD-styled */
+html:not(.touch-input) .hud .card:hover{--b:var(--h-hover-b);transform:perspective(900px) rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg)) translateY(-4px);
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),var(--h-glow-c),transparent 70%),var(--fill,var(--h-glass))}
+/* hover-interactive.css forces an old solid-green fill + white text (!important) on these
+   card types; restore the HUD hover for them (same look as every other card) */
+html:not(.touch-input) .hud .card:is(.svc,.pr,.cov,.postcard):hover{border-color:transparent!important;box-shadow:none!important;
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),var(--h-glow-c),transparent 70%),var(--fill,var(--h-glass))!important}
+html:not(.touch-input) .hud .card:is(.svc,.pr,.cov,.postcard):hover :is(h3,h4,.amt){color:var(--h-ink)!important}
+html:not(.touch-input) .hud .card:is(.svc,.pr,.cov,.postcard):hover :is(p,.cv,li,.pd,.tl,.amt small){color:var(--h-dim)!important}
+html:not(.touch-input) .hud .card:is(.svc,.pr,.postcard):hover :is(.tag,.ilink,.more .link){color:var(--h-green-ink)!important}
+html:not(.touch-input) .hud .card.svc:hover li::before{background:var(--h-green-ink)!important}
+html:not(.touch-input) .hud .card.pr:hover li::before{color:var(--h-green-ink)!important}
+/* the old cursor-follow card (CursorCard): its glow keeps ::before, so draw the edge with a ring */
+.hud .cfx-stage > .card{box-shadow:inset 0 0 0 1px var(--h-line-hi)}
+
+/* step blocks (how it works, pricing) and cover cards */
+.hud .blocks .st .sn{font:600 11px/1 var(--h-disp);letter-spacing:.12em;color:var(--h-red-ink)}
+.hud .blocks .st h3,.hud .cov h3{font:600 16px/1.35 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
+.hud .blocks .st p,.hud .cov p{font:400 15px/1.6 var(--h-body);color:var(--h-dim)}
+
+/* ---------- tags, badges ---------- */
+.hud :is(.tag,.badge){display:inline-flex;align-items:center;gap:6px;font:600 10px/1 var(--h-disp);letter-spacing:.1em;text-transform:uppercase;
+  padding:6px 9px;border:1px solid var(--h-line-hi);border-radius:0;color:var(--h-dim);background:var(--h-tint)}
+
+/* ---------- old buttons and links → HUD ---------- */
+.hud .btn{--c:10px;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 24px;border:0;border-radius:0;
+  font:600 12px/1 var(--h-disp);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;
+  clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)));transition:transform .2s var(--h-ease),translate .3s var(--h-ease),background-color .2s}
+.hud .btn-white,:root[data-theme="light"] .hud .btn-white{background:linear-gradient(180deg,var(--h-red-a),var(--h-red-b));color:#fff}
+.hud .btn-white::after{display:none}
+.hud :is(.btn-ghost,.btn-dark),:root[data-theme="light"] .hud :is(.btn-ghost,.btn-dark){background:var(--h-tint);color:var(--h-ink);box-shadow:inset 0 0 0 1px var(--h-line-hi)}
+.hud .btn:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--h-ink)}
+.hud .btn-white:focus-visible{box-shadow:inset 0 0 0 2px #fff}
+.hud :is(.link,.ilink){display:inline-flex;align-items:center;gap:6px;min-height:44px;font:600 12px/1.2 var(--h-disp);letter-spacing:.06em;color:var(--h-green-ink)}
+.hud :is(.link,.ilink) .ar{color:var(--h-green-ink)}
+.hud .hero-cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+html:not(.touch-input) .hud .btn-white:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.45);transform:translateY(-1px)}
+html:not(.touch-input) .hud :is(.btn-ghost,.btn-dark):hover{box-shadow:inset 0 0 0 1px var(--h-hover-b)}
+html:not(.touch-input) .hud :is(.link,.ilink):hover{color:var(--h-ink)}
+
+/* ---------- FAQ: each question a chamfered row; the + turns into × ---------- */
+.hud .faq{max-width:880px;border-top:0;display:grid;gap:10px}
+.hud .faq details{--c:12px;position:relative;background:var(--h-glass);border:0;box-shadow:inset 0 0 0 1px var(--h-line);
+  clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)));transition:background .3s,box-shadow .3s}
+.hud .faq details[open]{background:var(--h-ok-fill);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--h-green-ink) 45%,transparent)}
+.hud .faq summary{min-height:56px;align-items:center;padding:16px 20px;font:600 15px/1.4 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
+.hud .faq details[open] summary{color:var(--h-ink)}
+.hud .faq summary:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--h-green-ink)}
+.hud .faq summary .pm{display:grid;place-items:center;width:26px;height:26px;font:500 18px/1 var(--h-disp);color:var(--h-green-ink);box-shadow:inset 0 0 0 1px var(--h-line-hi)}
+.hud .faq details[open] summary .pm{color:var(--h-red-ink)}
+.hud .faq .a{padding:0 20px 20px;font:400 15.5px/1.65 var(--h-body);color:var(--h-dim)}
+html:not(.touch-input) .hud .faq summary:hover{color:var(--h-green-ink)}
+
+/* ---------- forms (contact, quote, tools) ---------- */
+.hud :is(input:not([type=checkbox]):not([type=radio]),textarea,select){font:400 15px/1.4 var(--h-body);color:var(--h-ink);
+  background:color-mix(in srgb,var(--h-void) 65%,transparent);border:1px solid var(--h-line-hi);border-radius:0;min-height:46px}
+.hud :is(input,textarea,select)::placeholder{color:var(--h-faint);opacity:1}
+.hud :is(input,textarea,select):focus-visible{outline:none;border-color:var(--h-green-ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--h-green-ink) 25%,transparent)}
+.hud :is(input[type=checkbox],input[type=radio]){accent-color:var(--h-green)}
+
+/* ---------- article prose (blog, legal) ---------- */
+.hud .prose{font:400 17px/1.75 var(--h-body);color:var(--h-dim)}
+.hud .prose :is(h2,h3,h4){font-family:var(--h-disp);letter-spacing:.01em;color:var(--h-ink)}
+.hud .prose h2{border-top-color:var(--h-line)}
+.hud .prose :is(strong,b){color:var(--h-ink)}
+.hud .prose a{color:var(--h-green-ink);border-bottom:1px solid color-mix(in srgb,var(--h-green-ink) 45%,transparent)}
+html:not(.touch-input) .hud .prose a:hover{color:var(--h-ink);border-color:var(--h-ink)}
+.hud .prose code{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--h-ink);background:var(--h-tint);border:1px solid var(--h-line);border-radius:0}
+.hud .prose pre{background:color-mix(in srgb,var(--h-void) 75%,transparent);border:1px solid var(--h-line-hi);border-radius:0}
+.hud .prose pre code{background:none;border:0}
+.hud .prose blockquote{border-left:2px solid var(--h-red);color:var(--h-ink);background:var(--h-tint)}
+.hud .prose :is(th,td){border-color:var(--h-line)}
+.hud .prose th{font-family:var(--h-disp);color:var(--h-ink)}
+.hud .prose li::marker{color:var(--h-green-ink)}
+
+/* ---------- phones: the "show all" collapse ---------- */
+.hud .mcol-btn{font:600 11px/1 var(--h-disp);letter-spacing:.08em;text-transform:uppercase;color:var(--h-green-ink);background:var(--h-tint);border:1px solid var(--h-line-hi);border-radius:0;min-height:44px}
+
+@media (max-width:900px){
+  .h-phero{min-height:0}
+  /* the mini globe sits right under the title: the copy's children join the hero grid */
+  .h-phero-grid{grid-template-columns:minmax(0,1fr);gap:18px}
+  .h-phero-copy{display:contents}
+  .h-phero-copy > .h-tag{justify-self:start}
+  .h-phero-viz{width:min(64%,300px);order:1;margin:-9vw auto -7vw;pointer-events:none}
+  .h-phero-copy > :not(.h-tag,h1){order:2}
+}
+@media (max-width:700px){
+  .h-phero .h-title{font-size:min(8vw,40px)}
+  .h-phero-viz{width:min(58%,240px)}
+  .hud .card{-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .hud .card,.hud .card *{transition:none!important}
+}

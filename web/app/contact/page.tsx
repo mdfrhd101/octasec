@@ -10,9 +10,11 @@ export const metadata = pageMeta({
   path: "/contact",
 });
 
+// HUD page (styles: hud-pages-b.css, scoped to .pg-contact): the form panel and the direct
+// lines beside it (both in ContactForm).
 export default function ContactPage() {
   return (
-    <>
+    <div className="pgb pg-contact">
       <PageHero
         eyebrow="Contact"
         title={
@@ -23,9 +25,9 @@ export default function ContactPage() {
           </>
         }
       />
-      <section className="wrap rv" style={{ paddingTop: 10 }}>
+      <section className="h-sec ct-sec">
         <ContactForm />
       </section>
-    </>
+    </div>
   );
 }

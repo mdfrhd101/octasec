@@ -1,6 +1,7 @@
+import type { CSSProperties } from "react";
 import PageHero from "../components/PageHero";
 import ScopeCTA from "../components/ScopeCTA";
-import FaqAccordion, { type FaqItem } from "../components/FaqAccordion";
+import type { FaqItem } from "../components/FaqAccordion";
 import FinalCTA from "../components/FinalCTA";
 import JsonLd from "../components/JsonLd";
 import { breadcrumbLd, pageMeta } from "../lib/seo";
@@ -60,9 +61,13 @@ const ITEMS: FaqItem[] = [
   },
 ];
 
+// HUD page (styles: hud-pages-b.css, scoped to .pg-faq): the FaqAccordion markup (same <details>
+// rows, same .faq skin from hud-site.css), numbered, revealed by HudMotion ([data-rv]: hidden
+// only once motion is armed, so the answers also read without JavaScript, which the shared
+// component's old .rv reveal does not allow), the rows sliding in and each answer opening smoothly.
 export default function FaqPage() {
   return (
-    <>
+    <div className="pgb pg-faq">
       <JsonLd data={[faqLd, breadcrumbLd([{ name: "Home", path: "/" }, { name: "FAQ", path: "/faq/" }])]} />
       <PageHero
         eyebrow="FAQ"
@@ -75,8 +80,19 @@ export default function FaqPage() {
         }
         ctas={<ScopeCTA />}
       />
-      <FaqAccordion items={ITEMS} />
+      <section className="h-sec fq-sec" id="faq">
+        <div className="faq fq-list" data-rv>
+          {ITEMS.map((it, i) => (
+            <details key={it.q} style={{ "--i": i } as CSSProperties}>
+              <summary>
+                {it.q} <span className="pm">+</span>
+              </summary>
+              <p className="a">{it.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
       <FinalCTA />
-    </>
+    </div>
   );
 }

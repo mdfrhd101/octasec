@@ -1,9 +1,7 @@
+import type { CSSProperties } from "react";
 import { pageMeta } from "../lib/seo";
-import Link from "next/link";
 import PageHero from "../components/PageHero";
 import ScopeCTA from "../components/ScopeCTA";
-import SectionHead from "../components/SectionHead";
-import Card from "../components/Card";
 import FinalCTA from "../components/FinalCTA";
 
 export const metadata = pageMeta({
@@ -13,6 +11,10 @@ export const metadata = pageMeta({
   keywords: ["about OctaSec", "Octagram Limited", "cybersecurity company Bangladesh", "Dhaka penetration testing company"],
   path: "/about",
 });
+
+// HUD page (styles: hud-pages-b.css, scoped to .pg-about). [data-rv] blocks are revealed on
+// scroll by HudMotion; the agency cards wipe in and their emblem brackets lock on.
+const v = (vars: Record<string, number>) => vars as CSSProperties;
 
 // Agencies the Octagram team behind OctaSec has served. To use real emblems, drop the
 // files in web/public/agencies/ and add `logo: "/agencies/<file>"` — the card then renders
@@ -26,7 +28,7 @@ const AGENCIES: { acr: string; name: string; logo?: string }[] = [
 
 export default function AboutPage() {
   return (
-    <>
+    <div className="pgb pg-about">
       <PageHero
         eyebrow="About"
         title={
@@ -39,9 +41,9 @@ export default function AboutPage() {
         ctas={<ScopeCTA />}
       />
 
-      <section className="wrap rv">
-        <div className="anchorb" style={{ maxWidth: "68ch" }}>
-          <p className="lead" style={{ textAlign: "left" }}>
+      <section className="h-sec ab-intro-sec">
+        <div className="ab-intro" data-rv>
+          <p className="ab-lead">
             OctaSec is the autonomous offensive-security engine of Octagram Ltd
             &mdash; the Dhaka-based security firm trusted by CID, Dhaka
             Metropolitan Police, Special Response Battalion and CTTC.
@@ -49,7 +51,7 @@ export default function AboutPage() {
             OctaSec to answer one question: why should deep security testing be a
             luxury?
           </p>
-          <p className="lead" style={{ textAlign: "left", marginTop: 16 }}>
+          <p className="ab-copy">
             The engine pairs AI-orchestrated hunting with a skill library distilled
             from thousands of disclosed real-world vulnerability reports. Every
             engagement is human-led, human-verified, and human-signed &mdash; the
@@ -58,68 +60,69 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="wrap center rv" style={{ paddingBlock: "clamp(28px,4vw,48px)" }}>
-        <span className="eyebrow">Organizations served</span>
-        <p className="lead" style={{ margin: "18px auto 0", maxWidth: "54ch" }}>
-          The Octagram red team behind OctaSec has delivered security work for
-          Bangladesh&apos;s leading law-enforcement agencies.
-        </p>
-        <div className="agencies stagger">
-          {AGENCIES.map((a) => (
-            <div className="agency" key={a.acr} title={a.name}>
-              <div className="agency-mark">
-                {a.logo ? <img src={a.logo} alt={`${a.name} logo`} /> : a.acr}
-              </div>
-              <div className="agency-name">{a.name}</div>
-            </div>
-          ))}
+      <section className="h-sec ab-org" aria-labelledby="ab-org-t">
+        <div className="h-head" data-rv>
+          <h2 id="ab-org-t" className="h-lbl">Organizations served</h2>
+          <p className="ab-org-lead">
+            The Octagram red team behind OctaSec has delivered security work for
+            Bangladesh&apos;s leading law-enforcement agencies.
+          </p>
         </div>
+        <ul className="ab-agencies pgb-wipe" data-rv>
+          {AGENCIES.map((a, i) => (
+            <li className="h-panel h-tilt ab-agency" key={a.acr} title={a.name} style={v({ "--d": i })}>
+              <div className="ab-mark">
+                {a.logo ? <img src={a.logo} alt={`${a.name} logo`} width={96} height={96} loading="lazy" decoding="async" /> : a.acr}
+              </div>
+              <span className="ab-acr" aria-hidden="true">{a.acr}</span>
+              <div className="ab-name">{a.name}</div>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      <section className="wrap center rv">
-        <SectionHead
-          eyebrow="One firm, two faces"
-          title="The engine, and the full-service team behind it."
-          text="OctaSec is a product of Octagram Limited — built, run and signed off by Octagram's own security team."
-          center
-        />
-        <div className="blocks stagger">
-          <Card className="cov">
-            <h3>OctaSec</h3>
+      <section className="h-sec ab-two" aria-labelledby="ab-two-t">
+        <div className="h-head" data-rv>
+          <span className="h-lbl">One firm, two faces</span>
+          <h2 id="ab-two-t" className="h-h2 h-split">The engine, and the full-service team behind it.</h2>
+          <p className="h-sub">OctaSec is a product of Octagram Limited — built, run and signed off by Octagram&apos;s own security team.</p>
+        </div>
+        {/* the two faces, wired together: OctaSec (product) ── Octagram (parent firm) */}
+        <div className="ab-faces pgb-wipe" data-rv>
+          <article className="h-panel h-tilt ab-face ok" style={v({ "--d": 0 })}>
+            <div className="h-ph">
+              <h3>OctaSec</h3>
+              <span className="h-tag ok"><i className="h-dot" />Product</span>
+            </div>
             <p>
               Octagram&apos;s productized offensive engine &mdash; AI-orchestrated
               hunting, human-gated, fixed-price.
             </p>
-          </Card>
-          <Card className="cov">
-            <h3>Octagram</h3>
+          </article>
+          <div className="ab-wire" aria-hidden="true"><i /></div>
+          <article className="h-panel h-tilt ab-face" style={v({ "--d": 1 })}>
+            <div className="h-ph">
+              <h3>Octagram</h3>
+              <span className="h-tag">Parent firm</span>
+            </div>
             <p>
               The parent firm behind OctaSec &mdash; full-service security, red
-              team, and six service lines.{" "}
-              <a href="https://octagramltd.com" style={{ color: "var(--gold)" }}>
-                Visit Octagram &#8599;
-              </a>
+              team, and six service lines.
             </p>
-          </Card>
+            <a className="ab-ext" href="https://octagramltd.com">
+              Visit Octagram <span aria-hidden="true">&#8599;</span>
+            </a>
+          </article>
         </div>
-        <div className="hero-cta" style={{ justifyContent: "center", marginTop: 30 }}>
-          <a className="link" href="https://octagramltd.com">
-            Meet the team <span className="ar">&rarr;</span>
+        <div className="ab-team" data-rv>
+          <a className="h-btn h-btn-line" href="https://octagramltd.com">
+            Meet the team <span aria-hidden="true">&rarr;</span>
           </a>
-          <span
-            style={{
-              fontFamily: "var(--m)",
-              fontSize: 12,
-              color: "var(--faint)",
-              alignSelf: "center",
-            }}
-          >
-            Careers &mdash; coming soon
-          </span>
+          <span className="h-tag ab-soon"><i className="h-dot" />Careers &mdash; coming soon</span>
         </div>
       </section>
 
       <FinalCTA />
-    </>
+    </div>
   );
 }

@@ -87,17 +87,21 @@ function QuoteModal({ plan, onClose }: { plan: Plan; onClose: () => void }) {
   }
 
   return (
-    // a click on the backdrop does NOT close the dialog — typed text is never lost by accident
+    // a click on the backdrop does NOT close the dialog — typed text is never lost by accident.
+    // HUD styles: hud-pages-a.css (.pg-pricing .qmodal): a chamfered glass panel that wipes in.
     <div className="qmodal" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="qmodal-title">
-      <div className="qcard card" ref={card}>
+      <div className="qcard h-panel" ref={card}>
         <button type="button" className="qx" onClick={onClose} aria-label="Close">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
         </button>
         {state === "sent" ? (
-          <div style={{ textAlign: "center", padding: "18px 4px" }}>
-            <h3 id="qmodal-title" style={{ color: "var(--gold)", marginBottom: 8 }}>Request received</h3>
+          <div className="qsent">
+            <span className="qsent-ic" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path pathLength={1} d="m6 12.5 4 4 8-9" /></svg>
+            </span>
+            <h3 id="qmodal-title">Request received</h3>
             <p className="qsub">Thanks — our team will send a scoped quote within one business day.</p>
-            <button type="button" className="btn btn-white" style={{ marginTop: 18 }} onClick={onClose}>Done</button>
+            <button type="button" className="h-btn h-btn-red" onClick={onClose}>Done</button>
           </div>
         ) : (
           <form className="cform qform" onSubmit={onSubmit}>
@@ -134,7 +138,7 @@ function QuoteModal({ plan, onClose }: { plan: Plan; onClose: () => void }) {
             {state === "error" && <p className="qerr" role="alert">{err}</p>}
             <div className="qrow">
               <button type="button" className="link" onClick={onClose}>Cancel</button>
-              <button className="btn btn-white" type="submit" disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Request quote"}</button>
+              <button className="h-btn h-btn-red" type="submit" disabled={state === "sending"}>{state === "sending" ? "Sending…" : "Request quote"}</button>
             </div>
           </form>
         )}

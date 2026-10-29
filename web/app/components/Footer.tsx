@@ -102,7 +102,7 @@ export default function Footer() {
         </div>
       </div>
       {/* oversized wordmark, cropped by the page edge — decorative */}
-      <div className="foot-mark" aria-hidden="true">OCTASEC</div>
+      <div className="foot-mark" aria-hidden="true">OCT<span className="fm-a">A</span>SEC</div>
     </footer>
   );
 }

@@ -14,10 +14,10 @@ export default function SectionHead({
 }) {
   return (
     // centring lives in CSS (.section-head.center, globals.css) so phones can left-align it
-    <div className={"section-head" + (center ? " center" : "")}>
-      <span className="eyebrow">{eyebrow}</span>
-      <h2 className="mh">{title}</h2>
-      {text ? <p>{text}</p> : null}
+    <div className={"section-head h-head" + (center ? " center" : "")}>
+      <span className="eyebrow h-lbl">{eyebrow}</span>
+      <h2 className="mh h-h2">{title}</h2>
+      {text ? <p className="h-sub">{text}</p> : null}
     </div>
   );
 }

@@ -29,6 +29,9 @@ const VERDICT_LABEL: Record<string, string> = {
   "unknown": "INCONCLUSIVE",
 };
 
+// HUD console (hud-pages-c.css). The request and its handling are unchanged; only the
+// markup is: a status tag in the header, a prompt-style field, a scan line while busy,
+// the verdict as a stamped readout (red exposed, green patched, neutral inconclusive).
 export default function Checker() {
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
@@ -58,49 +61,63 @@ export default function Checker() {
     }
   }
 
+  const verdict = res?.overall.verdict || "";
+  const tone = /exposed/.test(verdict) ? "crit" : /patched|not-php/.test(verdict) ? "ok" : "";
+  const state = busy ? "busy" : err ? "err" : res ? "done" : "idle";
+  const status = { busy: "Checking", err: "Error", done: "Complete", idle: "Ready" }[state];
+
   return (
-    <div className="card" style={{ maxWidth: 720, margin: "0 auto", textAlign: "left" }}>
-      <h3>Free exposure check</h3>
-      <p style={{ marginTop: 10 }}>
+    <div className="h-panel p2-con" data-state={state}>
+      <div className="h-ph">
+        <h3>Free exposure check</h3>
+        <span className={"h-tag p2-state" + (state === "err" ? " crit" : state === "idle" ? "" : " ok")} aria-hidden="true">
+          <i className="h-dot" />{status}
+        </span>
+      </div>
+      <p className="p2-con-p">
         Two benign requests, non-destructive by design — the same safe oracle from
         our research. Only check sites you own or are authorized to test.
       </p>
-      <form onSubmit={run} style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap" }}>
-        <input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://your-site.com"
-          aria-label="Website URL"
-          inputMode="url"
-          autoComplete="url"
-          spellCheck={false}
-          autoCapitalize="none"
-          maxLength={300}
-          required
-          style={{ flex: 1, minWidth: 220 }}
-        />
-        <button className="btn btn-white" type="submit" disabled={busy}>
+      <form onSubmit={run} className="p2-form">
+        <div className="h-edge p2-field">
+          <span className="p2-prompt" aria-hidden="true">&gt;_</span>
+          <input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://your-site.com"
+            aria-label="Website URL"
+            inputMode="url"
+            autoComplete="url"
+            spellCheck={false}
+            autoCapitalize="none"
+            maxLength={300}
+            required
+          />
+        </div>
+        <button className="h-btn h-btn-red p2-go" type="submit" disabled={busy}>
           {busy ? "Checking…" : "Check my site"}
         </button>
       </form>
-      {err ? <p role="alert" style={{ marginTop: 14, color: "var(--crit)" }}>{err}</p> : null}
+      {busy ? <div className="p2-scan" aria-hidden="true"><i /></div> : null}
+      {err ? <p role="alert" className="h-edge p2-err">{err}</p> : null}
       {res ? (
-        <div style={{ marginTop: 22 }}>
-          <div className={`p2s-verdict v-${res.overall.verdict}`}>
+        <div className={"p2-res" + (tone ? " " + tone : "")}>
+          <div className={`h-edge p2-verdict v-${res.overall.verdict}`}>
+            <i className="h-dot" aria-hidden="true" />
             {VERDICT_LABEL[res.overall.verdict] || res.overall.verdict}
           </div>
-          <p style={{ marginTop: 10 }}>{res.overall.summary}</p>
-          <ul style={{ marginTop: 14 }}>
-            <li>PHP: {res.php.version ? `${res.php.version} (${res.php.versionSource})` : "version not disclosed"}</li>
-            <li>Server topology: {res.php.sapi.handler}</li>
-            <li>Native PHP session: {res.php.cookies.nativeSession ? "observed" : "not observed"}</li>
-            <li>Patch oracle: {res.oracle.verdict} — {res.oracle.evidence}</li>
+          <p className="p2-sum">{res.overall.summary}</p>
+          <ul className="p2-read">
+            <li><span>PHP</span><b>{res.php.version ? `${res.php.version} (${res.php.versionSource})` : "version not disclosed"}</b></li>
+            <li><span>Server topology</span><b>{res.php.sapi.handler}</b></li>
+            <li><span>Native PHP session</span><b>{res.php.cookies.nativeSession ? "observed" : "not observed"}</b></li>
+            <li><span>Patch oracle</span><b>{res.oracle.verdict} — {res.oracle.evidence}</b></li>
           </ul>
-          <p style={{ marginTop: 14, fontSize: 13, opacity: 0.75 }}>
+          <p className="p2-fixed">
             Fixed releases: {res.fixedReleases}
           </p>
           {(res.overall.verdict === "exposed" || res.overall.verdict === "likely-exposed" || res.overall.verdict === "unknown") && (
-            <a className="btn btn-white" href="/contact" style={{ marginTop: 16 }}>
+            <a className="h-btn h-btn-red p2-go" href="/contact">
               Get it hardened — $10/site
             </a>
           )}

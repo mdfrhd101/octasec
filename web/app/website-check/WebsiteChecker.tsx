@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import HudCursor from "../components/hud/HudCursor";
 
 // same-origin by default: nginx (prod) proxies /api to the API; NEXT_PUBLIC_API_URL points elsewhere in dev
 const API = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -26,6 +27,9 @@ type CheckResult = {
 
 const STATUS_LABEL = { critical: "CRITICAL", high: "HIGH", warning: "WARNING", good: "GOOD", info: "INFO" };
 
+// HUD scan console (hud-pages-c.css). The request and its handling are unchanged; only the
+// markup is: a console panel with a live status tag, a prompt-style field, a scan line while
+// busy, then the report as panels that stamp in (summary, severity counts, findings, next step).
 export default function WebsiteChecker() {
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
@@ -57,50 +61,78 @@ export default function WebsiteChecker() {
     }
   }
 
+  // the state goes on data-state, not the class: React rewrites className on every change and
+  // would wipe the .is-in that HudMotion's reveal added (the console then turned invisible)
+  const state = busy ? "busy" : error ? "err" : result ? "done" : "idle";
+  const status = { busy: "Scanning", err: "Error", done: "Complete", idle: "Ready" }[state];
+
   return (
-    <div className="wsc-shell">
-      <div className="wsc-intro">
-        <span className="tag">FREE · PDF INCLUDED</span>
-        <h2>Check your external security baseline.</h2>
-        <p>PHP2Shell, Heartbleed, legacy TLS, safe CORS checks, certificate expiry, headers, cookies, CMS fingerprints, DNS/email protection and exposed Git/environment files.</p>
+    <div className="wc-shell">
+      <div className="h-head wc-intro" data-rv>
+        <span className="h-tag ok"><i className="h-dot" />FREE · PDF INCLUDED</span>
+        <h2 className="h-h2 h-split">Check your external security baseline.</h2>
+        <p className="h-sub">PHP2Shell, Heartbleed, legacy TLS, safe CORS checks, certificate expiry, headers, cookies, CMS fingerprints, DNS/email protection and exposed Git/environment files.</p>
       </div>
-      <form className="wsc-form" onSubmit={run}>
-        <label htmlFor="website-check-url">Website URL</label>
-        <div className="wsc-inputrow">
-          <input id="website-check-url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://your-site.com" inputMode="url" autoComplete="url" spellCheck={false} autoCapitalize="none" required maxLength={300} disabled={busy} />
-          <button className="btn btn-white" type="submit" disabled={busy}>{busy ? "Checking…" : "Check my website"}</button>
+      <HudCursor>
+        <div className="h-panel wc-con" data-state={state} data-rv>
+          <div className="h-ph">
+            <span className="h-lbl">Scan console</span>
+            <span className={"h-tag wc-state" + (state === "err" ? " crit" : state === "idle" ? "" : " ok")} aria-hidden="true">
+              <i className="h-dot" />{status}
+            </span>
+          </div>
+          <form className="wc-form" onSubmit={run}>
+            <label htmlFor="website-check-url">Website URL</label>
+            <div className="wc-row">
+              <div className="h-edge wc-field">
+                <span className="wc-prompt" aria-hidden="true">&gt;_</span>
+                <input id="website-check-url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://your-site.com" inputMode="url" autoComplete="url" spellCheck={false} autoCapitalize="none" required maxLength={300} disabled={busy} />
+              </div>
+              <button className="h-btn h-btn-red" type="submit" disabled={busy}>{busy ? "Checking…" : "Check my website"}</button>
+            </div>
+            <p className="wc-terms">Only check sites you own or are authorized to test. Target, IP and sanitized results are logged for abuse prevention. See <a href="/legal#privacy">privacy</a>.</p>
+          </form>
+          {busy && (
+            <div className="h-edge wc-progress" role="status">
+              <span className="wc-scan" aria-hidden="true"><i /></span>
+              <span className="wc-pulse" aria-hidden="true" />Running bounded web and TLS vulnerability checks. This can take up to 90 seconds.
+            </div>
+          )}
+          {error && <div className="h-edge wc-error" role="alert">{error}</div>}
         </div>
-        <p className="wsc-terms">Only check sites you own or are authorized to test. Target, IP and sanitized results are logged for abuse prevention. See <a href="/legal#privacy">privacy</a>.</p>
-      </form>
-      {busy && <div className="wsc-progress" role="status"><span className="wsc-pulse" />Running bounded web and TLS vulnerability checks. This can take up to 90 seconds.</div>}
-      {error && <div className="wsc-error" role="alert">{error}</div>}
+      </HudCursor>
       {result && (
-        <div className="wsc-results">
-          <div className={`wsc-summary v-${result.overall.verdict}`}>
+        <div className="wc-results">
+          <div className={`h-panel wc-summary v-${result.overall.verdict}`}>
             <div>
-              <span className="wsc-summary-label">{result.overall.label}</span>
+              <span className="wc-summary-label"><i className="h-dot" aria-hidden="true" />{result.overall.label}</span>
               <h3>{result.target}</h3>
               <p>{result.overall.summary}</p>
               <small>{result.checkedAtDhaka} · Report {result.reportId.slice(0, 12)} · {result.cached ? "Recent verified result" : "Fresh check"}</small>
             </div>
-            <a className="btn btn-white" href={`${API}/website-check/${result.reportId}/report.pdf`} download>Download PDF report</a>
+            <a className="h-btn h-btn-line wc-pdf" href={`${API}/website-check/${result.reportId}/report.pdf`} download>Download PDF report</a>
           </div>
-          <div className="wsc-counts" aria-label="Finding counts">
-            {(["critical", "high", "warning", "good", "info"] as const).map((key) => <div className={`wsc-count s-${key}`} key={key}><strong>{result.counts[key] || 0}</strong><span>{STATUS_LABEL[key]}</span></div>)}
+          <div className="wc-counts" aria-label="Finding counts">
+            {(["critical", "high", "warning", "good", "info"] as const).map((key, i) => (
+              <div className={`h-edge wc-count s-${key}`} key={key} style={{ animationDelay: `${0.15 + i * 0.07}s` }}>
+                <strong>{result.counts[key] || 0}</strong>
+                <span>{STATUS_LABEL[key]}</span>
+              </div>
+            ))}
           </div>
-          <div className="wsc-findings">
+          <div className="wc-findings">
             {result.findings.map((f, i) => (
-              <article className={`wsc-finding s-${f.status}`} key={`${f.category}-${f.title}-${i}`}>
-                <div className="wsc-finding-top"><span className="wsc-category">{f.category}</span><span className={`wsc-status s-${f.status}`}>{STATUS_LABEL[f.status]}</span></div>
+              <article className={`h-edge wc-finding s-${f.status}`} key={`${f.category}-${f.title}-${i}`} style={{ animationDelay: `${0.3 + Math.min(i, 10) * 0.06}s` }}>
+                <div className="wc-finding-top"><span className="wc-category">{f.category}</span><span className={`wc-status s-${f.status}`}>{STATUS_LABEL[f.status]}</span></div>
                 <h4>{f.title}</h4>
                 <p>{f.evidence}</p>
-                <div className="wsc-action"><strong>What to do</strong>{f.remediation}</div>
+                <div className="wc-action"><strong>What to do</strong>{f.remediation}</div>
               </article>
             ))}
           </div>
-          <div className="wsc-next">
+          <div className="h-panel wc-next">
             <div><h3>A clean baseline is not a pentest.</h3><p>{result.limitations}</p></div>
-            <a className="btn btn-white" href="/contact">Fix my risks with OctaSec</a>
+            <a className="h-btn h-btn-red" href="/contact">Fix my risks with OctaSec</a>
           </div>
         </div>
       )}

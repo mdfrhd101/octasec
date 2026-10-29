@@ -10,6 +10,7 @@ type DItem = { href: string; title: string; note?: string; lead?: boolean };
 type NavItem = { label: string; href?: string; dropdown?: DItem[] };
 
 // Primary bar. Services and About are dropdowns; everything else is a direct link.
+// Blog is a top-level link (owner, 2026-10-29), not in the About dropdown.
 const NAV: NavItem[] = [
   { label: "How it works", href: "/how-it-works" },
   {
@@ -21,13 +22,13 @@ const NAV: NavItem[] = [
   },
   { label: "Pricing", href: "/pricing" },
   { label: "Benchmarks", href: "/benchmarks" },
+  { label: "Blog", href: "/blog" },
   {
     label: "About",
     dropdown: [
       { href: "/about", title: "About OctaSec" },
-      { href: "/blog", title: "Blog" },
-      { href: "/faq", title: "FAQ" },
       { href: "/contact", title: "Contact" },
+      { href: "/faq", title: "FAQ" },
     ],
   },
 ];

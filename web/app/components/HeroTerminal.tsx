@@ -35,7 +35,8 @@ const LINES_COMPACT: [string, string][] = [
 const pickLines = () =>
   window.matchMedia && window.matchMedia("(max-width: 600px)").matches ? LINES_COMPACT : LINES;
 
-export default function HeroTerminal() {
+// className: the HUD homepage restyles the same terminal (h-term) inside its own panel
+export default function HeroTerminal({ className = "card media heroTerm" }: { className?: string }) {
   const bodyRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -132,7 +133,7 @@ export default function HeroTerminal() {
   }, []);
 
   return (
-    <div className="card media heroTerm" id="heroTerm" aria-hidden="true">
+    <div className={className} id="heroTerm" aria-hidden="true">
       <div className="term-bar">
         <i />
         <i />
