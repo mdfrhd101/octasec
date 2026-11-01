@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { auth } from "../services/index.js";
 import BrandLockup from "../components/BrandLockup.jsx";
+import HudField from "../components/HudField.jsx";
 
 // Opened from the emailed link: /portal/reset-password?token=…
 // The token is read once and immediately removed from the address bar/history.
@@ -44,6 +45,7 @@ export default function ResetPassword() {
 
   return (
     <div className="login">
+      <HudField />
       <div className="login-card card">
         <div className="brand"><BrandLockup height={26} /> <span>PORTAL</span></div>
         {done ? (

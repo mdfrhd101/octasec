@@ -40,24 +40,96 @@ a{color:var(--gold);text-decoration:none}
 .btn:disabled{opacity:.5;cursor:default;transform:none}
 .btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(232,67,58,.4)}
 
-/* ===== login ===== */
-.login{min-height:100vh;display:grid;place-items:center;padding:24px}
-.login-card{width:min(420px,94vw);padding:34px 30px;text-align:center}
+/* ===== logo ===== */
 .brand{display:inline-flex;align-items:center;gap:9px;font-family:var(--m);font-weight:600;letter-spacing:.18em;font-size:16px}
 .brand svg{width:28px;height:28px;flex:none}
 .brand span{color:var(--gold);font-size:11px;letter-spacing:.3em}
-.login-sub{color:var(--muted);font-size:13.5px;margin:12px 0 22px}
-#loginForm{display:grid;gap:13px;text-align:left}
-#loginForm label{display:grid;gap:6px;font-family:var(--m);font-size:11.5px;color:var(--muted);letter-spacing:.06em}
+
+/* ===== inputs ===== */
 input,select{background:#0b1118;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:11px 13px;font-family:inherit;font-size:14px;width:100%}
 input:focus,select:focus{outline:none;border-color:rgba(232,67,58,.55);box-shadow:0 0 0 3px rgba(232,67,58,.14)}
-.login-roles{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}
-.login-roles .lbl{font-family:var(--m);font-size:10.5px;letter-spacing:.26em;color:var(--faint);text-transform:uppercase}
-.rolebtns{display:flex;gap:9px;justify-content:center;margin-top:12px}
-.rolebtns button{flex:1;padding:10px 6px;border-radius:10px;border:1px solid rgba(232,67,58,.28);background:rgba(232,67,58,.06);
-  color:var(--gold);font-family:var(--m);font-size:12px;cursor:pointer;transition:background .2s,transform .2s}
-.rolebtns button:hover{background:rgba(232,67,58,.14);transform:translateY(-1px)}
-.login-note{margin-top:18px;font-family:var(--m);font-size:11px;color:var(--faint)}
+
+/* ===== sign-in screens: the website's HUD design (web/app/hud.css, its Contact form). Dark only, like the rest of the portal ===== */
+.login{
+  --h-void:#020604; --h-glass:rgba(3,20,14,.86);
+  --h-line:rgba(47,174,120,.17); --h-line-hi:rgba(47,174,120,.38);
+  --h-ink:#e9f3ee; --h-dim:#a7bab0; --h-faint:#85998f;
+  --h-red:#e8433a; --h-red-ink:#ff8b80; --h-red-a:#d63b31; --h-red-b:#b42c23;
+  --h-green-ink:#3fcf8e; --h-ok-bg:rgba(0,106,78,.24); --h-crit-bg:rgba(232,67,58,.12); --h-tint:rgba(0,106,78,.13);
+  --h-hover-b:rgba(255,110,120,.75); --h-ease:cubic-bezier(.2,.7,.2,1);
+  --h-disp:"Orbitron","Chakra Petch",system-ui,sans-serif; --h-body:"Exo 2",system-ui,sans-serif;
+  --f-line:47,174,120; --f-dot:120,210,165; --f-hot:232,67,58;
+  /* the portal's own tokens follow, for inline colours on these screens */
+  --text:var(--h-ink); --muted:var(--h-dim); --faint:var(--h-faint); --line:var(--h-line); --green:var(--h-green-ink); --red:var(--h-red-ink); --gold:var(--h-red-ink);
+  position:relative;z-index:0;min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:clamp(20px,5vh,56px) 16px;
+  font-family:var(--h-body);color:var(--h-ink);
+  background:radial-gradient(55% 45% at 66% 24%,rgba(0,106,78,.28),transparent 70%),radial-gradient(35% 35% at 4% 98%,rgba(232,67,58,.09),transparent 70%),var(--h-void);
+}
+.login > .h-field{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.7}
+
+/* chamfered frames: clip the box; ::before = 1px edge, ::after = the two diagonals */
+.login :is(.login-card,.rolebtns button,.btn.gold){clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)))}
+.login :is(.login-card,.rolebtns button){--b:var(--h-line-hi);position:relative}
+.login :is(.login-card,.rolebtns button)::before,.login :is(.login-card,.rolebtns button)::after{content:"";position:absolute;inset:0;z-index:auto;pointer-events:none;border-radius:0;opacity:1}
+.login :is(.login-card,.rolebtns button)::before{padding:1px;background:var(--b);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.login :is(.login-card,.rolebtns button)::after{background:
+  linear-gradient(to bottom left,transparent calc(50% - .8px),var(--b) 0 calc(50% + .8px),transparent 0) 100% 0/var(--c) var(--c) no-repeat,
+  linear-gradient(to bottom left,transparent calc(50% - .8px),var(--b) 0 calc(50% + .8px),transparent 0) 0 100%/var(--c) var(--c) no-repeat}
+
+.login .login-card{--c:20px;width:min(100%,460px);padding:26px clamp(20px,5vw,34px) clamp(24px,4vw,30px);text-align:left;
+  border:0;border-radius:0;overflow:visible;background:var(--h-glass);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+.login .brand{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:inherit;letter-spacing:normal}
+.login .brand span{display:inline-flex;align-items:center;gap:7px;padding:6px 9px 6px 8px;font:600 10px/1 var(--h-disp);letter-spacing:.1em;white-space:nowrap;
+  color:var(--h-green-ink);background:var(--h-ok-bg);border:1px solid color-mix(in srgb,var(--h-green-ink) 45%,transparent)}
+.login .brand span::before{content:"";width:6px;height:6px;flex:none;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+.login-title{margin-top:24px;font:700 clamp(24px,6vw,30px)/1.15 var(--h-disp);letter-spacing:.01em;color:var(--h-ink);text-wrap:balance}
+.login-sub{margin:10px 0 24px;font:400 16px/1.55 var(--h-body);color:var(--h-dim)}
+.brand + .login-sub{margin-top:24px}
+.login-card form > .login-sub{margin:24px 0 0}
+
+.login-card form{display:grid;gap:18px}
+.login-card form label{display:grid;gap:9px;font:600 11px/1.35 var(--h-disp);letter-spacing:.08em;text-transform:uppercase;color:var(--h-dim);transition:color .2s}
+.login-card form label:focus-within{color:var(--h-green-ink)}
+.login input{display:block;width:100%;min-height:50px;padding:12px 14px;border-radius:0;font:400 16px/1.45 var(--h-body);letter-spacing:normal;text-transform:none;color:var(--h-ink);
+  background:color-mix(in srgb,var(--h-void) 70%,transparent);border:1px solid var(--h-line-hi);transition:border-color .2s,box-shadow .2s,background-color .2s}
+.login input::placeholder{color:var(--h-faint);opacity:1}
+.login input:hover{border-color:color-mix(in srgb,var(--h-green-ink) 60%,transparent)}
+.login input:focus{outline:none;border-color:var(--h-green-ink);background:color-mix(in srgb,var(--h-void) 82%,transparent);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--h-green-ink) 24%,transparent),inset 3px 0 0 var(--h-green-ink)}
+.login input:-webkit-autofill,.login input:-webkit-autofill:hover,.login input:-webkit-autofill:focus{-webkit-text-fill-color:var(--h-ink);-webkit-box-shadow:0 0 0 1000px #04120d inset;
+  border:1px solid var(--h-line-hi);caret-color:var(--h-ink)}
+.login-forgot{margin-top:-8px;text-align:right}
+.login :is(.forgot-link,.login-note a){color:var(--h-ink);font-weight:600;border-bottom:1px solid var(--h-red);transition:color .2s}
+.login .forgot-link{display:inline-block;padding-top:4px;font:600 13px/1.4 var(--h-body)}
+.login :is(.forgot-link,.login-note a):hover{color:var(--h-red-ink)}
+.login :is(.forgot-link,.login-note a):focus-visible{outline:2px solid var(--h-ink);outline-offset:2px}
+
+.login :is(.form-err,.form-ok){display:flex;align-items:center;gap:12px;margin:0;padding:12px 14px;font:500 15px/1.45 var(--h-body)}
+.login .form-err{color:var(--h-red-ink);background:var(--h-crit-bg);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--h-red) 45%,transparent)}
+.login .form-err::before{content:"!";display:grid;place-items:center;width:18px;height:18px;flex:none;font:700 11px/1 var(--h-disp);box-shadow:inset 0 0 0 1px currentColor}
+.login .form-ok{color:var(--h-green-ink);background:var(--h-ok-bg);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--h-green-ink) 45%,transparent)}
+
+.login .btn.gold{--c:10px;width:100%;justify-content:center;min-height:50px;padding:0 24px;border:0;border-radius:0;font:600 12px/1 var(--h-disp);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;
+  color:#fff;background:linear-gradient(180deg,var(--h-red-a),var(--h-red-b));box-shadow:none}
+.login .btn.gold:hover{transform:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
+.login .btn.gold:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #fff}
+.login .btn.gold:disabled{opacity:.6;cursor:progress}
+.login .mrow{margin-top:4px}
+
+.login-roles{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:22px;padding-top:20px;border-top:1px solid var(--h-line)}
+.login-roles .lbl{font:500 12px/1.35 var(--h-disp);letter-spacing:.07em;color:var(--h-faint)}
+.rolebtns button{--c:9px;min-height:44px;padding:0 18px;border:0;border-radius:0;font:600 11px/1 var(--h-disp);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;
+  color:var(--h-ink);background:var(--h-tint);cursor:pointer;transition:background-color .2s}
+.login .rolebtns button:hover{--b:var(--h-hover-b);background:color-mix(in srgb,var(--h-red) 14%,transparent)}
+.login .rolebtns button:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--h-ink)}
+.login-note{margin-top:16px;font:400 13px/1.55 var(--h-body);color:var(--h-faint)}
+.login-card form .login-note{margin-top:0}
+@media (prefers-reduced-motion:no-preference){
+  .login-card{animation:login-in .6s var(--h-ease) both}
+}
+@keyframes login-in{from{opacity:0;transform:translateY(24px)}}
 
 /* ===== app shell ===== */
 .app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
@@ -156,7 +228,6 @@ input:focus,select:focus{outline:none;border-color:rgba(232,67,58,.55);box-shado
 
 /* React-portal additions */
 .form-err{color:var(--red);font-family:var(--m);font-size:12px;margin-top:2px}
-.login-roles .lbl{display:block;margin-bottom:8px}
 
 /* ===== RICH DASHBOARD ===== */
 .dash-top{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:stretch}
@@ -231,12 +302,6 @@ input:-webkit-autofill:active{
   transition:background-color 9999s ease-in-out 0s;
 }
 
-/* login form labels: left-aligned grid (card itself is centered) */
-.login-card form label{display:grid;gap:7px;text-align:left;font-family:var(--m);font-size:11.5px;color:var(--muted);letter-spacing:.06em}
-
-/* login/register form: proper vertical spacing between field groups (fixes overlap) */
-.login-card form{display:grid;gap:14px;text-align:left}
-
 /* textarea matches inputs */
 textarea{background:#0b1118;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:11px 13px;font-family:inherit;font-size:14px;width:100%;resize:vertical}
 textarea:focus{outline:none;border-color:rgba(232,67,58,.55);box-shadow:0 0 0 3px rgba(232,67,58,.14)}
@@ -295,9 +360,6 @@ label.chkline input{width:auto;accent-color:var(--gold)}
 .alertrow:last-child{border-bottom:0}
 .alertrow .when{font-family:var(--m);font-size:11px;color:var(--faint)}
 @media(max-width:760px){.contact-grid,.fgrid{grid-template-columns:1fr}.pipe{grid-template-columns:1fr 1fr}}
-
-.forgot-link{font-family:var(--m);font-size:11.5px;color:var(--gold)}
-.forgot-link:hover{text-decoration:underline}
 
 .refresh-line{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--m);font-size:11px;color:var(--faint);margin:-4px 0 12px}
 

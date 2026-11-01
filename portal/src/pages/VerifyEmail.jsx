@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { auth } from "../services/index.js";
 import { useAuth } from "../auth.jsx";
 import BrandLockup from "../components/BrandLockup.jsx";
+import HudField from "../components/HudField.jsx";
 
 // Opened from the emailed confirmation link: /portal/verify-email#token=…
 export default function VerifyEmail() {
@@ -29,6 +30,7 @@ export default function VerifyEmail() {
 
   return (
     <div className="login">
+      <HudField />
       <div className="login-card card">
         <div className="brand"><BrandLockup height={26} /> <span>PORTAL</span></div>
         {state === "working" && <p className="login-sub">Confirming your email…</p>}

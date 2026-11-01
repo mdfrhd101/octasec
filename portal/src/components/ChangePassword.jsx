@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../auth.jsx";
 import { Modal } from "../ui.jsx";
 import BrandLockup from "./BrandLockup.jsx";
+import HudField from "./HudField.jsx";
 
 function PasswordForm({ onDone, onCancel, submitLabel = "Change password" }) {
   const { changePassword } = useAuth();
@@ -39,6 +40,7 @@ export function ForcePasswordChange() {
   const { user, logout } = useAuth();
   return (
     <div className="login">
+      <HudField />
       <div className="login-card card">
         <div className="brand"><BrandLockup height={26} /> <span>PORTAL</span></div>
         <p className="login-sub">Your password was reset by an administrator. Choose a new password to continue, {user.email}.</p>

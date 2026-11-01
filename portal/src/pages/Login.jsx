@@ -2,6 +2,13 @@ import { useState } from "react";
 import { useAuth } from "../auth.jsx";
 import { auth } from "../services/index.js";
 import BrandLockup from "../components/BrandLockup.jsx";
+import HudField from "../components/HudField.jsx";
+
+const COPY = {
+  login: ["Sign in", "Manage your domains, assets and scans."],
+  forgot: ["Reset your password", "Enter your account email and we will send you a password-reset link."],
+  register: ["Create your account", "Get started with the OctaSec portal."],
+};
 
 export default function Login() {
   const { login, register, notice } = useAuth();
@@ -29,13 +36,13 @@ export default function Login() {
 
   return (
     <div className="login">
+      <HudField />
       <div className="login-card card">
         <div className="brand">
           <BrandLockup height={26} /> <span>PORTAL</span>
         </div>
-        <p className="login-sub">
-          {mode === "login" ? "Sign in to manage your domains, assets and scans." : mode === "forgot" ? "Enter your account email and we will send you a password-reset link." : "Create your account to get started."}
-        </p>
+        <h1 className="login-title">{COPY[mode][0]}</h1>
+        <p className="login-sub">{COPY[mode][1]}</p>
         <form onSubmit={submit}>
           {mode === "register" && (
             <div className="fgrid">
@@ -46,15 +53,15 @@ export default function Login() {
           <label>Email<input type="email" value={f.email} onChange={set("email")} placeholder="you@company.com" required /></label>
           {mode !== "forgot" && <label>Password<input type="password" value={f.password} onChange={set("password")} placeholder="••••••••" minLength={8} required /></label>}
           {mode === "login" && (
-            <div style={{ textAlign: "right", marginTop: -6, marginBottom: 10 }}>
+            <div className="login-forgot">
               <a href="#" className="forgot-link" onClick={(e) => { e.preventDefault(); setErr(""); setSent(""); setMode("forgot"); }}>Forgot password?</a>
             </div>
           )}
-          {sent && <div style={{ color: "var(--green)", fontSize: 13, marginBottom: 10 }}>{sent}</div>}
+          {sent && <div className="form-ok" role="status">{sent}</div>}
           {mode === "register" && (
             <label>Company name<input type="text" value={f.org} onChange={set("org")} placeholder="Company name" /></label>
           )}
-          {err ? <div className="form-err">{err}</div> : notice ? <div className="form-err">{notice}</div> : null}
+          {err ? <div className="form-err" role="alert">{err}</div> : notice ? <div className="form-err" role="alert">{notice}</div> : null}
           <button className="btn gold" type="submit" disabled={busy}>
             {busy ? "Please wait…" : mode === "login" ? "Sign in" : mode === "forgot" ? "Send reset link" : "Create account"}
           </button>
