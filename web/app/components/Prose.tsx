@@ -1,4 +1,5 @@
-"use client";
+// Server component: the markdown is rendered at build time, so react-markdown/remark-gfm never ship to the
+// browser (their email-autolink regex uses lookbehind, a parse error in Safari < 16.4 that broke blog posts).
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
