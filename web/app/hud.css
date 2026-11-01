@@ -269,13 +269,12 @@ html.bxi-on.bxi-reveal .hud-hero .hh-copy > :nth-child(2){transition-delay:.12s}
 html.bxi-on.bxi-reveal .hud-hero .hh-copy > :nth-child(3){transition-delay:.24s}
 html.bxi-on.bxi-reveal .hud-hero .hh-copy > :nth-child(4){transition-delay:.36s}
 html.bxi-on.bxi-reveal .hud-hero .hh-surfaces{transition-delay:.5s}
-/* once the stage fades and the page shows, the intro must stop swallowing clicks: the nav
-   (e.g. Blog) is visible from here, so let pointer events through to it */
+/* once the stage fades and the page shows, the intro must stop swallowing clicks */
 html.bxi-on.bxi-reveal .bxi{pointer-events:none}
-/* click and go: the nav (and the alert bar) stay on top of the intro film, so any link works
-   at any moment; navigating away unmounts the intro, which restores scrolling */
-html.bxi-on header.nav{z-index:2700}
-html.bxi-on .annbar{position:relative;z-index:2700}
+/* owner (2026-11-01): the nav and the alert bar stay out of the intro film and fade in as it
+   ends (the mark landing); a click / scroll / Esc still skips the intro at any moment */
+html.bxi-on:not(.bxi-land) header.nav,html.bxi-on:not(.bxi-land) .annbar{opacity:0;visibility:hidden;pointer-events:none}
+html.bxi-on.bxi-land header.nav,html.bxi-on.bxi-land .annbar{transition:opacity .45s ease}
 /* the stage and the HUD column assemble when the hero goes live (after the mark lands) */
 @media (prefers-reduced-motion:no-preference){
   .hud.is-armed .hud-hero:not(.is-live) :is(.h-ring,.h-halo,.h-node,.hh-meta,.h-hop,.h-packet){opacity:0}
