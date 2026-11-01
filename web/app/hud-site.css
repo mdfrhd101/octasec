@@ -68,15 +68,12 @@ html:not(.touch-input) .hud .card:is(.svc,.pr,.cov,.postcard):hover{border-color
 html:not(.touch-input) .hud .card:is(.svc,.pr,.cov,.postcard):hover :is(h3,h4,.amt){color:var(--h-ink)!important}
 html:not(.touch-input) .hud .card:is(.svc,.pr,.cov,.postcard):hover :is(p,.cv,li,.pd,.tl,.amt small){color:var(--h-dim)!important}
 html:not(.touch-input) .hud .card:is(.svc,.pr,.postcard):hover :is(.tag,.ilink,.more .link){color:var(--h-green-ink)!important}
-html:not(.touch-input) .hud .card.svc:hover li::before{background:var(--h-green-ink)!important}
 html:not(.touch-input) .hud .card.pr:hover li::before{color:var(--h-green-ink)!important}
-/* the old cursor-follow card (CursorCard): its glow keeps ::before, so draw the edge with a ring */
-.hud .cfx-stage > .card{box-shadow:inset 0 0 0 1px var(--h-line-hi)}
 
 /* step blocks (how it works, pricing) and cover cards */
 .hud .blocks .st .sn{font:600 11px/1 var(--h-disp);letter-spacing:.12em;color:var(--h-red-ink)}
-.hud .blocks .st h3,.hud .cov h3{font:600 16px/1.35 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
-.hud .blocks .st p,.hud .cov p{font:400 15px/1.6 var(--h-body);color:var(--h-dim)}
+.hud .blocks .st h3{font:600 16px/1.35 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
+.hud .blocks .st p{font:400 15px/1.6 var(--h-body);color:var(--h-dim)}
 
 /* ---------- tags, badges ---------- */
 .hud :is(.tag,.badge){display:inline-flex;align-items:center;gap:6px;font:600 10px/1 var(--h-disp);letter-spacing:.1em;text-transform:uppercase;
@@ -93,7 +90,6 @@ html:not(.touch-input) .hud .card.pr:hover li::before{color:var(--h-green-ink)!i
 .hud .btn-white:focus-visible{box-shadow:inset 0 0 0 2px #fff}
 .hud :is(.link,.ilink){display:inline-flex;align-items:center;gap:6px;min-height:44px;font:600 12px/1.2 var(--h-disp);letter-spacing:.06em;color:var(--h-green-ink)}
 .hud :is(.link,.ilink) .ar{color:var(--h-green-ink)}
-.hud .hero-cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 html:not(.touch-input) .hud .btn-white:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.45);transform:translateY(-1px)}
 html:not(.touch-input) .hud :is(.btn-ghost,.btn-dark):hover{box-shadow:inset 0 0 0 1px var(--h-hover-b)}
 html:not(.touch-input) .hud :is(.link,.ilink):hover{color:var(--h-ink)}

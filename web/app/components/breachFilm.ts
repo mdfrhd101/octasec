@@ -6,7 +6,6 @@
 // Real-ESRGAN and sharpened. Picked by the size the frame is drawn at: 2560px AVIF for big or
 // high-DPI screens, 1600px AVIF otherwise, 800px WebP for phones and browsers without AVIF.
 // `win` = decoded frames kept on each side of the current one. File names: 000.avif …
-// (the reduced-motion still is still.webp, set in breach-scroll.css)
 export const SETS = {
   x: { dir: "/anim/breach/x/", ext: "avif", n: 176, fps: 18, win: 8 },
   d: { dir: "/anim/breach/d/", ext: "avif", n: 176, fps: 18, win: 12 },

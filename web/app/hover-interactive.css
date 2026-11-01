@@ -33,19 +33,19 @@
   .dd-item:hover{padding-left:18px}
 
   /* ghost / dark buttons: subtle lift */
-  .btn-ghost,.btn-dark{transition:transform .18s var(--hv-ease),background .25s,border-color .25s,box-shadow .25s,color .25s}
-  .btn-ghost:hover,.btn-dark:hover{transform:translateY(-2px)}
+  .btn-dark{transition:transform .18s var(--hv-ease),background .25s,border-color .25s,box-shadow .25s,color .25s}
+  .btn-dark:hover{transform:translateY(-2px)}
 
   /* comparison / benchmark / dashboard rows: surface tint + accent bar slides in from the left */
-  .cmp-row:not(.head),.brow:not(.head),.drow:not(.head){position:relative;transition:background .2s}
-  .cmp-row:not(.head)::before,.brow:not(.head)::before,.drow:not(.head)::before{content:"";position:absolute;left:0;top:0;bottom:0;
+  .drow:not(.head){position:relative;transition:background .2s}
+  .drow:not(.head)::before{content:"";position:absolute;left:0;top:0;bottom:0;
     width:2px;background:var(--hv-accent);transform:scaleY(0);transform-origin:center;transition:transform .25s var(--hv-ease)}
-  .cmp-row:not(.head):hover,.brow:not(.head):hover,.drow:not(.head):hover{background:var(--hv-surface)}
-  .cmp-row:not(.head):hover::before,.brow:not(.head):hover::before,.drow:not(.head):hover::before{transform:scaleY(1)}
+  .drow:not(.head):hover{background:var(--hv-surface)}
+  .drow:not(.head):hover::before{transform:scaleY(1)}
 
   /* list items: slide + marker lift */
-  .svc li,.pr li{transition:transform .2s var(--hv-ease)}
-  .svc li:hover,.pr li:hover{transform:translateX(5px)}
+  .pr li{transition:transform .2s var(--hv-ease)}
+  .pr li:hover{transform:translateX(5px)}
 
   /* footer links: nudge + accent */
   .foot-grid a,.foot-contact a{transition:color .2s,transform .2s var(--hv-ease)}
@@ -55,38 +55,15 @@
   /* form inputs: accent border on hover (focus ring already exists) */
   .cform input:hover,.cform textarea:hover,.cform select:hover{border-color:var(--hv-bd)}
 
-  /* agency logo plates: lift + green ring (logos never recolour) */
-  .agency-mark{transition:transform .25s var(--hv-ease),box-shadow .25s}
-  .agency:hover .agency-mark{transform:translateY(-3px) scale(1.03);box-shadow:0 12px 26px -10px rgba(0,106,78,.4)}
-
-  /* pillar cards: hover fills the whole card GREEN; text → white, accents → red
-     (!important so the light-mode .glass white bg / dark text can't win in day mode).
-     html:not(.touch-input) = mouse only: on phones the "hover" stuck after a tap/swipe
-     (CursorFX sets the class from the last pointer type). */
-  .pillar{transition:background .3s var(--hv-ease),border-color .3s,transform .3s var(--hv-ease),box-shadow .35s}
-  html:not(.touch-input) .pillar:hover{background:linear-gradient(155deg,#00563f,#006A4E 55%,#00744f)!important;border-color:#006A4E!important;
-    transform:translateY(-6px);box-shadow:0 24px 50px -18px rgba(0,106,78,.55)!important}
-  html:not(.touch-input) .pillar:hover h3{color:#fff!important}
-  html:not(.touch-input) .pillar:hover p{color:rgba(255,255,255,.88)!important}
-  html:not(.touch-input) .pillar:hover .pk{color:#ff9a86!important}                                   /* number → red */
-  html:not(.touch-input) .pillar:hover .pchips span{color:#fff!important;border-color:rgba(255,255,255,.4)!important;background:rgba(255,255,255,.1)!important}
-  html:not(.touch-input) .pillar:hover .pchips span::before{background:#ff9a86!important}             /* chip marker → red */
-
-  /* content cards (service / pricing / coverage / blog) → same green-fill + white/red text.
+/* content cards (service / pricing / coverage / blog) → same green-fill + white/red text.
      Dark mockups (.heroTerm/.dash/.trace) and data tables (.cmp/.btable) are intentionally left out. */
-  html:not(.touch-input) .card.svc:hover,html:not(.touch-input) .card.pr:hover,
-  html:not(.touch-input) .card.cov:hover,html:not(.touch-input) .card.postcard:hover{
+  html:not(.touch-input) .card.pr:hover{
     background:linear-gradient(155deg,#00563f,#006A4E 55%,#00744f)!important;border-color:#006A4E!important;
     box-shadow:0 24px 50px -18px rgba(0,106,78,.55)!important}
-  html:not(.touch-input) .card.svc:hover :is(h3,h4,p,.cv,li,.amt,.pd),
-  html:not(.touch-input) .card.pr:hover :is(h3,h4,p,.cv,li,.amt,.pd),
-  html:not(.touch-input) .card.cov:hover :is(h3,h4,p),
-  html:not(.touch-input) .card.postcard:hover :is(h3,h4,p){color:#fff!important}
-  html:not(.touch-input) .card.svc:hover .tag,html:not(.touch-input) .card.pr:hover .tag,
-  html:not(.touch-input) .card.postcard:hover .ilink,html:not(.touch-input) .card.svc:hover .more .link{color:#ff9a86!important}
-  html:not(.touch-input) .card.svc:hover li::before{background:#ff9a86!important}
+  html:not(.touch-input) .card.pr:hover :is(h3,h4,p,.cv,li,.amt,.pd){color:#fff!important}
+  html:not(.touch-input) .card.pr:hover .tag{color:#ff9a86!important}
   html:not(.touch-input) .card.pr:hover li::before{color:#ff9a86!important}
-  html:not(.touch-input) .card.svc:hover .tl,html:not(.touch-input) .card.pr:hover .amt small{color:rgba(255,255,255,.72)!important}
+  html:not(.touch-input) .card.pr:hover .amt small{color:rgba(255,255,255,.72)!important}
 
   /* icon micro-nudge on any link with an arrow */
   .link .ar,.ilink .ar,.annbar .ar{transition:transform .2s var(--hv-ease)}
@@ -112,20 +89,6 @@ a:focus-visible,button:focus-visible,summary:focus-visible,.card:focus-visible,
 /* ---- 4. reduced motion: drop the motion-heavy FX, keep instant states ---- */
 @media (prefers-reduced-motion:reduce){
   .cursor-ring{display:none!important}
-  .nav-links a::after,.cmp-row::before,.brow::before,.drow::before,
-  .svc li,.pr li,.foot-grid a,.foot-contact a,.agency-mark,.dd-item{transition:none!important}
+  .nav-links a::after,.drow::before,.pr li,.foot-grid a,.foot-contact a,.dd-item{transition:none!important}
 }
 
-/* ---- 5. cursor cards (homepage Pricing + "How it compares"): green highlighted border; a soft red
-   shadow + glow follow the pointer. Any `.card` wrapped in <CursorCard> gets this.
-   CursorCard.tsx eases --px/--py (pointer offset from the centre, -1..1), --gx/--gy (glow position)
-   and --sa (hover fade 0..1) every animation frame, so the shadow and glow glide with the pointer.
-   No CSS transition on them — the per-frame easing IS the smoothing. The shadow is !important so
-   the theme's `.card` / `.card:hover` shadows (day mode's is (0,4,0)) can't replace it. */
-.cfx-stage > .card{transition:border-color .35s var(--hv-ease),transform .3s var(--hv-ease);
-  box-shadow:0 0 0 1px rgba(0,106,78,var(--sa,0)),0 0 28px -4px rgba(0,106,78,calc(var(--sa,0) * .5)),
-    calc(var(--px,0) * 24px) calc(var(--py,0) * 18px + 22px) 56px -18px rgba(232,67,58,calc(var(--sa,0) * .45))!important}
-html:not(.touch-input) .cfx-stage > .card:hover{border-color:#006A4E}
-/* the red glow inside the card (the flat-card restyle hides .card::before everywhere else) */
-:root .cfx-stage > .card::before{display:block!important;opacity:var(--sa,0);transition:none;
-  background:radial-gradient(380px circle at var(--gx,50%) var(--gy,50%),rgba(232,67,58,.2),transparent 62%)}
