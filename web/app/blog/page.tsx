@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import PageHero from "../components/PageHero";
-import FinalCTA from "../components/FinalCTA";
 import HudCursor from "../components/hud/HudCursor";
 import { getAllPosts, formatDate } from "../lib/blog";
 
@@ -103,8 +102,6 @@ export default function BlogIndex() {
           })}
         </div>
       </section>
-
-      <FinalCTA />
     </div>
   );
 }

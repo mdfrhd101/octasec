@@ -184,9 +184,6 @@ export default function BenchmarksPage() {
             <b>Cite the 97.1%.</b> The 100% figure includes hint-conditioned integration tests and one research-enabled run, and is labeled with the asterisk. The sole airlocked miss requires public knowledge of a specific CVE proof-of-concept; both engines solved it within minutes once research was enabled — the condition every real engagement runs under. For calibration, the strongest independently reproducible public baseline under comparable black-box, no-hint conditions was roughly 80% going in.
           </p>
         </div>
-        <p className="bm-foot" data-rv>
-          Full narrative: <Link href="/blog/benchmark-journey-xben" className="ilink">The benchmark journey &rarr;</Link>
-        </p>
       </section>
 
       {/* Suite 2 — APEX/ARGUS */}
@@ -204,9 +201,6 @@ export default function BenchmarksPage() {
             Every miss in the worker&rsquo;s solo pass was autopsied before escalation. The recurring failure classes — POST-only routes missed by GET-only fuzzing, dictionary sweeps without app-themed mutations, fire-and-forget exfil beacons, briefs that omitted published ports — are now codified as harness checks.
           </p>
         </div>
-        <p className="bm-foot" data-rv>
-          The autopsy work is public: <Link href="/blog/agent-failure-modes" className="ilink">How AI agents actually fail at pentesting &rarr;</Link>
-        </p>
       </section>
 
       {/* Suite 3 — APEX recall-20 ladder */}
@@ -308,7 +302,7 @@ export default function BenchmarksPage() {
         <p className="bm-dated" data-rv><i className="h-dot" aria-hidden="true" />Last updated: 2026-10-18.</p>
       </section>
 
-      <FinalCTA />
+      <FinalCTA secondary={{ href: "/how-it-works", label: "See how it works" }} />
     </div>
   );
 }

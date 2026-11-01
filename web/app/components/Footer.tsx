@@ -71,14 +71,11 @@ export default function Footer() {
           <div>
             <h2>Company</h2>
             <Link href="/about">About</Link>
-            <a href="https://octagramltd.com">Octagram Ltd &#8599;</a>
             <Link href="/contact">Contact</Link>
           </div>
           <div>
             <h2>Portal</h2>
             <a href="/portal/">Sign in</a>
-            <a href="/portal/">Client portal</a>
-            <a href="/portal/">Corporate portal</a>
           </div>
         </div>
         <p className="foot-roe">

@@ -5,7 +5,6 @@ import PageHero from "../components/PageHero";
 import ScopeCTA from "../components/ScopeCTA";
 import AutoSlider from "../components/AutoSlider";
 import HudCursor from "../components/hud/HudCursor";
-import DifferentiatorTable from "../components/DifferentiatorTable";
 import FinalCTA from "../components/FinalCTA";
 
 export const metadata = pageMeta({
@@ -103,7 +102,7 @@ export default function HowItWorksPage() {
           </>
         }
         sub="Four stages. The engine does the grinding; a named human operator verifies, writes and signs every finding."
-        ctas={<ScopeCTA />}
+        ctas={<ScopeCTA howLink={false} />}
       />
 
       {/* desktop: four columns on one rail; ≤1180px: a vertical timeline. Each step reveals
@@ -235,7 +234,6 @@ export default function HowItWorksPage() {
         </HudCursor>
       </section>
 
-      <DifferentiatorTable />
       <FinalCTA />
     </div>
   );

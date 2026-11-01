@@ -1,7 +1,7 @@
 import BreachIntro from "./components/BreachIntro";
 import JsonLd from "./components/JsonLd";
 import HudHero from "./components/hud/HudHero";
-import { HudCompare, HudFinal, HudNumbers, HudPath, HudPricing, HudProblem, HudRules, HudWorldBand } from "./components/hud/HudSections";
+import { HudCompare, HudNumbers, HudPath, HudPricing, HudProblem, HudRules, HudWorldBand } from "./components/hud/HudSections";
 import { serviceLd } from "./lib/seo";
 
 // "Mission control" homepage (design fork). Styles: hud.css (+ hud-site.css for the shared
@@ -22,7 +22,6 @@ export default function HomePage() {
       <HudPath />
       <HudCompare />
       <HudPricing />
-      <HudFinal />
     </div>
   );
 }

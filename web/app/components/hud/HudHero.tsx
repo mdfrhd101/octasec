@@ -7,7 +7,15 @@ import HudGlobe from "./HudGlobe";
 import { SCENES } from "./hudData";
 import { isFirefox } from "../browser";
 
-const SURFACES = ["Web apps", "APIs", "External attack surface", "Continuous monitoring", "AI / LLM features", "Network & wireless"];
+// each opens its own card on /services
+const SURFACES = [
+  ["Web apps", "s1"],
+  ["APIs", "s2"],
+  ["External attack surface", "s3"],
+  ["Continuous monitoring", "s4"],
+  ["AI / LLM features", "s5"],
+  ["Network & wireless", "s6"],
+];
 
 // the chain story, in ms from the start of a scene → step 1..7
 // 1-3: weaknesses found and chained · 4: proof attached · 5: operator verifying · 6: signed · 7: fade out
@@ -151,7 +159,6 @@ export default function HudHero() {
 
         <div className={"hh-stage" + state} ref={stage} aria-hidden="true">
           <HudGlobe scene={sc} step={step} formed={live} still={still} />
-          <div className="hh-meta tl"><span className="h-lbl">Attack surface</span><span className="h-lbl h-ink">your-app.com · 6 assets</span></div>
           <div className="hh-meta bl"><span className="h-lbl">Sample engagement · illustrative</span></div>
         </div>
 
@@ -198,8 +205,8 @@ export default function HudHero() {
       <nav className="hh-surfaces" aria-label="What we test">
         <span className="h-lbl">Testing surfaces</span>
         <ul>
-          {SURFACES.map((t) => (
-            <li key={t}><Link href="/services">{t}</Link></li>
+          {SURFACES.map(([t, id]) => (
+            <li key={id}><Link href={"/services#" + id}>{t}</Link></li>
           ))}
         </ul>
       </nav>

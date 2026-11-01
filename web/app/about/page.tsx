@@ -44,12 +44,10 @@ export default function AboutPage() {
       <section className="h-sec ab-intro-sec">
         <div className="ab-intro" data-rv>
           <p className="ab-lead">
-            OctaSec is the autonomous offensive-security engine of Octagram Ltd
-            &mdash; the Dhaka-based security firm trusted by CID, Dhaka
-            Metropolitan Police, Special Response Battalion and CTTC.
-            Octagram&apos;s red team built
-            OctaSec to answer one question: why should deep security testing be a
-            luxury?
+            Octagram Ltd is the Dhaka-based security firm trusted by CID, Dhaka
+            Metropolitan Police, Special Response Battalion and CTTC. Its red team
+            built OctaSec to answer one question: why should deep security testing
+            be a luxury?
           </p>
           <p className="ab-copy">
             The engine pairs AI-orchestrated hunting with a skill library distilled
@@ -115,9 +113,6 @@ export default function AboutPage() {
           </article>
         </div>
         <div className="ab-team" data-rv>
-          <a className="h-btn h-btn-line" href="https://octagramltd.com">
-            Meet the team <span aria-hidden="true">&rarr;</span>
-          </a>
           <span className="h-tag ab-soon"><i className="h-dot" />Careers &mdash; coming soon</span>
         </div>
       </section>

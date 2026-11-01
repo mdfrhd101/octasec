@@ -70,7 +70,7 @@ export default function WebsiteChecker() {
     <div className="wc-shell">
       <div className="h-head wc-intro" data-rv>
         <span className="h-tag ok"><i className="h-dot" />FREE · PDF INCLUDED</span>
-        <h2 className="h-h2 h-split">Check your external security baseline.</h2>
+        <h1 className="h-h2 h-split">Check your external security baseline.</h1>
         <p className="h-sub">PHP2Shell, Heartbleed, legacy TLS, safe CORS checks, certificate expiry, headers, cookies, CMS fingerprints, DNS/email protection and exposed Git/environment files.</p>
       </div>
       <HudCursor>
@@ -106,7 +106,7 @@ export default function WebsiteChecker() {
           <div className={`h-panel wc-summary v-${result.overall.verdict}`}>
             <div>
               <span className="wc-summary-label"><i className="h-dot" aria-hidden="true" />{result.overall.label}</span>
-              <h3>{result.target}</h3>
+              <h2>{result.target}</h2>
               <p>{result.overall.summary}</p>
               <small>{result.checkedAtDhaka} · Report {result.reportId.slice(0, 12)} · {result.cached ? "Recent verified result" : "Fresh check"}</small>
             </div>
@@ -124,14 +124,14 @@ export default function WebsiteChecker() {
             {result.findings.map((f, i) => (
               <article className={`h-edge wc-finding s-${f.status}`} key={`${f.category}-${f.title}-${i}`} style={{ animationDelay: `${0.3 + Math.min(i, 10) * 0.06}s` }}>
                 <div className="wc-finding-top"><span className="wc-category">{f.category}</span><span className={`wc-status s-${f.status}`}>{STATUS_LABEL[f.status]}</span></div>
-                <h4>{f.title}</h4>
+                <h3>{f.title}</h3>
                 <p>{f.evidence}</p>
                 <div className="wc-action"><strong>What to do</strong>{f.remediation}</div>
               </article>
             ))}
           </div>
           <div className="h-panel wc-next">
-            <div><h3>A clean baseline is not a pentest.</h3><p>{result.limitations}</p></div>
+            <div><h2>A clean baseline is not a pentest.</h2><p>{result.limitations}</p></div>
             <a className="h-btn h-btn-red" href="/contact">Fix my risks with OctaSec</a>
           </div>
         </div>

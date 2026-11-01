@@ -69,6 +69,7 @@ export default function AutoSlider({
     const enable = () => {
       if (!clone) {
         clone = (track.firstElementChild as HTMLElement).cloneNode(true) as HTMLElement;
+        clone.removeAttribute("id");
         clone.setAttribute("aria-hidden", "true");
         clone.classList.add("is-clone");
         track.appendChild(clone);
@@ -102,6 +103,14 @@ export default function AutoSlider({
       settleT = window.setTimeout(settle, 140);
     };
     const onVis = () => start();
+
+    // arrived on a card's anchor (/services#s4): mark that card, and stay on it until the page is touched
+    const target = document.getElementById(location.hash.slice(1));
+    if (target && track.contains(target)) {
+      target.classList.add("is-target");
+      held = true;
+      paintDots();
+    }
 
     const io = new IntersectionObserver(
       ([e]) => {

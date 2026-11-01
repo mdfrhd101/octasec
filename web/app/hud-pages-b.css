@@ -117,8 +117,6 @@ html:not(.touch-input) .hud .pgb .pgb-card.crit.h-tilt:hover{--b:var(--h-red)}
 .pg-benchmarks .bm-call.warn{--b:color-mix(in srgb,var(--h-red) 50%,transparent);--fill:linear-gradient(165deg,var(--h-crit-bg),var(--h-glass) 60%)}
 .pg-benchmarks .bm-call p{font:400 15.5px/1.65 var(--h-body);color:var(--h-dim);max-width:118ch}
 .pg-benchmarks .bm-call b{color:var(--h-ink);font-weight:600}
-.pg-benchmarks .bm-foot{margin-top:12px;font:400 15px/1.6 var(--h-body);color:var(--h-dim)}
-.pg-benchmarks .bm-foot .ilink{vertical-align:middle}
 .pg-benchmarks .bm-fine{margin-top:20px;max-width:118ch;font:400 14px/1.6 var(--h-body);color:var(--h-faint)}
 .pg-benchmarks .bm-dated{display:flex;align-items:center;gap:10px;margin-top:22px;font:500 11.5px/1.3 var(--h-disp);letter-spacing:.08em;color:var(--h-dim)}
 .pg-benchmarks .bm-dated .h-dot{color:var(--h-green-ink)}

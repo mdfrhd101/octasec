@@ -111,8 +111,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               <span className="h-tag ok"><i className="h-dot" />Published</span>
             </div>
             <dl className="pc-dl">
-              <div><dt>Filed</dt><dd>{formatDate(post.date)}</dd></div>
-              <div><dt>Read</dt><dd>{mins} min</dd></div>
               <div><dt>Sections</dt><dd>{pad(sections)}</dd></div>
               <div><dt>Tags</dt><dd>{pad(post.tags.length)}</dd></div>
             </dl>
@@ -123,9 +121,6 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               <span className="h-lbl">Progress</span>
               <i />
             </div>
-            <Link href="/blog" className="h-edge pc-rail-back">
-              <span aria-hidden="true">&larr;</span> All posts
-            </Link>
           </div>
         </aside>
 

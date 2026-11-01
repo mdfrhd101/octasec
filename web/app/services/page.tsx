@@ -3,7 +3,6 @@ import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import PageHero from "../components/PageHero";
 import ScopeCTA from "../components/ScopeCTA";
-import FinalCTA from "../components/FinalCTA";
 import AutoSlider from "../components/AutoSlider";
 import HudCursor from "../components/hud/HudCursor";
 
@@ -61,7 +60,7 @@ function Svc({
   timeline: string;
 }) {
   return (
-    <article className="h-panel h-tilt pa-card sv-card" data-rv>
+    <article id={tag.toLowerCase()} className="h-panel h-tilt pa-card sv-card" data-rv>
       <i className="sv-scan" aria-hidden="true" />
       <div className="h-ph">
         <span className="sv-id">{tag}</span>
@@ -82,9 +81,6 @@ function Svc({
           <span className="sr-only">: </span>
           <span className="h-tag">{timeline}</span>
         </span>
-        <Link className="link" href="/contact">
-          Book scoping call <span className="ar">&rarr;</span>
-        </Link>
       </div>
     </article>
   );
@@ -266,8 +262,6 @@ export default function ServicesPage() {
           </div>
         </HudCursor>
       </section>
-
-      <FinalCTA />
     </div>
   );
 }

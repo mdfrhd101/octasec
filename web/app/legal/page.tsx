@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { pageMeta } from "../lib/seo";
 import PageHero from "../components/PageHero";
-import FinalCTA from "../components/FinalCTA";
 
 export const metadata = pageMeta({
   title: "Legal, Privacy & Terms",
@@ -144,7 +143,6 @@ export default function LegalPage() {
           </div>
         </div>
       </section>
-      <FinalCTA />
     </div>
   );
 }

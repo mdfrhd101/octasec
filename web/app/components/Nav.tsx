@@ -150,17 +150,20 @@ export default function Nav() {
 
   return (
     <>
-      <a className="annbar" href="/php2shell/">
-        <b className="ann-tag">ACTIVE EXPLOITATION</b>
-        <span className="ann-long">
-          PHP2Shell pre-auth RCE in PHP core &mdash; emergency patching from $10/site, EOL PHP covered
-        </span>
-        {/* phones/tablets show this one-line version instead (mobile.css) */}
-        <span className="ann-short">
-          <b>PHP2Shell RCE</b> &mdash; patch from $10
-        </span>
-        <span className="ar">&rarr;</span>
-      </a>
+      {/* not on the page it points to */}
+      {pathname.startsWith("/php2shell") ? null : (
+        <a className="annbar" href="/php2shell/">
+          <b className="ann-tag">ACTIVE EXPLOITATION</b>
+          <span className="ann-long">
+            PHP2Shell pre-auth RCE in PHP core &mdash; emergency patching from $10/site, EOL PHP covered
+          </span>
+          {/* phones/tablets show this one-line version instead (mobile.css) */}
+          <span className="ann-short">
+            <b>PHP2Shell RCE</b> &mdash; patch from $10
+          </span>
+          <span className="ar">&rarr;</span>
+        </a>
+      )}
       <div className={"mp-backdrop" + (open ? " open" : "")} onClick={closeAll} aria-hidden="true" />
       <header className={"nav" + (tucked && !open ? " is-hidden" : "")} onFocus={() => setTucked(false)}>
         <div className="wrap">

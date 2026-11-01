@@ -198,8 +198,7 @@ export default function MissionPath({ head }: { head: ReactNode }) {
             <div className="mp-chapters">
               {STAGES.map((s, i) => (
                 <article key={s.k} className={"mp-chap" + (s.tone ? " " + s.tone : "") + chapCls(i)}>
-                  <span className="mp-word" aria-hidden="true">{s.n}</span>
-                  <span className="mp-step">{s.k} · {s.n}</span>
+                  <span className="mp-word">{s.n}</span>
                   <h3>{s.t}</h3>
                   <p>{s.d}</p>
                   <div className="mp-chips">{s.c.map((c) => <span key={c}>{c}</span>)}</div>

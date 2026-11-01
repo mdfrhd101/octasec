@@ -1,8 +1,6 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { pageMeta } from "../lib/seo";
-import PageHero from "../components/PageHero";
-import FinalCTA from "../components/FinalCTA";
 import WebsiteChecker from "./WebsiteChecker";
 
 export const metadata = pageMeta({
@@ -20,16 +18,11 @@ const NOTES = [
   { t: "Need the full picture?", d: "This free baseline cannot see business logic, authenticated authorization, internal services, or unknown vulnerabilities. That is where our verified pentest takes over." },
 ];
 
-// HUD: the hero, then the scan console (WebsiteChecker), three ground rules, the PHP2Shell
-// cross-link; blocks reveal on scroll (HudMotion), styles in hud-pages-c.css
+// HUD: the page opens on the scan console (WebsiteChecker, owner: no hero above the tool), then
+// three ground rules, the PHP2Shell cross-link; blocks reveal on scroll (HudMotion), styles in hud-pages-c.css
 export default function WebsiteCheckPage() {
   return (
     <div className="pg-wsc">
-      <PageHero
-        eyebrow="Free low-impact safety check"
-        title={<>Find the weak spots.<br />Before someone else does.</>}
-        sub="One URL gives you a clear external security baseline: urgent exposures first, practical fixes next, and a downloadable PDF for your team or hosting provider."
-      />
       <section className="h-sec wc-tool" id="check">
         <WebsiteChecker />
       </section>
@@ -41,7 +34,7 @@ export default function WebsiteCheckPage() {
                 <span className="h-lbl">{String(i + 1).padStart(2, "0")}</span>
                 <i />
               </div>
-              <h3>{n.t}</h3>
+              <h2>{n.t}</h2>
               <p>{n.d}</p>
             </div>
           ))}
@@ -51,7 +44,6 @@ export default function WebsiteCheckPage() {
           <Link className="h-link wc-php-a" href="/php2shell">Use our specialist PHP2Shell exposure checker <span aria-hidden="true">&rarr;</span></Link>
         </p>
       </section>
-      <FinalCTA />
     </div>
   );
 }

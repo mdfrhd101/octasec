@@ -3,7 +3,6 @@ import { pageMeta } from "../lib/seo";
 import Link from "next/link";
 import PageHero from "../components/PageHero";
 import FaqAccordion, { type FaqItem } from "../components/FaqAccordion";
-import FinalCTA from "../components/FinalCTA";
 import Checker from "./Checker";
 
 export const metadata = pageMeta({
@@ -243,8 +242,6 @@ export default function Php2ShellPage() {
         </div>
         <FaqAccordion items={FAQ} />
       </section>
-
-      <FinalCTA />
     </div>
   );
 }

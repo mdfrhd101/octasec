@@ -232,7 +232,7 @@ export function HudPricing() {
   );
 }
 
-export function HudFinal() {
+export function HudFinal({ secondary = { href: "/benchmarks", label: "See our benchmarks" } }: { secondary?: { href: string; label: string } }) {
   return (
     <section className="h-sec hs-final" aria-labelledby="hs-final-t">
       <div className="h-panel hs-final-card" data-rv>
@@ -244,7 +244,7 @@ export function HudFinal() {
         <p className="h-sub">Book a 30-minute scoping call. If a scanner is enough for you, we&apos;ll say so.</p>
         <div className="h-cta">
           <Link className="h-btn h-btn-red" href="/contact">Book a scoping call <span aria-hidden="true">&rsaquo;</span></Link>
-          <Link className="h-btn h-btn-line" href="/benchmarks">See our benchmarks</Link>
+          <Link className="h-btn h-btn-line" href={secondary.href}>{secondary.label}</Link>
         </div>
       </div>
     </section>

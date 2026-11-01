@@ -143,10 +143,8 @@ html:not(.touch-input) .pg-blog .bl-lead .bl-card:hover{--b:var(--h-hover-b);tra
 .pg-post .pc-read .h-lbl{color:var(--h-dim)}
 .pg-post .pc-read i{position:relative;display:block;height:4px;overflow:hidden;background:var(--h-line)}
 .pg-post .pc-read i::after{content:"";position:absolute;inset:0;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--h-acc),var(--h-green-ink))}
-.pg-post .pc-rail-back{--c:9px;justify-self:start;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;font:600 11px/1 var(--h-disp);letter-spacing:.1em;
-  text-transform:uppercase;color:var(--h-green-ink);transition:color .2s,background-color .2s}
-.pg-post :is(.pc-back,.pc-rail-back):focus-visible{outline:none;--b:var(--h-ink);box-shadow:inset 0 0 0 2px var(--h-ink)}
-html:not(.touch-input) .pg-post :is(.pc-back,.pc-rail-back):hover{--b:var(--h-hover-b);color:var(--h-ink);background:color-mix(in srgb,var(--h-red) 14%,transparent)}
+.pg-post .pc-back:focus-visible{outline:none;--b:var(--h-ink);box-shadow:inset 0 0 0 2px var(--h-ink)}
+html:not(.touch-input) .pg-post .pc-back:hover{--b:var(--h-hover-b);color:var(--h-ink);background:color-mix(in srgb,var(--h-red) 14%,transparent)}
 /* the body: comfortable reading type, HUD section heads, framed tables, call-outs */
 .pg-post .pc-body{grid-area:body;margin-top:clamp(30px,5vh,52px);padding-top:clamp(30px,5vh,48px);border-top:1px solid var(--h-line)}
 .pg-post .pc-body::before{content:"";position:absolute;left:0;top:-2px;width:56px;height:3px;background:var(--h-green-ink)}
@@ -360,6 +358,7 @@ html:not(.touch-input) .pg-p2s .p2-go:hover{background:linear-gradient(180deg,#0
 }
 
 /* =============================== website check =============================== */
+.pg-wsc .wc-tool{padding-top:clamp(28px,5vh,56px)}
 .pg-wsc .wc-shell{display:grid;gap:clamp(20px,3vh,28px);max-width:1100px;margin-inline:auto}
 .pg-wsc .wc-intro{margin:0;justify-items:start}
 .pg-wsc .wc-con{--c:22px;--b:color-mix(in srgb,var(--h-green-ink) 45%,transparent);display:grid;gap:18px;padding:clamp(20px,3vw,34px)}
@@ -394,7 +393,7 @@ html:not(.touch-input) .pg-p2s .p2-go:hover{background:linear-gradient(180deg,#0
 .pg-wsc .v-urgent .wc-summary-label{color:var(--h-red-ink)}
 .pg-wsc .v-urgent .wc-summary-label .h-dot{animation:h-blink 1.1s steps(1) infinite}
 .pg-wsc .v-baseline .wc-summary-label{color:var(--h-green-ink)}
-.pg-wsc .wc-summary h3{margin:12px 0 8px;font:600 clamp(20px,1.8vw,28px)/1.25 var(--h-disp);letter-spacing:.01em;color:var(--h-ink);overflow-wrap:anywhere}
+.pg-wsc .wc-summary h2{margin:12px 0 8px;font:600 clamp(20px,1.8vw,28px)/1.25 var(--h-disp);letter-spacing:.01em;color:var(--h-ink);overflow-wrap:anywhere}
 .pg-wsc .wc-summary p{margin-bottom:10px;font:400 15.5px/1.6 var(--h-body);color:var(--h-dim)}
 .pg-wsc .wc-summary small{font:500 12.5px/1.5 "IBM Plex Mono",ui-monospace,monospace;color:var(--h-dim);overflow-wrap:anywhere}
 .pg-wsc .wc-summary .h-btn{flex:none}
@@ -419,12 +418,12 @@ html:not(.touch-input) .pg-p2s .p2-go:hover{background:linear-gradient(180deg,#0
 .pg-wsc .wc-status:is(.s-critical,.s-high){color:var(--h-red-ink);border-color:color-mix(in srgb,var(--h-red) 55%,transparent);background:var(--h-crit-bg)}
 .pg-wsc .wc-status.s-good{color:var(--h-green-ink);border-color:color-mix(in srgb,var(--h-green-ink) 50%,transparent);background:var(--h-ok-bg)}
 .pg-wsc .wc-status.s-info{color:var(--h-dim)}
-.pg-wsc .wc-finding h4{margin:12px 0 8px;font:600 15.5px/1.35 var(--h-disp);letter-spacing:.015em;color:var(--h-ink);overflow-wrap:anywhere}
+.pg-wsc .wc-finding h3{margin:12px 0 8px;font:600 15.5px/1.35 var(--h-disp);letter-spacing:.015em;color:var(--h-ink);overflow-wrap:anywhere}
 .pg-wsc .wc-finding p{font:400 14.5px/1.55 var(--h-body);color:var(--h-dim);overflow-wrap:anywhere}
 .pg-wsc .wc-action{margin-top:12px;padding-top:12px;border-top:1px dashed var(--h-line-hi);font:400 14px/1.55 var(--h-body);color:var(--h-dim);overflow-wrap:anywhere}
 .pg-wsc .wc-action strong{display:block;margin-bottom:5px;font:600 10.5px/1.3 var(--h-disp);letter-spacing:.1em;text-transform:uppercase;color:var(--h-green-ink)}
 .pg-wsc .wc-next{--c:20px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:clamp(20px,3vw,30px);animation:pgc-up .6s .4s var(--h-ease) both}
-.pg-wsc .wc-next h3{margin-bottom:8px;font:600 18px/1.3 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
+.pg-wsc .wc-next h2{margin-bottom:8px;font:600 18px/1.3 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
 .pg-wsc .wc-next p{font:400 14.5px/1.55 var(--h-body);color:var(--h-dim)}
 .pg-wsc .wc-next .h-btn{flex:none}
 /* the three ground rules + the PHP2Shell cross-link */
@@ -434,7 +433,7 @@ html:not(.touch-input) .pg-p2s .p2-go:hover{background:linear-gradient(180deg,#0
 .pg-wsc .wc-note-h{display:flex;align-items:center;gap:12px}
 .pg-wsc .wc-note-h .h-lbl{color:var(--h-green-ink);font-weight:600}
 .pg-wsc .wc-note-h i{flex:1;height:1px;background:linear-gradient(90deg,var(--h-line-hi),transparent)}
-.pg-wsc .wc-note h3{font:600 17px/1.35 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
+.pg-wsc .wc-note h2{font:600 17px/1.35 var(--h-disp);letter-spacing:.02em;color:var(--h-ink)}
 .pg-wsc .wc-note p{font:400 15.5px/1.6 var(--h-body);color:var(--h-dim)}
 .pg-wsc .wc-php{--c:14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px 12px;margin-top:22px;padding:8px 22px;
   font:500 15.5px/1.5 var(--h-body);color:var(--h-ink);text-align:center;background:var(--h-tint)}

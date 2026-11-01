@@ -56,6 +56,8 @@
    /services
    ============================================================================= */
 .pg-services .sv-card{--c:18px;display:flex;flex-direction:column;gap:14px;padding:22px 22px 14px}
+/* opened from a homepage link (/services#s4): the page scrolls to the card while it still sits 34px low for its reveal (24px on phones), so stop short of the nav */
+.pg-services .sv-card{scroll-margin-top:36px}
 .pg-services .sv-card > :not(.sv-scan){position:relative}
 .pg-services .sv-card .h-ph{margin:0}
 .pg-services .sv-id{display:inline-flex;align-items:center;gap:10px;font:700 13px/1 var(--h-disp);letter-spacing:.16em;color:var(--h-green-ink)}
@@ -68,7 +70,7 @@
   clip-path:polygon(0 0,70% 0,100% 30%,100% 100%,30% 100%,0 70%)}
 .pg-services .sv-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0 14px;margin-top:auto;padding-top:6px;border-top:1px solid var(--h-line)}
 .pg-services .sv-tl{display:inline-flex;align-items:center;gap:10px;min-height:44px}
-.pg-services .sv-foot .link{margin-left:auto}
+.pg-services .sv-card.is-target{--b:var(--h-hover-b);box-shadow:inset 0 0 50px color-mix(in srgb,var(--h-red) 14%,transparent)}
 /* S4: a monitor trace that keeps drawing (reduced motion: the whole trace) */
 .pg-services .sv-pulse{stroke-dasharray:1 1;stroke-dashoffset:0}
 /* the scan line that sweeps a card once as it arrives */

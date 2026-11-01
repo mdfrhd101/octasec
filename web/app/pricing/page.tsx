@@ -4,7 +4,6 @@ import Link from "next/link";
 import PageHero from "../components/PageHero";
 import AutoSlider from "../components/AutoSlider";
 import HudCursor from "../components/hud/HudCursor";
-import HudField from "../components/hud/HudField";
 import FaqAccordion, { type FaqItem } from "../components/FaqAccordion";
 import { QuoteProvider, QuoteButton } from "../components/QuoteRequest";
 
@@ -218,23 +217,6 @@ export default function PricingPage() {
             <h2 id="pr-faq-t" className="h-h2 h-split">Straight answers.</h2>
           </div>
           <FaqAccordion items={FAQ} />
-        </section>
-
-        <section className="h-sec hs-final pr-ready" aria-labelledby="pr-ready-t">
-          <div className="h-panel hs-final-card" data-rv>
-            {/* the homepage's final band: particle field + sweep */}
-            <HudField variant="final" />
-            <span className="hs-sweep" aria-hidden="true" />
-            <span className="h-lbl">Ready?</span>
-            <h2 id="pr-ready-t" className="h-h2 h-split">Get a fixed quote in one business day.</h2>
-            <p className="h-sub">Tell us what you need tested &mdash; or book a call and we&apos;ll scope it together.</p>
-            <div className="h-cta">
-              <QuoteButton className="h-btn h-btn-red">Get a quote</QuoteButton>
-              <Link className="h-btn h-btn-line" href="/contact">
-                Book a scoping call instead <span aria-hidden="true">&rarr;</span>
-              </Link>
-            </div>
-          </div>
         </section>
       </QuoteProvider>
     </div>
