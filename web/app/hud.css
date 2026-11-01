@@ -383,10 +383,12 @@ html.bxi-on.bxi-land header.nav,html.bxi-on.bxi-land .annbar{transition:opacity 
 
 /* ---------- mission path: the old chapters on the flight path ---------- */
 /* desktop + motion: pinned stage, scroll draws the climb (--dr) and fills the rail (--p);
-   otherwise (phones/tablets, reduced motion): a stories stepper; without JS: a drawn chart */
+   otherwise (phones/tablets, short or zoomed-in windows, reduced motion): a stories stepper;
+   without JS: a drawn chart */
 .mp-stage{display:grid;gap:clamp(14px,2.4vh,26px)}
-.mp{position:relative;aspect-ratio:1400/530;--dr:1}
-.mp svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.mp{position:relative;display:grid;grid-template-columns:minmax(0,1fr);--dr:1}
+/* the chart's box ends where its drop lines end (PLOT.card), right on top of the stage cards */
+.mp svg{grid-area:1/1;display:block;width:100%;height:auto;aspect-ratio:1400/372;overflow:visible}
 .mp-grid line{stroke:var(--h-acc);stroke-opacity:.12}
 .mp-ticks line,.mp-axis{stroke:var(--h-acc);stroke-opacity:.55;fill:none}
 .mp-ax{font:500 12px var(--h-disp);letter-spacing:.07em;fill:var(--h-faint)} .mp-ax.hi{fill:var(--h-dim)}
@@ -411,7 +413,7 @@ html.bxi-on.bxi-land header.nav,html.bxi-on.bxi-land .annbar{transition:opacity 
 .mp-bar::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--h-acc),var(--h-red) 62%,var(--h-green-ink));transform:scaleX(var(--p,0));transform-origin:0 50%}
 /* chapter stories: stacked in one grid cell (the tallest sets the height), one shown at a time */
 .mp-chapters{display:none}
-.mp-armed .mp-chapters{display:grid;position:absolute;z-index:3;left:7.5%;top:9.5%;width:min(42%,540px)}
+.mp-armed .mp-chapters{display:grid;grid-area:1/1;position:relative;z-index:3;align-self:start;margin:3.6% 0 0 7.5%;width:min(42%,540px)}
 /* the leaving chapter clears fast, the next one comes in after it: the two never ghost over each other */
 .mp-chap{grid-area:1/1;display:grid;align-content:start;gap:10px;opacity:0;transform:translateX(40px);pointer-events:none;
   transition:opacity .22s var(--h-ease),transform .3s var(--h-ease)}
@@ -427,13 +429,12 @@ html.bxi-on.bxi-land header.nav,html.bxi-on.bxi-land .annbar{transition:opacity 
 .mp-chips span{font:500 9.5px/1 var(--h-disp);letter-spacing:.09em;text-transform:uppercase;padding:7px 9px;border:1px solid var(--h-line-hi);color:var(--h-dim)}
 .mp-chap.ok .mp-chips span{border-color:color-mix(in srgb,var(--h-green-ink) 45%,transparent);color:var(--h-green-ink)}
 .mp-chap.crit .mp-chips span{border-color:color-mix(in srgb,var(--h-red) 50%,transparent);color:var(--h-red-ink)}
-/* stage cards under the axis (desktop): the active chapter lights up */
-.mp-card{--cx:-50%;position:absolute;z-index:3;width:clamp(200px,17.5vw,268px);transform:translateX(var(--cx));
-  display:grid;gap:8px;padding:14px 16px;background:var(--h-glass);--c:12px;transition:opacity .5s var(--h-ease),box-shadow .5s,transform .5s var(--h-ease);
+/* stage cards under the axis (desktop): equal columns, edge to edge with the plot (PLOT.x0, PLOT.x1);
+   the active chapter lights up */
+.mp-cards{display:grid;grid-area:2/1;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-inline:4.2857%}
+.mp-card{position:relative;z-index:3;display:grid;align-content:start;gap:8px;padding:14px 16px;background:var(--h-glass);--c:12px;transition:opacity .5s var(--h-ease),box-shadow .5s;
   clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)));box-shadow:inset 0 0 0 1px var(--h-line-hi)}
-.mp-card.start{--cx:-30px} .mp-card.end{--cx:calc(-100% + 30px)}
 .mp-armed .mp-card:not(.on):not(.done){opacity:.32}
-.mp-armed .mp-card.on{transform:translateX(var(--cx)) translateY(-6px)}
 .mp-card.crit.on,.mp-card.crit.done{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--h-red) 60%,transparent);background:var(--h-alert-fill)}
 .mp-card.ok.on,.mp-card.ok.done{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--h-green-ink) 55%,transparent);background:var(--h-ok-fill)}
 .mp-card.on:not(.crit):not(.ok){box-shadow:inset 0 0 0 1px var(--h-green-ink)}
@@ -448,14 +449,14 @@ html.bxi-on.bxi-land header.nav,html.bxi-on.bxi-land .annbar{transition:opacity 
 /* pinned (desktop with motion): a tall track; the stage sticks while the chapters play */
 .hs-path.is-pinned .mp-track{height:calc(100vh + var(--n) * 70vh)}
 .hs-path.is-pinned .mp-stage{position:sticky;top:0;height:100vh;align-content:center;padding:clamp(70px,9vh,100px) 0 clamp(10px,2vh,24px)}
-.hs-path.is-pinned .mp{width:min(100%,calc((100vh - 320px) * 1400 / 530));margin-inline:auto}
+.hs-path.is-pinned .mp{width:min(100%,calc((100vh - 400px) * 1400 / 372));margin-inline:auto}
 .hs-path.is-pinned .mp-stage > .h-head{margin-bottom:0}
-/* stepper (phones/tablets, or reduced motion): rail segments are the timer, one chapter at a time */
-.hs-path.mp-armed:not(.is-pinned) .mp{aspect-ratio:auto;display:grid;gap:18px}
-.hs-path.mp-armed:not(.is-pinned) .mp svg{position:relative;height:auto;aspect-ratio:1400/356}
-.hs-path.mp-armed:not(.is-pinned) .mp-card{display:none}
+/* stepper (phones/tablets, short windows, reduced motion): rail segments are the timer, one chapter at a time */
+.hs-path.mp-armed:not(.is-pinned) .mp{gap:18px}
+.hs-path.mp-armed:not(.is-pinned) .mp svg{grid-area:auto;aspect-ratio:1400/356}
+.hs-path.mp-armed:not(.is-pinned) .mp-cards{display:none;grid-area:auto}
 .hs-path.mp-armed:not(.is-pinned) .mp-legend{display:flex}
-.hs-path.mp-armed:not(.is-pinned) .mp-chapters{position:relative;left:auto;top:auto;width:auto}
+.hs-path.mp-armed:not(.is-pinned) .mp-chapters{grid-area:auto;margin:0;width:auto}
 .hs-path.mp-armed:not(.is-pinned) .mp-rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding-bottom:0;font-size:10.5px;letter-spacing:.08em}
 .hs-path.mp-armed:not(.is-pinned) .mp-rail span{position:relative;min-height:44px;padding:14px 0 0;cursor:pointer}
 .hs-path.mp-armed:not(.is-pinned) .mp-rail span::before,.hs-path.mp-armed:not(.is-pinned) .mp-rail span::after{content:"";position:absolute;left:0;right:0;top:0;height:3px}
@@ -466,6 +467,17 @@ html.bxi-on.bxi-land header.nav,html.bxi-on.bxi-land .annbar{transition:opacity 
 .hs-path.paused .mp-rail span.on::after{animation-play-state:paused}
 .hs-path.mp-armed:not(.is-pinned) .mp-bar{display:none}
 @keyframes h-chapfill{from{transform:scaleX(0)}to{transform:none}}
+/* four cards in a row need the room, otherwise two rows. MissionPath only pins when the stage fits
+   one screen; a short or zoomed-in desktop window scrolls chart, story and cards down the page */
+@media (max-width:977px){
+  .mp-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hs-path.is-pinned .mp{width:min(100%,calc((100vh - 540px) * 1400 / 372))}
+  .hs-path.is-pinned .mp-drop{display:none}
+}
+@media (min-width:900px){
+  .hs-path.mp-armed:not(.is-pinned) .mp-cards{display:grid}
+  .hs-path.mp-armed:not(.is-pinned) .mp-drop{display:none}
+}
 
 /* ---------- compare table ---------- */
 .hs-tbl{--c:18px;padding:8px 22px}
@@ -622,10 +634,9 @@ html:not(.touch-input) body:has(.hud) .cursor-ring.is-hot{background:rgba(244,42
   .hs-num-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .hs-rules{grid-template-columns:minmax(0,1fr)}
   /* no JS on a narrow screen: the chart keeps its top, the stage cards drop into a grid under it */
-  .hs-path:not(.mp-armed) .mp{aspect-ratio:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .hs-path:not(.mp-armed) .mp svg{position:relative;grid-column:1/-1;height:auto;aspect-ratio:1400/356}
-  .hs-path:not(.mp-armed) .mp-card{position:relative;left:auto!important;top:auto!important;width:auto;--cx:0px}
-  .hs-path:not(.mp-armed) .mp-legend{display:flex;grid-column:1/-1}
+  .hs-path:not(.mp-armed) .mp svg{aspect-ratio:1400/356}
+  .hs-path:not(.mp-armed) .mp-cards{grid-area:3/1;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-inline:0;margin-top:12px}
+  .hs-path:not(.mp-armed) .mp-legend{display:flex;grid-area:2/1;margin-top:12px}
   .hs-price-card{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:900px){
@@ -679,7 +690,7 @@ html:not(.touch-input) body:has(.hud) .cursor-ring.is-hot{background:rgba(244,42
   .hh-chain li{font-size:12.5px}
   .hh-chain li::before{left:-17px;top:4px}
   .hh-chain::before{left:3px}
-  .hs-path:not(.mp-armed) .mp{grid-template-columns:minmax(0,1fr)}
+  .hs-path:not(.mp-armed) .mp-cards{grid-template-columns:minmax(0,1fr)}
   /* the old phone terminal: a fixed five-row window that scrolls like a real one */
   .h-term .term-body{min-height:0;height:129px;font-size:12px;line-height:21px}
   .h-term .ln{white-space:pre;overflow:hidden;text-overflow:ellipsis}

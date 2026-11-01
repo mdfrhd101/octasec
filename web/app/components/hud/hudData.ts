@@ -134,13 +134,13 @@ export function pointAt(f: number): [number, number] {
 }
 
 export type Stage = {
-  f: number; k: string; n: string; tag: string; tone?: "ok" | "crit"; p: string; align?: "start" | "end";
+  f: number; k: string; n: string; tag: string; tone?: "ok" | "crit"; p: string;
   // the chapter (old MethodChapters copy): headline, story, chips
   t: string; d: string; c: string[];
 };
 export const STAGES: Stage[] = [
   {
-    f: 0.07, k: "01", n: "Scope", tag: "Signed", tone: "ok", align: "start",
+    f: 0.07, k: "01", n: "Scope", tag: "Signed", tone: "ok",
     p: "Rules of engagement signed. Assets allow-listed, scope enforced at the network level.",
     t: "You define it. We enforce it.",
     d: "Assets and rules of engagement are agreed and signed by both sides. Scope is enforced mechanically at the network level — not just on paper.",
@@ -161,7 +161,7 @@ export const STAGES: Stage[] = [
     c: ["Business logic", "Auth & roles", "Attack chains"],
   },
   {
-    f: 0.96, k: "04", n: "Prove", tag: "Verified", tone: "ok", align: "end",
+    f: 0.96, k: "04", n: "Prove", tag: "Verified", tone: "ok",
     p: "Reproduced, then verified and signed by a named operator. Free retest included.",
     t: "If we can't prove it, we don't report it.",
     d: "Minimum-impact proof, then a named human operator verifies and signs every finding. You get a case file, a fix — and a free retest.",

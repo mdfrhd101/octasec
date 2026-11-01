@@ -18,7 +18,9 @@ const drawn = (p: number) => {
  * chapter logic (MethodChapters):
  * - desktop with motion: a tall track with a pinned stage. Scroll progress draws the climb
  *   (--dr) and picks the chapter; its story shows in the chapter panel, the rail fills (--p).
- * - phones/tablets (<900px): a stories-style stepper. The rail becomes four segments; the
+ *   The stage cards stay under the chart, edge to edge with it: four in a row, two rows if narrow.
+ * - phones/tablets, and desktop windows too short or zoomed in to fit the pinned stage (the stage
+ *   cards then flow under the story): a stories-style stepper. The rail becomes four segments; the
  *   active one fills (that fill is the timer), then the next chapter slides in from the
  *   right and the climb draws on to its stage. Swipe or tap a segment to move; a finger on
  *   it pauses. Only plays while on screen.
@@ -42,7 +44,12 @@ export default function MissionPath({ head }: { head: ReactNode }) {
     const track = trackRef.current, plot = plotRef.current;
     if (!track || !plot) return;
     setArmed(true);
-    const mq = window.matchMedia("(min-width: 900px) and (prefers-reduced-motion: no-preference)");
+    // pinning needs the whole stage on one screen: chart + four cards in a row, or + two rows when
+    // the window is narrower (hud.css). A shorter or zoomed-in window scrolls normally instead.
+    const mq = window.matchMedia(
+      "(min-width: 978px) and (min-height: 650px) and (prefers-reduced-motion: no-preference), " +
+        "(min-width: 900px) and (min-height: 800px) and (prefers-reduced-motion: no-preference)"
+    );
     let raf = 0, cur = -1;
     const update = () => {
       raf = 0;
@@ -199,15 +206,9 @@ export default function MissionPath({ head }: { head: ReactNode }) {
                 </article>
               ))}
             </div>
-            {STAGES.map((s, i) => {
-              const [x] = pointAt(s.f);
-              return (
-                <div
-                  key={s.k}
-                  aria-hidden="true"
-                  className={"mp-card c" + i + (s.align ? " " + s.align : "") + (s.tone ? " " + s.tone : "") + (i === active ? " on" : i < active ? " done" : "")}
-                  style={{ left: ((x / VW) * 100).toFixed(3) + "%", top: ((CARD / VH) * 100).toFixed(3) + "%" }}
-                >
+            <div className="mp-cards" aria-hidden="true">
+              {STAGES.map((s, i) => (
+                <div key={s.k} className={"mp-card c" + i + (s.tone ? " " + s.tone : "") + (i === active ? " on" : i < active ? " done" : "")}>
                   <div className="mp-ch">
                     <span className="mp-k">{s.k}</span>
                     <b>{s.n}</b>
@@ -215,8 +216,8 @@ export default function MissionPath({ head }: { head: ReactNode }) {
                   </div>
                   <p>{s.p}</p>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
       </div>
