@@ -22,5 +22,42 @@ export default function SmoothScroll() {
     window.__lenis = lenis;
     return () => { lenis.destroy(); delete window.__lenis; };
   }, []);
+
+  // A trackpad flick keeps sending (momentum) wheel events for a second or more after the fingers
+  // lift. Click a link meanwhile and those events scroll the NEXT page straight down to its footer
+  // (owner, Firefox on a Mac). So after a click on an internal link, wheel input is swallowed until
+  // that stream pauses: the new page opens at the top, and the next deliberate scroll works as usual.
+  useEffect(() => {
+    let swallow = false;
+    let timer = 0;
+    let since = 0;
+    const holdUntilPause = () => {
+      swallow = true;
+      clearTimeout(timer);
+      timer = window.setTimeout(() => (swallow = false), 300); // a 300 ms gap = the stream has ended
+    };
+    const onWheel = (e: WheelEvent) => {
+      if (!swallow) return;
+      if (performance.now() - since > 3000) { swallow = false; return; } // never block scrolling for long
+      e.preventDefault(); // neither the browser nor Lenis (a later listener) scrolls
+      e.stopImmediatePropagation();
+      holdUntilPause();
+    };
+    const onClick = (e: MouseEvent) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      const href = a?.getAttribute("href") || "";
+      if (!a || !href.startsWith("/") || a.target === "_blank") return; // internal page links only
+      since = performance.now();
+      holdUntilPause();
+    };
+    window.addEventListener("wheel", onWheel, { capture: true, passive: false });
+    document.addEventListener("click", onClick, true);
+    return () => {
+      window.removeEventListener("wheel", onWheel, { capture: true });
+      document.removeEventListener("click", onClick, true);
+      clearTimeout(timer);
+    };
+  }, []);
   return null;
 }
