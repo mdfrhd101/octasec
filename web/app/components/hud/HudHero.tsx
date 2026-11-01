@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import HudField from "./HudField";
 import HudGlobe from "./HudGlobe";
 import { SCENES } from "./hudData";
+import { isFirefox } from "../browser";
 
 const SURFACES = ["Web apps", "APIs", "External attack surface", "Continuous monitoring", "AI / LLM features", "Network & wireless"];
 
@@ -107,7 +108,7 @@ export default function HudHero() {
   // a slight tilt of the stage toward a real mouse (CSS ignores it on touch input)
   useEffect(() => {
     const el = ref.current, st = stage.current;
-    if (!el || !st || still) return;
+    if (!el || !st || still || isFirefox()) return; // firefox.css drops the tilt
     const move = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       const r = el.getBoundingClientRect();

@@ -202,7 +202,7 @@ The owner changed the brief after approving the scroll-driven lead-in. The homep
 
 - `components/BreachIntro.tsx` is used with `once={false}`.
 - It plays full screen on every page load, and a reload plays it again. It does not play on in-site navigation, and never again on scroll.
-- Its length is about 6.5 s (the owner settled on 6–7 s, after trying 5–6, 8–10 and 10–12 s): `PLAY` 4.6 s, `FLY` 0.95 s, `LAND` 0.45 s. It buffers like a video on a slow network.
+- Its length is about 6.5 s (the owner settled on 6–7 s, after trying 5–6, 8–10 and 10–12 s): `PLAY` 4.6 s, `FLY` 0.95 s, `LAND` 0.45 s. On a slow network or device it skips frames rather than running long (`MAX_LAG`, 0.8 s). Firefox draws it lighter: a 1× canvas, 30 draws a second, no blend between frames.
 - At the end the mark lands on the hero's seal and the hero appears.
 - No visible Skip button (owner: `skipButton={false}`). It can still be skipped with Esc, Enter, Space, a click, the wheel or a swipe.
 - It is off under reduced motion and without JavaScript.

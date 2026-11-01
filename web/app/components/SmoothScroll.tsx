@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
+import { isFirefox } from "./browser";
 
 declare global {
   interface Window { __lenis?: Lenis }
@@ -11,6 +12,8 @@ declare global {
  * Site-wide smooth scrolling (Lenis). Not started under prefers-reduced-motion, nor on
  * touch-first phones/tablets: native momentum scrolling is better there, and Lenis would
  * only keep a rAF loop running (anchor jumps use CSS scroll-padding-top instead — mobile.css).
+ * Not in Firefox either: its own smooth scrolling runs off the main thread, so it stays fluid
+ * while the page is busy; Lenis would tie every scroll step to the main thread.
  * Modals call window.__lenis?.stop()/start(); inner scrollers use data-lenis-prevent.
  */
 export default function SmoothScroll() {
@@ -18,6 +21,7 @@ export default function SmoothScroll() {
     if (!window.matchMedia) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (window.matchMedia("(hover: none) and (pointer: coarse) and (max-width: 1024px)").matches) return;
+    if (isFirefox()) return;
     const lenis = new Lenis({ lerp: 0.1, anchors: { offset: 0 }, autoRaf: true, stopInertiaOnNavigate: true });
     window.__lenis = lenis;
     return () => { lenis.destroy(); delete window.__lenis; };
@@ -27,18 +31,25 @@ export default function SmoothScroll() {
   // lift. Click a link meanwhile and those events scroll the NEXT page straight down to its footer
   // (owner, Firefox on a Mac). So after a click on an internal link, wheel input is swallowed until
   // that stream pauses: the new page opens at the top, and the next deliberate scroll works as usual.
+  // The wheel listener exists only for that moment: a permanent non-passive one makes the browser
+  // wait for the main thread before every native scroll step.
   useEffect(() => {
     let swallow = false;
     let timer = 0;
     let since = 0;
+    const release = () => {
+      swallow = false;
+      window.removeEventListener("wheel", onWheel, { capture: true });
+    };
     const holdUntilPause = () => {
+      if (!swallow) window.addEventListener("wheel", onWheel, { capture: true, passive: false });
       swallow = true;
       clearTimeout(timer);
-      timer = window.setTimeout(() => (swallow = false), 300); // a 300 ms gap = the stream has ended
+      timer = window.setTimeout(release, 300); // a 300 ms gap = the stream has ended
     };
     const onWheel = (e: WheelEvent) => {
       if (!swallow) return;
-      if (performance.now() - since > 3000) { swallow = false; return; } // never block scrolling for long
+      if (performance.now() - since > 3000) { release(); return; } // never block scrolling for long
       e.preventDefault(); // neither the browser nor Lenis (a later listener) scrolls
       e.stopImmediatePropagation();
       holdUntilPause();
@@ -51,7 +62,6 @@ export default function SmoothScroll() {
       since = performance.now();
       holdUntilPause();
     };
-    window.addEventListener("wheel", onWheel, { capture: true, passive: false });
     document.addEventListener("click", onClick, true);
     return () => {
       window.removeEventListener("wheel", onWheel, { capture: true });

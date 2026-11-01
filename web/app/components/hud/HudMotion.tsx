@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { isFirefox } from "../browser";
 
 /**
  * Motion for the HUD homepage, on the old SiteMotion logic:
@@ -112,8 +113,9 @@ export default function HudMotion() {
     if (foot) io2.observe(foot);
     cleanups.push(() => { io.disconnect(); io2.disconnect(); root.classList.remove("is-armed"); });
 
-    /* section-title parallax (desktop only; not inside the pinned chapters stage) */
-    const heads = Array.from(document.querySelectorAll<HTMLElement>(".hud .h-sec > .h-head"));
+    /* section-title parallax (desktop only; not inside the pinned chapters stage). Not in Firefox:
+       its native scroll runs ahead of the main thread, so a drift written from here would jitter. */
+    const heads = isFirefox() ? [] : Array.from(document.querySelectorAll<HTMLElement>(".hud .h-sec > .h-head"));
     const small = window.matchMedia("(max-width: 900px)");
     let raf = 0;
     const drift = () => {

@@ -1,0 +1,26 @@
+/* =============================================================================
+   firefox.css: Firefox only, loaded last. Revert: remove its import in layout.tsx.
+   Firefox redoes every blur and filter on each frame, so the homepage hero ran at 15 fps
+   there against 60 in Chrome (2026-11-01, same scripted visit, one effect off at a time:
+   backdrop-filter and the glows cost the most). They only add a soft glow on this dark
+   design, so Firefox goes without them: the layout, colours and motion stay the same.
+   The canvases and the film are lightened in JS (components/browser.ts).
+   ============================================================================= */
+@supports (-moz-appearance:none){
+  :root *,:root *::before,:root *::after{backdrop-filter:none!important;filter:none!important}
+  /* without the blur, more opaque glass keeps panels readable, and the nav and its menus go solid:
+     text scrolling behind them would otherwise show through */
+  :root:has(.hud){--h-glass:rgba(3,20,14,.86);--h-glass-hi:#041610}
+  :root[data-theme="light"]:has(.hud){--h-glass:rgba(255,255,255,.92);--h-glass-hi:#fff}
+  :root[data-theme="light"] .navbar{background:#fff!important}
+  /* the film covers the hero: nothing under it needs painting until it starts to fade */
+  html.bxi-on:not(.bxi-reveal) .hud-hero{visibility:hidden}
+  /* a live canvas under a mask is masked again on every redraw */
+  .h-field{-webkit-mask-image:none!important;mask-image:none!important}
+  /* the globe's lean toward the mouse: a 3D context around its canvas and drawings */
+  .h-orb{transform:none!important;transition:none!important}
+  .hh-stage{perspective:none!important}
+  /* moving dots and dashes would redraw the whole orbit drawing on every frame */
+  .h-packet{display:none!important}
+  .h-hop .h-flow{animation:none!important}
+}

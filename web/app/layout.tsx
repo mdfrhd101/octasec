@@ -10,6 +10,7 @@ import "./hud-site.css";
 import "./hud-pages-a.css";
 import "./hud-pages-b.css";
 import "./hud-pages-c.css";
+import "./firefox.css";
 import Nav from "./components/Nav";
 import SkipLink from "./components/SkipLink";
 import Footer from "./components/Footer";

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type CSSProperties } from "react";
 import { C, NODES, ORBITS, PACKETS, SPHERE, hop, nodePos, onOrbit, orbitArc, type NodeId, type Scene } from "./hudData";
+import { isFirefox } from "../browser";
 
 type Props = { scene: Scene; step: number; formed: boolean; still: boolean; mini?: boolean };
 
@@ -33,7 +34,7 @@ export default function HudGlobe({ scene, step, formed, still, mini = false }: P
 
     let W = 0, H = 0, R = 0, cx = 0, cy = 0;
     const size = () => {
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const dpr = Math.min(isFirefox() ? 1.5 : 2, window.devicePixelRatio || 1); // fewer pixels to upload each frame
       W = canvas.clientWidth; H = canvas.clientHeight;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -75,6 +76,7 @@ export default function HudGlobe({ scene, step, formed, still, mini = false }: P
       bd.addColorStop(0, col.a); bd.addColorStop(0.6, col.b); bd.addColorStop(1, col.c);
       ctx.globalAlpha = e; ctx.fillStyle = bd; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
       const ca = Math.cos(a), sa = Math.sin(a);
+      ctx.fillStyle = `rgb(${col.dot})`; // one colour, alpha per dot: parsing a colour string per dot is what costs
       for (let i = 0; i < n; i++) {
         const o = i * 5, x = pts[o], y = pts[o + 1], z = pts[o + 2], land = pts[o + 3];
         const X = x * ca + z * sa, Z0 = -x * sa + z * ca, Y = y * ct - Z0 * st, Z = y * st + Z0 * ct;
@@ -86,9 +88,10 @@ export default function HudGlobe({ scene, step, formed, still, mini = false }: P
         const key = 0.55 + 0.45 * Math.max(0, -X * 0.35 - Y * 0.6 + Z * 0.7);
         const al = Math.min(1, lit * key * (0.3 + 0.7 * Z)) * grow;
         const s = city ? 2.3 : land ? 1.6 : 1;
-        ctx.fillStyle = `rgba(${col.dot},${al.toFixed(3)})`;
+        ctx.globalAlpha = al;
         ctx.fillRect(cx + X * r - s / 2, cy + Y * r - s / 2, s, s);
       }
+      ctx.globalAlpha = 1;
       ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.clip();
       const rim = ctx.createRadialGradient(cx, cy + r * 0.2, r * 0.8, cx, cy + r * 0.2, r * 1.25);
       rim.addColorStop(0, `rgba(${col.rim},0)`); rim.addColorStop(1, `rgba(${col.rim},${(0.42 * e).toFixed(3)})`);
@@ -112,13 +115,15 @@ export default function HudGlobe({ scene, step, formed, still, mini = false }: P
 
     let a = 0.9, last = 0, raf = 0, visible = true;
     const formNow = (t: number) => (formAt.current === null ? 0 : clamp((t - formAt.current) / FORM_MS));
+    const ff = isFirefox(), gap = ff ? 30 : 0; // ms between draws: 30 fps there, plenty for a slow spin
     const loop = (t: number) => {
       raf = 0;
       if (!visible) return;
+      if (t - last < gap) { raf = requestAnimationFrame(loop); return; }
       if (last) a += Math.min(50, t - last) * SPIN;
       last = t;
       draw(a, formNow(t));
-      movePackets(t);
+      if (!ff) movePackets(t); // firefox.css hides the packets
       raf = requestAnimationFrame(loop);
     };
     const kick = () => { if (!raf && !still) { last = 0; raf = requestAnimationFrame(loop); } };

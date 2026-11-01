@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { WORLD } from "./worldMask";
+import { isFirefox } from "../browser";
 
 // markers: Octagram's HQ (the red disc, like the flag) and world clocks for local test windows
 const SITES = [
@@ -58,7 +59,7 @@ export default function HudWorld() {
   const cv = useRef<HTMLCanvasElement | null>(null);
   const [times, setTimes] = useState<Record<string, string>>({});
   const [hit, setHit] = useState<string | null>(null);
-  const [sweep, setSweep] = useState("090.4°E");
+  const sweepEl = useRef<HTMLElement | null>(null);
 
   // live clocks (client only: the server can't know the visitor's "now")
   useEffect(() => {
@@ -133,10 +134,13 @@ export default function HudWorld() {
       }
     };
 
-    let raf = 0, visible = true, t0 = performance.now(), lastHit = "";
+    let raf = 0, visible = true, t0 = performance.now(), lastHit = "", drawn = 0, told = 0;
+    const gap = isFirefox() ? 30 : 0; // ms between draws: 30 fps there
     const loop = (t: number) => {
       raf = 0;
       if (!visible) return;
+      if (t - drawn < gap) { raf = requestAnimationFrame(loop); return; }
+      drawn = t;
       const p = ((t - t0) % SWEEP_MS) / SWEEP_MS;
       frame(p);
       const lon = LON0 + p * 360;
@@ -144,7 +148,11 @@ export default function HudWorld() {
       const near = SITES.find((s) => Math.abs(s.lon - lon) < 4);
       const k = near ? near.k : "";
       if (k !== lastHit) { lastHit = k; setHit(k || null); }
-      if (Math.round(t / 120) % 2 === 0) setSweep(`${Math.abs(lon).toFixed(1).padStart(5, "0")}°${lon < 0 ? "W" : "E"}`);
+      // written straight to the element: a React render per frame only to change this readout is costly
+      if (t - told > 90 && sweepEl.current) {
+        told = t;
+        sweepEl.current.textContent = `${Math.abs(lon).toFixed(1).padStart(5, "0")}°${lon < 0 ? "W" : "E"}`;
+      }
       raf = requestAnimationFrame(loop);
     };
     const kick = () => { if (!raf && !reduce) raf = requestAnimationFrame(loop); };
@@ -183,7 +191,7 @@ export default function HudWorld() {
           </span>
         </div>
       ))}
-      <div className="hw-read tl"><span>Sweep</span><b>{sweep}</b></div>
+      <div className="hw-read tl"><span>Sweep</span><b ref={sweepEl}>090.4°E</b></div>
       <div className="hw-read br"><span>Land cells</span><b>7,821</b></div>
     </div>
   );

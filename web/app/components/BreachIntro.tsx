@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import BrandMark from "./BrandMark";
 import { BEATS, RING, SEAL_FIT, avifOk, drawFrame, fitFrame, frameStore, frontToBack, pickSet, pushIn, ramp, timeAt } from "./breachFilm";
+import { isFirefox } from "./browser";
 import "../breach-scroll.css";
 
 /**
@@ -10,18 +11,19 @@ import "../breach-scroll.css";
  * before the page. At its end the real OctaSec mark, faded in over Gemini's octagon, flies into
  * `target` (the hero's Seal Scanner) and lands exactly on its ring, while the dark stage fades
  * away and the hero copy comes in; then the live seal takes over from the mark.
- * - A clock drives the film (scroll is locked meanwhile); it waits whenever the frame it needs
- *   isn't decoded yet, like a buffering video, and gives up on a very slow network.
+ * - A clock drives the film (scroll is locked meanwhile); it waits briefly when the frame it needs
+ *   isn't decoded yet, then skips ahead (MAX_LAG), and gives up on a dead network.
  * - Skip: the button, Esc / Enter / Space / ↓, a click, the wheel or a swipe → straight to the flight.
  * - No intro with reduced motion, without JS (an inline script turns it on before first paint),
  *   on client-side navigations, or — with `once` — after the first time in this browser session.
  */
 // Owner (2026-10-26): the whole intro takes 6–7 s — film + flight + landing ≈ 6 s once the
-// opening frames are in (on a slow network it buffers like a video, so it can run longer)
+// opening frames are in (a slow network or device skips frames rather than running longer)
 const PLAY = 4.6; // s: the film, progress 0 → 0.9 (TIMELINE's holds give each caption time)
 const FLY = 0.95; // s: the mark's flight into the hero, while the stage fades away
 const SKIP_FLY = 0.75;
 const LAND = 0.45; // s: the live seal fades in under the mark
+const MAX_LAG = 0.8; // s: how far the film's clock may fall behind real time
 const KEY = "octasec-intro-seen";
 
 type Prop = "opacity" | "transform" | "visibility" | "width" | "height" | "clipPath";
@@ -65,9 +67,11 @@ export default function BreachIntro({
     const q = (s: string) => stage.querySelector<HTMLElement>(s)!;
     const caps = Array.from(stage.querySelectorAll<HTMLElement>(".bx-cap"));
     const end = q(".bx-end"), mark = q(".bx-mark"), bar = q(".bx-bar"), backdrop = q(".bxi-backdrop");
-    let alive = true, raf = 0, last = 0, wall = 0, lenisStopped = false;
+    // Firefox redraws a full-screen canvas far more slowly: a 1× canvas, 30 draws a second, no blend between frames
+    const ff = isFirefox();
+    let alive = true, raf = 0, last = 0, wall = 0, lenisStopped = false, drawn = 0;
     let phase: "load" | "play" | "fly" | "land" = "load";
-    let t = 0, ft = 0, lt = 0, stall = 0, flyDur = FLY, canvasFrom = 1;
+    let t = 0, played = 0, ft = 0, lt = 0, flyDur = FLY, canvasFrom = 1;
     let from = { x: 0, y: 0, s: 1 };
     window.scrollTo(0, 0);
 
@@ -76,7 +80,7 @@ export default function BreachIntro({
     const layout = () => {
       W = stage.clientWidth;
       H = stage.clientHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = ff ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       const { stacked, capY, ...r } = fitFrame(W, H);
@@ -123,7 +127,7 @@ export default function BreachIntro({
       const f = Math.min(n - 1, timeAt(p) * fps);
       const i0 = Math.floor(f), a = frames ? frames.nearest(i0) : -1;
       if (a >= 0) {
-        const b = a === i0 ? frames!.get(Math.min(n - 1, i0 + 1)) : null;
+        const b = a === i0 && !ff ? frames!.get(Math.min(n - 1, i0 + 1)) : null;
         const r = pushIn(base, 1 + 0.05 * ramp(0, 0.8, p));
         drawFrame(ctx, frames!.get(a)!, b, f - i0, r.x * dpr, r.y * dpr, r.w * dpr, r.h * dpr);
       }
@@ -172,7 +176,8 @@ export default function BreachIntro({
     const loop = (now: number) => {
       raf = 0;
       if (!alive) return;
-      const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+      // real time even at a low frame rate: the film drops frames, it doesn't turn into slow motion
+      const dt = last ? Math.min(0.25, (now - last) / 1000) : 0;
       last = now;
       wall += dt;
       if (!lenisStopped && window.__lenis) {
@@ -190,12 +195,15 @@ export default function BreachIntro({
         const p = 0.9 * Math.min(1, t / PLAY);
         const f = Math.min(n - 1, timeAt(p) * fps);
         frames!.seek(Math.round(f));
-        // the clock only runs while the frame it needs is decoded
-        if (frames!.get(Math.floor(f))) {
-          t += dt;
-          stall = 0;
-        } else if ((stall += dt) > 5) fly(true);
-        film(p);
+        // the clock waits while the frame it needs is decoding, but never falls more than MAX_LAG behind
+        // real time: frames get skipped instead, so a slow network or decoder can't stretch the film
+        played += dt;
+        if (frames!.get(Math.floor(f))) t += dt;
+        t = Math.max(t, played - MAX_LAG);
+        if (!ff || now - drawn >= 30) {
+          drawn = now;
+          film(p);
+        }
         if (t >= PLAY && phase === "play") fly(false);
       }
       if (phase === "fly") {

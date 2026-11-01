@@ -193,7 +193,7 @@ body:has(.hud) .mobile-panel .mp-cta a:not(.btn){font:500 12px/1 var(--h-disp);l
 .hh-num{font:700 30px/1 var(--h-disp);margin:2px 0 12px;font-variant-numeric:tabular-nums}
 .hh-num small{font:500 11px var(--h-disp);letter-spacing:.06em;color:var(--h-dim);margin-left:8px}
 .h-bars{display:flex;align-items:flex-end;gap:2px;height:58px}
-.h-bars i{flex:1;min-width:2px;background:repeating-linear-gradient(to top,color-mix(in srgb,var(--h-green-ink) 88%,transparent) 0 3px,transparent 3px 5px);transition:height .8s var(--h-ease)}
+.h-bars i{flex:1;min-width:2px;background:linear-gradient(to top,color-mix(in srgb,var(--h-green-ink) 88%,transparent) 0 3px,transparent 3px) 0 100%/100% 5px repeat-y;transition:height .8s var(--h-ease)}
 .hh-axis{display:flex;justify-content:space-between;margin-top:8px}
 
 /* alert card: the chain story */
@@ -392,7 +392,7 @@ html.bxi-on.bxi-land header.nav,html.bxi-on.bxi-land .annbar{transition:opacity 
 .mp-ax{font:500 12px var(--h-disp);letter-spacing:.07em;fill:var(--h-faint)} .mp-ax.hi{fill:var(--h-dim)}
 .mp-scan{fill:none;stroke:var(--h-ink);stroke-opacity:.42;stroke-dasharray:3 7}
 .mp-area{fill:url(#mp-ta);clip-path:inset(0 calc((1 - var(--dr)) * 100%) 0 0)}
-.mp-line{fill:none;stroke:url(#mp-tg);stroke-width:2.6;filter:url(#mp-gl);stroke-dasharray:1;stroke-dashoffset:calc(1 - var(--dr))}
+.mp-line{fill:none;stroke:url(#mp-tg);stroke-width:2.6;filter:url(#mp-gl);stroke-dasharray:1;stroke-dashoffset:calc((1 - var(--dr)) * 1px)}
 .hs-path:not(.is-pinned) .mp-line{transition:stroke-dashoffset 1s var(--h-ease)}
 .hs-path:not(.is-pinned) .mp-area{transition:clip-path 1s var(--h-ease)}
 .mp-m{--mc:var(--h-acc);transition:opacity .5s var(--h-ease)} .mp-m.crit{--mc:var(--h-red)} .mp-m.ok{--mc:var(--h-green-ink)}
@@ -444,7 +444,7 @@ html.bxi-on.bxi-land header.nav,html.bxi-on.bxi-land .annbar{transition:opacity 
 .mp-legend{display:none;gap:8px 18px;flex-wrap:wrap;font:500 10.5px/1.3 var(--h-disp);letter-spacing:.06em;color:var(--h-faint)}
 .mp-legend span{display:inline-flex;align-items:center;gap:8px}
 .mp-legend span::before{content:"";width:22px;height:2px;background:linear-gradient(90deg,var(--h-acc),var(--h-red))}
-.mp-legend .sc::before{background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--h-ink) 45%,transparent) 0 3px,transparent 3px 7px)}
+.mp-legend .sc::before{background:linear-gradient(90deg,color-mix(in srgb,var(--h-ink) 45%,transparent) 3px,transparent 3px) 0 0/7px 100% repeat-x}
 /* pinned (desktop with motion): a tall track; the stage sticks while the chapters play */
 .hs-path.is-pinned .mp-track{height:calc(100vh + var(--n) * 70vh)}
 .hs-path.is-pinned .mp-stage{position:sticky;top:0;height:100vh;align-content:center;padding:clamp(70px,9vh,100px) 0 clamp(10px,2vh,24px)}
