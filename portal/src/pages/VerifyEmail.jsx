@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { auth } from "../services/index.js";
 import { useAuth } from "../auth.jsx";
-import BrandLockup from "../components/BrandLockup.jsx";
-import HudField from "../components/HudField.jsx";
+import AuthShell from "../components/AuthShell.jsx";
 
 // Opened from the emailed confirmation link: /portal/verify-email#token=…
 export default function VerifyEmail() {
@@ -29,19 +28,15 @@ export default function VerifyEmail() {
   }, [adoptSession]);
 
   return (
-    <div className="login">
-      <HudField />
-      <div className="login-card card">
-        <div className="brand"><BrandLockup height={26} /> <span>PORTAL</span></div>
-        {state === "working" && <p className="login-sub">Confirming your email…</p>}
-        {state === "done" && <p className="login-sub" style={{ color: "var(--green)" }}>Email confirmed — your account is active. Taking you to the portal…</p>}
-        {state === "failed" && (
-          <>
-            <p className="login-sub">{err}</p>
-            <button className="btn gold" onClick={() => window.location.replace(import.meta.env.BASE_URL || "/")}>Go to sign in</button>
-          </>
-        )}
-      </div>
-    </div>
+    <AuthShell>
+      {state === "working" && <p className="login-sub">Confirming your email…</p>}
+      {state === "done" && <p className="login-sub" style={{ color: "var(--green)" }}>Email confirmed — your account is active. Taking you to the portal…</p>}
+      {state === "failed" && (
+        <>
+          <p className="login-sub">{err}</p>
+          <button className="btn gold" onClick={() => window.location.replace(import.meta.env.BASE_URL || "/")}>Go to sign in</button>
+        </>
+      )}
+    </AuthShell>
   );
 }

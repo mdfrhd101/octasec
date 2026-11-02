@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { auth } from "../services/index.js";
-import BrandLockup from "../components/BrandLockup.jsx";
-import HudField from "../components/HudField.jsx";
+import AuthShell from "../components/AuthShell.jsx";
 
 // Opened from the emailed link: /portal/reset-password?token=…
 // The token is read once and immediately removed from the address bar/history.
@@ -44,31 +43,27 @@ export default function ResetPassword() {
   const toLogin = () => { window.location.href = (import.meta.env.BASE_URL || "/"); };
 
   return (
-    <div className="login">
-      <HudField />
-      <div className="login-card card">
-        <div className="brand"><BrandLockup height={26} /> <span>PORTAL</span></div>
-        {done ? (
-          <>
-            <p className="login-sub" style={{ color: "var(--green)" }}>Password updated. Every other session has been signed out.</p>
-            <button className="btn gold" onClick={toLogin}>Sign in</button>
-          </>
-        ) : !token ? (
-          <>
-            <p className="login-sub">This reset link is incomplete. Open the link from your email again, or request a new one.</p>
-            <button className="btn gold" onClick={toLogin}>Back to sign in</button>
-          </>
-        ) : (
-          <form onSubmit={submit}>
-            <p className="login-sub">Choose a password for your account (at least 8 characters, not a common password).</p>
-            <label>New password<input type="password" value={f.next} onChange={(e) => setF((s) => ({ ...s, next: e.target.value }))} autoComplete="new-password" minLength={8} maxLength={128} required autoFocus /></label>
-            <label>Confirm new password<input type="password" value={f.confirm} onChange={(e) => setF((s) => ({ ...s, confirm: e.target.value }))} autoComplete="new-password" minLength={8} maxLength={128} required /></label>
-            {err && <div className="form-err">{err}</div>}
-            <button className="btn gold" type="submit" disabled={busy}>{busy ? "Saving…" : "Set new password"}</button>
-            <p className="login-note"><a href="#" onClick={(e) => { e.preventDefault(); toLogin(); }}>Back to sign in</a></p>
-          </form>
-        )}
-      </div>
-    </div>
+    <AuthShell>
+      {done ? (
+        <>
+          <p className="login-sub" style={{ color: "var(--green)" }}>Password updated. Every other session has been signed out.</p>
+          <button className="btn gold" onClick={toLogin}>Sign in</button>
+        </>
+      ) : !token ? (
+        <>
+          <p className="login-sub">This reset link is incomplete. Open the link from your email again, or request a new one.</p>
+          <button className="btn gold" onClick={toLogin}>Back to sign in</button>
+        </>
+      ) : (
+        <form onSubmit={submit}>
+          <p className="login-sub">Choose a password for your account (at least 8 characters, not a common password).</p>
+          <label>New password<input type="password" value={f.next} onChange={(e) => setF((s) => ({ ...s, next: e.target.value }))} autoComplete="new-password" minLength={8} maxLength={128} required autoFocus /></label>
+          <label>Confirm new password<input type="password" value={f.confirm} onChange={(e) => setF((s) => ({ ...s, confirm: e.target.value }))} autoComplete="new-password" minLength={8} maxLength={128} required /></label>
+          {err && <div className="form-err">{err}</div>}
+          <button className="btn gold" type="submit" disabled={busy}>{busy ? "Saving…" : "Set new password"}</button>
+          <p className="login-note"><a href="#" onClick={(e) => { e.preventDefault(); toLogin(); }}>Back to sign in</a></p>
+        </form>
+      )}
+    </AuthShell>
   );
 }

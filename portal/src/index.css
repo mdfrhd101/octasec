@@ -61,11 +61,16 @@ input:focus,select:focus{outline:none;border-color:rgba(232,67,58,.55);box-shado
   --f-line:47,174,120; --f-dot:120,210,165; --f-hot:232,67,58;
   /* the portal's own tokens follow, for inline colours on these screens */
   --text:var(--h-ink); --muted:var(--h-dim); --faint:var(--h-faint); --line:var(--h-line); --green:var(--h-green-ink); --red:var(--h-red-ink); --gold:var(--h-red-ink);
-  position:relative;z-index:0;min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:clamp(20px,5vh,56px) 16px;
+  position:relative;z-index:0;min-height:100vh;min-height:100dvh;display:grid;grid-template-rows:auto 1fr;row-gap:12px;place-items:center;padding:clamp(20px,5vh,56px) 16px;
   font-family:var(--h-body);color:var(--h-ink);
   background:radial-gradient(55% 45% at 66% 24%,rgba(0,106,78,.28),transparent 70%),radial-gradient(35% 35% at 4% 98%,rgba(232,67,58,.09),transparent 70%),var(--h-void);
 }
 .login > .h-field{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.7}
+.login > .spin{grid-row:1 / -1}
+/* the logo, top left: back to the website */
+.login-home{justify-self:start;align-self:start;display:inline-flex;align-items:center;min-height:44px;margin:-8px 0 0 clamp(0px,calc(3vw - 16px),32px);transition:opacity .2s}
+.login-home:hover{opacity:.8}
+.login-home:focus-visible{outline:2px solid var(--h-ink);outline-offset:4px}
 
 /* chamfered frames: clip the box; ::before = 1px edge, ::after = the two diagonals */
 .login :is(.login-card,.rolebtns button,.btn.gold){clip-path:polygon(0 0,calc(100% - var(--c)) 0,100% var(--c),100% 100%,var(--c) 100%,0 calc(100% - var(--c)))}
@@ -80,11 +85,11 @@ input:focus,select:focus{outline:none;border-color:rgba(232,67,58,.55);box-shado
 
 .login .login-card{--c:20px;width:min(100%,460px);padding:26px clamp(20px,5vw,34px) clamp(24px,4vw,30px);text-align:left;
   border:0;border-radius:0;overflow:visible;background:var(--h-glass);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
-.login .brand{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:inherit;letter-spacing:normal}
+.login .brand{display:flex;align-items:center;font-size:inherit;letter-spacing:normal}
 .login .brand span{display:inline-flex;align-items:center;gap:7px;padding:6px 9px 6px 8px;font:600 10px/1 var(--h-disp);letter-spacing:.1em;white-space:nowrap;
   color:var(--h-green-ink);background:var(--h-ok-bg);border:1px solid color-mix(in srgb,var(--h-green-ink) 45%,transparent)}
 .login .brand span::before{content:"";width:6px;height:6px;flex:none;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
-.login-title{margin-top:24px;font:700 clamp(24px,6vw,30px)/1.15 var(--h-disp);letter-spacing:.01em;color:var(--h-ink);text-wrap:balance}
+.login-title{margin-top:20px;font:700 clamp(24px,6vw,30px)/1.15 var(--h-disp);letter-spacing:.01em;color:var(--h-ink);text-wrap:balance}
 .login-sub{margin:10px 0 24px;font:400 16px/1.55 var(--h-body);color:var(--h-dim)}
 .brand + .login-sub{margin-top:24px}
 .login-card form > .login-sub{margin:24px 0 0}
