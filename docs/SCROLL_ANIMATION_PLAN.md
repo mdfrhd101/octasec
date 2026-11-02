@@ -1,5 +1,42 @@
 # Scroll animation — "Denied… then OctaSec gets in"
 
+## Now on the homepage: an autoplay video (2026-11-02)
+
+Everything below this section is the history of the scroll-scrubbed test. What the site runs today:
+
+- `components/filmBoot.ts`: an inline script in the homepage's HTML. It picks a file, fetches all of it at high priority, then
+  plays it. A film that is all in memory can't stall, and the script doesn't wait for the JS bundle.
+- `components/BreachIntro.tsx`: the stage markup and the mark's flight into the hero's globe once the video ends.
+- `breach-scroll.css`: everything on top of the video runs on CSS clocks, so a busy main thread can't make it stutter.
+- The video has the old film's speed ramp baked in (4.6 s), so the browser only plays it.
+
+| File | Size | Who gets it | Codec settings |
+| --- | --- | --- | --- |
+| `film-x.av1.mp4` / `film-x.hevc.mp4` | 1053 / 1684 KB | 2560px: big or high-DPI screens with hardware decoding or 8+ desktop cores (never Firefox) | AV1 CRF 50 / HEVC CRF 32 |
+| `film-d.av1.mp4` / `film-d.hevc.mp4` | 647 / 953 KB | 1600px: other computers | AV1 CRF 48 / HEVC CRF 31 |
+| `film-m.av1.mp4` / `film-m.hevc.mp4` | 270 / 373 KB | 854px: phones and links around 1 Mbps | AV1 CRF 48 / HEVC CRF 31 |
+| `film-s.av1.mp4` / `film-s.hevc.mp4` | 139 / 138 KB | 704px, 24 fps, not sharpened: slow links, down to 256 kbps | AV1 CRF 49 / HEVC CRF 35 |
+| `film-m.h264.mp4` | 377 KB | last resort if neither AV1 nor HEVC plays | H.264 CRF 29 |
+
+AV1 is tried first, then HEVC (Safari and iPhones without AV1 hardware), then H.264. If nothing plays, or autoplay is blocked (for
+example iOS Low Power Mode), the page goes straight to the hero. All 30 fps except the `s` files, 10-bit except H.264, BT.709,
+`hvc1` tag, `moov` first. A file that would take more than 3 s while a smaller one exists is dropped for the smaller one mid-download.
+
+VMAF against the masters, measured as the visitor sees it (old frame sets on the film's clock, with their blending):
+old 2560px 85.9, 1600px 84.9, 800px phone 77.3; new `x` 92.1, `d` 91.4, `m` 89.8. The `s` file scores 89.0 against its own
+704px source, but on a large screen it is visibly softer than `d`: at 256 kbps there is no way to deliver the sharp file in time.
+
+Slow links: on a slow link (`bxi-slow`) nothing on the page uses the web fonts until the film is done, so they don't compete with
+it. At 256 kbps a page load costs about 370 KB before the hero: 28 KB HTML, 47 KB CSS, 148 KB JS, 139 KB film.
+
+Masters and tools, outside the public repo (`D:\AI\media\octasec-scroll-anim\tools\`): `build_film.py` (speed ramp → lossless
+master), `film_bench.py` (sharpened sources, VMAF), `film_final.py` (slow encodes), `film_low.py` (the `s` tier), `film_score.py`.
+
+Deploy: nginx needs `mp4` in its cached static types and `media-src 'self' blob:` in the site's CSP (`deploy/nginx.conf`, `deploy/docker/nginx.container.conf`).
+With an old CSP the film still plays: the script falls back to the file's URL. Check after deploying: real Safari on a Mac and an iPhone.
+
+---
+
 Status: test build (2026-10-26). The owner's 10-beat storyboard → Gemini images + Veo clips → a
 scroll-scrubbed `<canvas>` (scroll down plays forward, scroll up plays backward).
 Still open: placement on the site, caption wording.

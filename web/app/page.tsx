@@ -10,10 +10,9 @@ export default function HomePage() {
   return (
     <div className="hud-home">
       <JsonLd data={serviceLd} />
-      {/* autoplay intro film, ~6.5 s on every load (no Skip button, no captions; a click,
-          scroll or Esc still skips it). Its mark now lands on the globe's core, and the
-          sphere forms outward from there. Off with reduced motion. */}
-      <BreachIntro target=".hud-hero .hud-core" once={false} skipButton={false} captions={false} />
+      {/* autoplay intro film, 6 s on every load (a click, scroll or Esc skips it). Its mark lands on the
+          globe's core, and the sphere forms outward from there. Off with reduced motion. */}
+      <BreachIntro target=".hud-hero .hud-core" />
       <HudHero />
       <HudNumbers />
       <HudProblem />

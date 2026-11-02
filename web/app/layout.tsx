@@ -100,7 +100,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){document.documentElement.classList.add('js');try{var t=localStorage.getItem('octasec-theme');if(t!=='dark'&&t!=='light')t='dark';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='light'?'#f4f7fb':'#00080b');}catch(e){}})();",
+              "(function(){document.documentElement.classList.add('js');if(location.pathname==='/')document.documentElement.classList.add('bxi-slow');try{var t=localStorage.getItem('octasec-theme');if(t!=='dark'&&t!=='light')t='dark';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='light'?'#f4f7fb':'#00080b');}catch(e){}})();",
           }}
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
