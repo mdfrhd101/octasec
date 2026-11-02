@@ -33,16 +33,24 @@ export default function SmoothScroll() {
   // that stream pauses: the new page opens at the top, and the next deliberate scroll works as usual.
   // The wheel listener exists only for that moment: a permanent non-passive one makes the browser
   // wait for the main thread before every native scroll step.
+  // Without Lenis (Firefox, reduced motion) the browser scrolls natively and a listener added mid-stream
+  // can't cancel it (real wheel input, 2026-11-02: top of the new page, its footer 45 ms later). So the page
+  // can't scroll at all until the stream pauses (html.nav-hold); Next's own jump to the top still works.
   useEffect(() => {
     let swallow = false;
     let timer = 0;
     let since = 0;
+    const html = document.documentElement;
     const release = () => {
       swallow = false;
+      html.classList.remove("nav-hold");
       window.removeEventListener("wheel", onWheel, { capture: true });
     };
     const holdUntilPause = () => {
-      if (!swallow) window.addEventListener("wheel", onWheel, { capture: true, passive: false });
+      if (!swallow) {
+        window.addEventListener("wheel", onWheel, { capture: true, passive: false });
+        if (!window.__lenis) html.classList.add("nav-hold");
+      }
       swallow = true;
       clearTimeout(timer);
       timer = window.setTimeout(release, 300); // a 300 ms gap = the stream has ended
@@ -66,6 +74,7 @@ export default function SmoothScroll() {
     return () => {
       window.removeEventListener("wheel", onWheel, { capture: true });
       document.removeEventListener("click", onClick, true);
+      html.classList.remove("nav-hold");
       clearTimeout(timer);
     };
   }, []);

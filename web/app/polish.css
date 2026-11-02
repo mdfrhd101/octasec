@@ -86,6 +86,8 @@ footer{font-size:15px}.foot-grid a,.foot-grid p{font-size:15px}.foot-copy,.foot-
 :root[data-theme="light"] input:-webkit-autofill:focus,:root[data-theme="light"] input:-webkit-autofill:active{-webkit-box-shadow:0 0 0 1000px #fff inset;box-shadow:0 0 0 1000px #fff inset}
 /* in-page anchors (#privacy, #terms…) landed under the fixed header on desktop (phones/tablets: mobile.css) */
 @media (min-width:901px){html{scroll-padding-top:96px}}
+/* just after a click on a link, until the wheel stream pauses (SmoothScroll): the gutter keeps the page from shifting */
+html.nav-hold{overflow:hidden;scrollbar-gutter:stable}
 /* skip link: the first Tab stop on every page, visible only while focused */
 .skip-link{position:fixed;left:16px;top:-80px;z-index:10000;padding:12px 18px;border-radius:10px;background:var(--text);color:var(--bg);font-weight:600;text-decoration:none}
 .skip-link:focus{top:12px}
